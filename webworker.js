@@ -1,3 +1,5 @@
+// This file helps make the compiled js file be imported as a web worker
+// *the web worker will be imported by magickApi.js
 
 if (typeof Module == "undefined") {
     Module = {
