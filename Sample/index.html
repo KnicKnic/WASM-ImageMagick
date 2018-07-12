@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <title>Wasm ImageMagick</title>
+  <script DEFER src="https://cdn.jsdelivr.net/g/filesaver.js"></script>
+  <script DEFER src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+</head>
+
+<body>
+  <br> Magick command
+<br>
+  <input type="text" id="magickCommand" size=120 value="convert * -flatten -crop x20% +repage -quality 100 -scene 0 -set filename:mysize %t %[filename:mysize]-%d.jpeg">
+  <br>
+  <input type=file name=file id="your-files" aria-label="File Input" accept=".jpg,.jpeg,.png,.bmp,.tif,.tiff,.psd" multiple>
+  <br>
+  <p>share url for this command <span id="shareUrl"></span></p>
+  <div id="Processing" hidden>
+    <H2>Splitting pictures, ignore unresponsive webpage and wait up to 60 seconds per file, then give up.</H2>
+    <H2 id="files-remaining" hidden>0</H2>
+  </div>
+  <button id="GenerateZip" disabled>Generate Zip of Images</button>
+  <div id="imageHolder" class="image-holder" style="display:flex;flex-direction:column;align-items: flex-start"></div>
+
+  <script type='module'>
+    //import the library to talk to imagemagick
+    import * as Magick from './magickApi.js';
+
+    // various html elements
+    let magickCommand = document.getElementById("magickCommand");
+    let shareUrl = document.getElementById("shareUrl");
+    let imageHolder = document.getElementById('imageHolder');
+    let processing = document.getElementById("Processing");
+    let filesRemaining = document.getElementById("files-remaining");
+    let yourFiles = document.getElementById("your-files");
+    let generateZip = document.getElementById("GenerateZip")
+
+
+    // deal with input urls
+    {
+      let hash = window.location.hash;
+      if(hash.length >1)
+      {
+        magickCommand.value = decodeURIComponent(hash.substring(2))
+      }
+
+      function cmdChange(){
+        shareUrl.innerText=window.location.href.split('#')[0] + "#!" + encodeURIComponent(magickCommand.value);
+      }
+      cmdChange()
+      magickCommand.oninput = cmdChange;
+    }
+
+    //generate zips
+    {
+      function GenerateZip() {
+        let zip = new JSZip();
+
+        if (imageHolder.hasChildNodes()) {
+          let children = imageHolder.childNodes;
+          for (let i = 0; i < children.length; i++) {
+            let child = children[i].wasmResponse;
+
+            zip.file(child['name'], child['blob'])
+          }
+          zip.generateAsync({ type: "blob" })
+            .then(function (content) {
+              // see FileSaver.js
+              saveAs(content, "out.zip");
+            });
+        }
+      };
+      generateZip.onclick = GenerateZip;
+    }
+
+    // helper to read user inputed files
+    function ReadFile(file){
+      let readFile = Magick.CreatePromiseEvent();
+
+      // read fileName & content
+      let fr = new FileReader();
+      fr.onload = function (txt) {
+        let fileName = file.name
+
+        let encoded_txt = txt.target.result;
+        let content = new Uint8Array(encoded_txt);
+        let sourceFilename = fileName
+        
+        readFile['resolve']([sourceFilename, content]);
+      }
+      fr.readAsArrayBuffer(file);
+
+      return readFile;
+    };
+
+    let SetProcessing = function (isProcessing){
+        //filesRemaining.hidden = !isProcessing;
+        processing.hidden = !isProcessing;
+    }
+
+    // handle new images to process
+    let processFiles = async function () {
+      // When the yourFiles has changed, there are new files
+      let files = yourFiles.files;
+
+      if (files.length > 0) {
+        //clean up old images and show processing screen
+        SetProcessing(true);
+        imageHolder.innerHTML = '';
+
+        // for each file requested split them (files isn't an array)
+        let toProcess=[];
+        for (let fileIndex = 0; fileIndex < files.length; ++fileIndex) {
+          filesRemaining.innerText = "" + (files.length - fileIndex);
+          let [fileName,content] = await ReadFile(files[fileIndex]);
+          toProcess.push({'name': fileName, 'content': content})
+        }
+
+        let cmd = magickCommand.value;
+        let splitFiles = await Magick.Call(toProcess, cmd.split(" "));
+                                              
+        for (let file of splitFiles) {
+          let img = document.createElement('img');
+          img.src = URL.createObjectURL(file['blob']);
+          img.name = file['name']
+          img.wasmResponse = file
+          imageHolder.appendChild(img);
+        }    
+        
+        SetProcessing(false);
+      }
+      generateZip.disabled=!imageHolder.hasChildNodes();
+    };
+    yourFiles.addEventListener("change", function (event) {
+      event.preventDefault();
+      processFiles();
+    }, false);
+  </script>
+</body>
+
+</html>
