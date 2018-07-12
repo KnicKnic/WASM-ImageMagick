@@ -13,6 +13,7 @@ emcmake make -s ALLOW_MEMORY_GROWTH=1    CFLAGS="-O3" CXXFLAGS="-O3"
 
 cd /code/libjpeg
 emcmake make -s ALLOW_MEMORY_GROWTH=1    clean
+autoreconf -fvi
 emconfigure ./configure --disable-shared
 emcmake make -s ALLOW_MEMORY_GROWTH=1    clean
 emcmake make -s ALLOW_MEMORY_GROWTH=1      CFLAGS="-O3" CXXFLAGS="-O3" 
@@ -49,4 +50,5 @@ emconfigure ./configure --prefix=/ --disable-shared --without-threads --without-
 emcmake make -s ALLOW_MEMORY_GROWTH=1    CFLAGS="-O3" CXXFLAGS="-O3" 
 
 #produce the correct output file
-/bin/bash ./libtool --silent --tag=CC   --mode=link emcc --pre-js /code/webworker.js -s ALLOW_MEMORY_GROWTH=1    -O3 -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -o utilities/magick.html utilities/magick.o MagickCore/libMagickCore-7.Q16HDRI.la MagickWand/libMagickWand-7.Q16HDRI.la 
+#/bin/bash ./libtool --silent --tag=CC   --mode=link emcc --pre-js /code/webworker.js -s ALLOW_MEMORY_GROWTH=1    -O3 -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -o utilities/magick.html utilities/magick.o MagickCore/libMagickCore-7.Q16HDRI.la MagickWand/libMagickWand-7.Q16HDRI.la 
+/bin/bash ./libtool --silent --tag=CC   --mode=link emcc -s ALLOW_MEMORY_GROWTH=1    -O3 -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -o utilities/magick.html utilities/magick.o MagickCore/libMagickCore-7.Q16HDRI.la MagickWand/libMagickWand-7.Q16HDRI.la 

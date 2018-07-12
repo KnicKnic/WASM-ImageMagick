@@ -5,4 +5,7 @@ docker build -t wasm-imagemagick-build-tools .
 
 docker run --rm -it --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash ./build.sh
 
+#windows cmd
+#docker run --rm -it --workdir /code -v %CD%:/code wasm-imagemagick-build-tools bash ./build.sh
+
 ```
