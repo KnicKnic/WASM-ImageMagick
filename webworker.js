@@ -1,32 +1,29 @@
 
 if (typeof Module == "undefined") {
     Module = {
-      'noInitialRun' : true
+      'noInitialRun' : true,
+      'moduleLoaded' : false,
+      'messagesToProcess' : []      
     };
  // see https://kripken.github.io/emscripten-site/docs/api_reference/module.html
+    Module.onRuntimeInitialized = function (){
+        //console.log('loaded wasm')
+        FS.mkdir('/pictures');
+        FS.currentPath = '/pictures'
+    
+        Module.moduleLoaded = true;
+        //alert('loaded')
+        processFiles();
+    };
 }
 
-// import "./magick";
-
-var moduleLoaded = false;
-var messagesToProcess = [];
-Module.onRuntimeInitialized = function (){
-  //console.log('loaded wasm')
-  FS.mkdir('/pictures');
-  FS.currentPath = '/pictures'
-
-  moduleLoaded = true;
-  //alert('loaded')
-  processFiles();
-};
-
-processFiles = function(){
-    if(!moduleLoaded)
+let processFiles = function(){
+    if(!Module.moduleLoaded)
     {
         return;
     }
     
-    for( let message of messagesToProcess)
+    for( let message of Module.messagesToProcess)
     {
         for( let file of message['files'])
         {
@@ -59,11 +56,11 @@ processFiles = function(){
         message['processed'] = responseFiles
         postMessage(message);
     }
-    messagesToProcess = [];
+    Module.messagesToProcess = [];
 };
 
-onmessage = function(magickRequest) {
-    messagesToProcess.push(magickRequest.data);
+let onmessage = function(magickRequest) {
+    Module.messagesToProcess.push(magickRequest.data);
     //console.log('Message received from main script ' + picture);
     processFiles();
   }
