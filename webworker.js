@@ -19,7 +19,7 @@ if (typeof Module == "undefined") {
     };
 }
 
-let processFiles = function(){
+processFiles = function(){
     if(!Module.moduleLoaded)
     {
         return;
@@ -61,7 +61,7 @@ let processFiles = function(){
     Module.messagesToProcess = [];
 };
 
-let onmessage = function(magickRequest) {
+onmessage = function(magickRequest) {
     Module.messagesToProcess.push(magickRequest.data);
     //console.log('Message received from main script ' + picture);
     processFiles();
