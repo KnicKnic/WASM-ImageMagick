@@ -28,3 +28,20 @@ docker run --rm -it --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools
 #docker run --rm -it --workdir /code -v %CD%:/code wasm-imagemagick-build-tools bash ./build.sh
 
 ```
+
+Produces magick.js & magick.wasm in the current folder. Along with magickApi.js that is all the files needed on the webserver.
+
+To use, 
+1. import magickApi.js in a javascript module
+1. call "Call" in the module
+    1. Pass in 2 parameters, 
+        1. an array of objects 
+            1. name:"filename" 
+            1. blob: new Uint8Array(contents)
+        1. array of magick cmdline args
+    1. example: [{name: "filenamestring", blob: new Uint8Array(imageContents)}], ["mogrify", "-thumbnail", "10%", "*"]
+1. get promise 
+    1. on Success an array of objects
+        1. name: "filename" 
+        1. blob: new Blob(contents)
+    1. on error a string
