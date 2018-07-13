@@ -9,13 +9,15 @@
 </head>
 
 <body>
-  <br> Magick command
+  For license info of this project and related components see <a href="https://github.com/knicknic/WASM-ImageMagick">https://github.com/knicknic/WASM-ImageMagick</a>
+  <br><br> Magick command
 <br>
   <input type="text" id="magickCommand" size=120 value="convert * -flatten -crop x20% +repage -quality 100 -scene 0 -set filename:mysize %t %[filename:mysize]-%d.jpeg">
   <br>
   <input type=file name=file id="your-files" aria-label="File Input" accept=".jpg,.jpeg,.png,.bmp,.tif,.tiff,.psd" multiple>
   <br>
   <p>share url for this command <span id="shareUrl"></span></p>
+  <p>*share format will change in future, so don't give out links <b>JUST YET.</b></p>
   <div id="Processing" hidden>
     <H2>Splitting pictures, ignore unresponsive webpage and wait up to 60 seconds per file, then give up.</H2>
     <H2 id="files-remaining" hidden>0</H2>

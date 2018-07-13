@@ -39,7 +39,11 @@ processFiles = function(){
         for( let file of message['files'])
         {
             // cleanup source files
-            FS.unlink(file['name'])
+            // mogrify then output files have same name, so skip
+            if(message['args'][0] != "mogrify")
+            {
+                FS.unlink(file['name'])
+            }
         }
                 
         let dir = FS.open('/pictures')
@@ -66,3 +70,4 @@ onmessage = function(magickRequest) {
     //console.log('Message received from main script ' + picture);
     processFiles();
   }
+
