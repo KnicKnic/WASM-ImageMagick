@@ -6,23 +6,79 @@
   <title>Wasm ImageMagick</title>
   <script DEFER src="https://cdn.jsdelivr.net/g/filesaver.js"></script>
   <script DEFER src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+  <style>
+    table,
+    th,
+    td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+  </style>
 </head>
 
 <body>
   For license info of this project and related components see <a href="https://github.com/knicknic/WASM-ImageMagick">https://github.com/knicknic/WASM-ImageMagick</a>
-  <br><br> Magick command
-<br>
-  <input type="text" id="magickCommand" size=120 value="convert * -flatten -crop x20% +repage -quality 100 -scene 0 -set filename:mysize %t %[filename:mysize]-%d.jpeg">
+  <br><p id="descriptionTxt">Enter description</p>
+  <div id="advancedOptions" hidden>
+    
+  
+    <table>
+      <tr>
+        <th>Advanced Options</th>
+        <th>Values</th>
+      </tr>
+      <tr>
+        <td>
+          <label for="descriptionInput">Description</label>
+        </td>
+        <td>
+            <input type="text" id="descriptionInput" size=120 value="Enter description">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="magickCommand">Magick command</label>
+        </td>
+        <td>
+            <input type="text" id="magickCommand" size=120 value="convert * -flatten -crop x20% +repage -quality 100 -scene 0 -set filename:mysize %t %[filename:mysize]-%d.jpeg">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="autoZip">Generate Zip when done processing</label>
+        </td>
+        <td>
+          <input type="checkbox" name="autoZip" id="autoZip" value="1">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="magickEachPicture">Run command for each picture</label>
+        </td>
+        <td>
+          <input type="checkbox" name="" id="magickEachPicture" value="1" />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label for="showAdvanced">Url shows advanced options</label>
+        </td>
+        <td>
+          <input type="checkbox" name="" id="showAdvanced" value="1" />
+        </td>
+      </tr>
+    </table>
+  <p>Share command url: <a id="shareUrl"></a></p>
+  <button id="GenerateZip" disabled>Generate Zip of Images</button>
   <br>
-  <input type=file name=file id="your-files" aria-label="File Input" accept=".jpg,.jpeg,.png,.bmp,.tif,.tiff,.psd" multiple>
   <br>
-  <p>share url for this command <span id="shareUrl"></span></p>
-  <p>*share format will change in future, so don't give out links <b>JUST YET.</b></p>
+</div>
+<input type=file name=file id="your-files" aria-label="File Input" accept=".jpg,.jpeg,.png,.bmp,.tif,.tiff,.psd" multiple>
+<button id="advancedOptionsButton" >Advanced Options</button>
   <div id="Processing" hidden>
-    <H2>Splitting pictures, ignore unresponsive webpage and wait up to 60 seconds per file, then give up.</H2>
+    <H2>Processing pictures, ignore unresponsive webpage and wait up to 60 seconds per file, then give up.</H2>
     <H2 id="files-remaining" hidden>0</H2>
   </div>
-  <button id="GenerateZip" disabled>Generate Zip of Images</button>
   <div id="imageHolder" class="image-holder" style="display:flex;flex-direction:column;align-items: flex-start"></div>
 
   <script type='module'>
@@ -30,13 +86,20 @@
     import * as Magick from './magickApi.js';
 
     // various html elements
+    let advancedOptions = document.getElementById('advancedOptions');
+    let descriptionTxt = document.getElementById("descriptionTxt");
+    let descriptionInput = document.getElementById("descriptionInput");
     let magickCommand = document.getElementById("magickCommand");
+    let autoZip = document.getElementById("autoZip");
+    let magickEachPicture = document.getElementById("magickEachPicture");
+    let showAdvanced = document.getElementById("showAdvanced");
     let shareUrl = document.getElementById("shareUrl");
-    let imageHolder = document.getElementById('imageHolder');
-    let processing = document.getElementById("Processing");
-    let filesRemaining = document.getElementById("files-remaining");
-    let yourFiles = document.getElementById("your-files");
     let generateZip = document.getElementById("GenerateZip")
+    let yourFiles = document.getElementById("your-files");
+    let advancedOptionsButton = document.getElementById('advancedOptionsButton');
+    let imageHolder = document.getElementById('imageHolder');
+    let filesRemaining = document.getElementById("files-remaining");
+    let processing = document.getElementById("Processing");
 
 
     // deal with input urls
@@ -44,37 +107,70 @@
       let hash = window.location.hash;
       if(hash.length >1)
       {
-        magickCommand.value = decodeURIComponent(hash.substring(2))
+        try{
+          let options = JSON.parse(decodeURIComponent(hash.substring(2)));
+          descriptionInput.value = options['desc'];
+          magickCommand.value = options['cmd'];
+          autoZip.checked = options['autoZip'];
+          magickEachPicture.checked = options['magickEachPicture'];
+          advancedOptions.hidden = !options['showAdvanced'];
+          showAdvanced.checked = options['showAdvanced'];
+        }
+        catch(e){
+          advancedOptions.hidden = false;
+        }
       }
+      else{
+        advancedOptions.hidden = false;
+      }
+      advancedOptionsButton.onclick = function(){advancedOptions.hidden = !advancedOptions.hidden;};
 
-      function cmdChange(){
-        shareUrl.innerText=window.location.href.split('#')[0] + "#!" + encodeURIComponent(magickCommand.value);
+      let calculateShareUrl = function(){
+        let shareUrlObj = {}
+        shareUrlObj['desc'] = descriptionInput.value;
+        shareUrlObj['cmd'] = magickCommand.value;
+        shareUrlObj['autoZip'] = autoZip.checked;
+        shareUrlObj['magickEachPicture'] = magickEachPicture.checked;
+        shareUrlObj['showAdvanced'] = showAdvanced.checked;
+        shareUrl.href=window.location.href.split('#')[0] + "#!" + encodeURIComponent(JSON.stringify(shareUrlObj));
+        shareUrl.innerText = shareUrl.href
+
       }
-      cmdChange()
-      magickCommand.oninput = cmdChange;
+      magickCommand.oninput = calculateShareUrl;
+
+      descriptionInput.oninput = function(){
+        descriptionTxt.innerText = descriptionInput.value;
+        calculateShareUrl();
+      }
+      descriptionInput.oninput();
+
+      autoZip.oninput = calculateShareUrl;
+      magickEachPicture.oninput = calculateShareUrl;
+      showAdvanced.oninput = calculateShareUrl;
+
+      calculateShareUrl();
     }
 
     //generate zips
-    {
-      function GenerateZip() {
-        let zip = new JSZip();
+    
+    function GenerateZip() {
+      let zip = new JSZip();
 
-        if (imageHolder.hasChildNodes()) {
-          let children = imageHolder.childNodes;
-          for (let i = 0; i < children.length; i++) {
-            let child = children[i].wasmResponse;
+      if (imageHolder.hasChildNodes()) {
+        let children = imageHolder.childNodes;
+        for (let i = 0; i < children.length; i++) {
+          let child = children[i].wasmResponse;
 
-            zip.file(child['name'], child['blob'])
-          }
-          zip.generateAsync({ type: "blob" })
-            .then(function (content) {
-              // see FileSaver.js
-              saveAs(content, "out.zip");
-            });
+          zip.file(child['name'], child['blob'])
         }
-      };
-      generateZip.onclick = GenerateZip;
-    }
+        zip.generateAsync({ type: "blob" })
+          .then(function (content) {
+            // see FileSaver.js
+            saveAs(content, "out.zip");
+          });
+      }
+    };
+    generateZip.onclick = GenerateZip;
 
     // helper to read user inputed files
     function ReadFile(file){
@@ -119,10 +215,30 @@
           toProcess.push({'name': fileName, 'content': content})
         }
 
+        function ProcessResponse(file) {
+          let img = document.createElement('img');
+          img.src = URL.createObjectURL(file['blob']);
+          img.name = file['name']
+          img.wasmResponse = file
+          imageHolder.appendChild(img);
+        }    
+
         let cmd = magickCommand.value;
-        let splitFiles = await Magick.Call(toProcess, cmd.split(" "));
-                                              
-        for (let file of splitFiles) {
+        let processedFiles = [];
+
+        if(magickEachPicture.checked)
+        {
+          for (let singleSourceImage of toProcess){
+            let newProcessedFiles = await Magick.Call([singleSourceImage], cmd.split(" "));
+            processedFiles.push(...newProcessedFiles)
+          }
+        }
+        else
+        {          
+          processedFiles = await Magick.Call(toProcess, cmd.split(" "));
+        }
+
+        for (let file of processedFiles){
           let img = document.createElement('img');
           img.src = URL.createObjectURL(file['blob']);
           img.name = file['name']
@@ -131,6 +247,10 @@
         }    
         
         SetProcessing(false);
+        if(autoZip.checked)
+        {
+          GenerateZip();
+        }
       }
       generateZip.disabled=!imageHolder.hasChildNodes();
     };
