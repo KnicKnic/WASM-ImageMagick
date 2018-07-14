@@ -215,14 +215,6 @@
           toProcess.push({'name': fileName, 'content': content})
         }
 
-        function ProcessResponse(file) {
-          let img = document.createElement('img');
-          img.src = URL.createObjectURL(file['blob']);
-          img.name = file['name']
-          img.wasmResponse = file
-          imageHolder.appendChild(img);
-        }    
-
         let cmd = magickCommand.value;
         let processedFiles = [];
 

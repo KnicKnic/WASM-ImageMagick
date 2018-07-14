@@ -1,3 +1,4 @@
 **/magick.js
 **/magick.wasm
 /samples/cmdline/magickApi.js
+/samples/rotate/magickApi.js

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <title>Rotate</title>
+</head>
+
+<body>
+  For license info of this project and related components see
+  <a href="https://github.com/knicknic/WASM-ImageMagick">https://github.com/knicknic/WASM-ImageMagick</a>
+  <BR>
+  <p>Source image: </p>
+  <img id="srcImage" src="rotate.png">
+  <BR>
+  <br>
+  <p>Rotated and enlarged image: </p>
+  <img id="rotatedImage">
+
+  <script type='module'>
+    //import the library to talk to imagemagick
+    import * as Magick from './magickApi.js';
+
+    // various html elements
+    let rotatedImage = document.getElementById('rotatedImage');
+
+    // Fetch the image to rotate, and call image magick
+    let DoMagickCall = async function () {
+      let fetchedSourceImage = await fetch("rotate.png");
+      let arrayBuffer = await fetchedSourceImage.arrayBuffer();
+      let sourceBytes = new Uint8Array(arrayBuffer);
+
+      // calling image magick with one source image, and command to rotate & resize image
+      let processedFiles = await Magick.Call([{ 'name': 'srcFile.png', 'content': sourceBytes }], ["convert", "srcFile.png", "-rotate", "90", "-resize", "200%", "out.png"]);
+
+      // response can be multiple files (example split)
+      // here we know we just have one
+      let firstOutputImage = processedFiles[0]
+      rotatedImage.src = URL.createObjectURL(firstOutputImage['blob'])
+      console.log("created image " + firstOutputImage['name'])
+    };
+    DoMagickCall();
+  </script>
+</body>
+
+</html>

@@ -1,18 +1,20 @@
 # Web assembly ImageMagick
-This project is not affiliated with [ImageMagick](https://www.imagemagick.org) , but is merely recompiling the code to be [WebAssembly](https://webassembly.org/). I did this because I found it useful to share the power of ImageMagick with people that had problems with cmdline.
+This project is not affiliated with [ImageMagick](https://www.imagemagick.org) , but is merely recompiling the code to be [WebAssembly](https://webassembly.org/). I did this because I found it useful to share the power of ImageMagick with people that struggle with cmdline.
+
+## Simple Sample
+see [samples/rotate#code](samples/rotate#code)
+
+A simple webpage that has image in array and loads magickApi.js to rotate file
+
+Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
 
 ## Status
 Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
 
 * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
-    * see [samples/cmdline])(samples/cmdline)
+    * see [samples/cmdline](samples/cmdline)
 
 * Used in [Croppy](http://croppy.duckdns.org) to split webcomics from one long vertical strip into many panels.
-
-## Simple Sample
-*TODO* 
-
-    Write a simple html that has image in array and loads magickApi.js to rotate file
 
 ## Build instructions
 ```
@@ -31,7 +33,8 @@ docker run --rm -it --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools
 
 Produces magick.js & magick.wasm in the current folder. Along with magickApi.js that is all the files needed on the webserver.
 
-To use, 
+## Usage
+To use, see [samples/rotate#code](samples/rotate#code) for code
 1. import magickApi.js in a javascript module
 1. call "Call" in the module
     1. Pass in 2 parameters, 
@@ -39,7 +42,7 @@ To use,
             1. name:"filename" 
             1. blob: new Uint8Array(contents)
         1. array of magick cmdline args
-    1. example: [{name: "filenamestring", blob: new Uint8Array(imageContents)}], ["mogrify", "-thumbnail", "10%", "*"]
+    1. example: `Call([{name: "filenamestring", blob: new Uint8Array(imageContents)}], ["mogrify", "-thumbnail", "10%", "*"])`
 1. get promise 
     1. on Success an array of objects
         1. name: "filename" 
