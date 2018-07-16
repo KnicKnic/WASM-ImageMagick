@@ -24,7 +24,7 @@ export function Call (inputFiles, command) {
     return emptyPromise;
 }
 
-let magickWorker = new Worker('magick.1.js');
+let magickWorker = new Worker('magick.js');
 
 let magickWorkerPromises = {}
 let magickWorkerPromisesKey = 1
