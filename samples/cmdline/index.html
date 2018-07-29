@@ -101,6 +101,32 @@
     let filesRemaining = document.getElementById("files-remaining");
     let processing = document.getElementById("Processing");
 
+    //service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (registration) {
+          let refreshing;
+          navigator.serviceWorker.addEventListener('controllerchange',
+            function () {
+              if (refreshing) return;
+              refreshing = true;
+              window.location.reload();
+            }
+          );
+
+          if (registration.active) {
+            registration.active.addEventListener('message', function (msg) {
+              alert(msg);
+              location.reload();
+            });
+          }
+        }, function (err) {
+          // registration failed :(
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+
 
     // deal with input urls
     {
