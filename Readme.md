@@ -12,9 +12,10 @@ Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knic
 Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
 
 * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
-    * see [samples/cmdline](samples/cmdline)
+    * For code see [samples/cmdline](samples/cmdline)
 
-* Used in [Croppy](http://croppy.duckdns.org) to split webcomics from one long vertical strip into many panels.
+* Used in [Croppy](https://knicknic.github.io/croppy/) to split webcomics from one long vertical strip into many panels.
+    * For code see https://github.com/KnicKnic/croppy
 
 ## Build instructions
 ```
