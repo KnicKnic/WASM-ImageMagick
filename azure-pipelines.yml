@@ -1,0 +1,25 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+pool:
+  vmImage: 'Ubuntu 16.04'
+
+steps:
+- script: docker build -t wasm-imagemagick-build-tools .
+  displayName: build builder
+
+- script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash ./build.sh 
+  displayName: build wasm
+
+#   # currently fails due to memory error
+#   ## exception thrown: RuntimeError: memory access out of bounds,RuntimeError: memory access out of bounds
+# - script: docker run -v "$PWD":/code --rm --workdir /code node node  /code/tests/rotate/node.js
+#   displayName: test wasm with nodejs
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+    echo TODO figure out how to copy build artifcats
+  displayName: 'Run a multi-line script'
