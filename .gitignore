@@ -2,3 +2,4 @@
 **/magick.wasm
 /samples/cmdline/magickApi.js
 /samples/rotate/magickApi.js
+/tests/rotate/node.js

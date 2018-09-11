@@ -4,7 +4,7 @@ A simple test case to test whether or not wasm file works. I used NodeJS thinkin
 I ended up just copying the wasm loading code to for expedience.
 
 # To run
-run from the root directory of the project (if not on windows change "%CD%" to "$pwd")
+run from the root directory of the project (if on windows change "$PWD" to "%CD%")
 ```
-docker run -v "%CD%":/code --rm -it --workdir /code node node  /code/tests/rotate/node.js
+docker run -v "$PWD":/code --rm -it --workdir /code node node  /code/tests/rotate/node.js
 ```

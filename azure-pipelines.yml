@@ -13,10 +13,10 @@ steps:
 - script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash ./build.sh 
   displayName: build wasm
 
-#   # currently fails due to memory error
-#   ## exception thrown: RuntimeError: memory access out of bounds,RuntimeError: memory access out of bounds
-# - script: docker run -v "$PWD":/code --rm --workdir /code node node  /code/tests/rotate/node.js
-#   displayName: test wasm with nodejs
+  # currently fails due to memory error
+  ## exception thrown: RuntimeError: memory access out of bounds,RuntimeError: memory access out of bounds
+- script: docker run -v "$PWD":/code --rm --workdir /code node node  /code/tests/rotate/node.js
+  displayName: test wasm with nodejs
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.

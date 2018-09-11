@@ -55,3 +55,7 @@ emcmake make -s ALLOW_MEMORY_GROWTH=1    CFLAGS="-O3" CXXFLAGS="-O3"
 cp /code/webworker.js /code/magick.js
 cat /code/ImageMagick/utilities/magick.js >> /code/magick.js
 mv /code/ImageMagick/utilities/magick.wasm  /code/magick.wasm
+
+#produce tests
+cp /code/tests/rotate/node_header.js /code/tests/rotate/node.js
+cat /code/ImageMagick/utilities/magick.js >> /code/tests/rotate/node.js
