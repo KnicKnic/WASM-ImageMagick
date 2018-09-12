@@ -1,4 +1,4 @@
-FROM trzeci/emscripten:sdk-tag-1.38.6-64bit
+FROM trzeci/emscripten:sdk-tag-1.38.11-64bit
 # the latest trzeci/emscripten produces binaries that do not work
 # trzeci/emscripten:sdk-tag-1.38.6-64bit is the sha above
 
