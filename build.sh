@@ -7,19 +7,16 @@ export PKG_CONFIG_PATH="/code/libpng:/code/zlib:/code/libjpeg:/code/libtiff:/cod
 export PNG_LIBS="-L/code/libpng -L/code/libpng/.libs"
 
 cd /code/zlib
-emcmake make -s ALLOW_MEMORY_GROWTH=1    clean
 emconfigure ./configure --static
 emcmake make -s ALLOW_MEMORY_GROWTH=1    CFLAGS="-O3" CXXFLAGS="-O3" 
 
 cd /code/libjpeg
-emcmake make -s ALLOW_MEMORY_GROWTH=1    clean
 autoreconf -fvi
 emconfigure ./configure --disable-shared
 emcmake make -s ALLOW_MEMORY_GROWTH=1    clean
 emcmake make -s ALLOW_MEMORY_GROWTH=1      CFLAGS="-O3" CXXFLAGS="-O3" 
 
 cd /code/libpng
-emcmake make -s ALLOW_MEMORY_GROWTH=1    clean
 libtoolize
 aclocal
 autoreconf
@@ -31,7 +28,6 @@ emconfigure ./configure --disable-shared
 emcmake make -s ALLOW_MEMORY_GROWTH=1     CFLAGS="-O3" CXXFLAGS="-O3" 
 
 cd /code/libtiff
-emcmake make -s ALLOW_MEMORY_GROWTH=1    clean
 libtoolize --force
 aclocal
 autoreconf --force
@@ -44,7 +40,6 @@ emcmake make -s ALLOW_MEMORY_GROWTH=1      CFLAGS="-O3" CXXFLAGS="-O3"
 
 
 cd /code/ImageMagick
-emcmake make -s ALLOW_MEMORY_GROWTH=1    clean
 #emconfigure ./configure --prefix=/ --disable-shared --without-threads --without-magick-plus-plus --without-perl --without-x --disable-largefile --disable-openmp --without-bzlib --without-dps --without-freetype --without-jbig --without-openjp2 --without-lcms --without-wmf --without-xml --without-fftw --without-flif --without-fpx --without-djvu --without-fontconfig --without-raqm --without-gslib --without-gvc --without-heic --without-lqr --without-openexr --without-pango --without-raw --without-rsvg --without-webp --without-xml PKG_CONFIG_PATH="/code/libpng:/code/libpng/.libs:/code/zlib:/code/libjpeg:/code/libtiff:/code/libtiff/libtiff:"
 emconfigure ./configure --prefix=/ --disable-shared --without-threads --without-magick-plus-plus --without-perl --without-x --disable-largefile --disable-openmp --without-bzlib --without-dps --without-freetype --without-jbig --without-openjp2 --without-lcms --without-wmf --without-xml --without-fftw --without-flif --without-fpx --without-djvu --without-fontconfig --without-raqm --without-gslib --without-gvc --without-heic --without-lqr --without-openexr --without-pango --without-raw --without-rsvg --without-webp --without-xml PKG_CONFIG_PATH="/code/libpng:/code/zlib:/code/libjpeg:/code/libtiff:/code/libtiff/libtiff:"
 emcmake make -s ALLOW_MEMORY_GROWTH=1    CFLAGS="-O3" CXXFLAGS="-O3" 
