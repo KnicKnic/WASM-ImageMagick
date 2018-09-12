@@ -2,33 +2,72 @@
 Module = {
     'noInitialRun' : true,
 };
+
+function RotateFile(sourceFileName, destinationFileName)
+{
+    sourceFileNameEmscripten = '/' + sourceFileName;
+    destinationFileNameEmscripten = '/' + destinationFileName;
+    sourceFile = fs.readFileSync(sourceFileName);
+    FS.writeFile(sourceFileNameEmscripten, sourceFile);
+    command =  ["convert", sourceFileNameEmscripten, "-rotate", "90", destinationFileNameEmscripten];
+    if(destinationFileName.endsWith('.png'))
+    {
+        command =  ["convert", sourceFileNameEmscripten, "-rotate", "90", "-define", "png:include-chunk=none", destinationFileNameEmscripten];
+    }
+    console.log(`attempting to convert ${sourceFileName} to ${destinationFileName}` )
+    try{
+        a = Module['callMain'](command);
+        // console.log(`main returned  ${a}` )
+    }
+    catch(e)
+    {
+        console.log(`failed to convert ${sourceFileName} to ${destinationFileName}` )
+        console.log(`exception ${e}` )
+    }
+    
+    console.log(`converted ${sourceFileName} to ${destinationFileName}` )
+    destinationFileEmscripten = FS.readFile(destinationFileNameEmscripten);
+    fs.writeFileSync(destinationFileName,destinationFileEmscripten);
+}
+
+function ValidateFilesSame(leftFileName, rightFileName)
+{
+    leftFile = fs.readFileSync(leftFileName);
+    rightFile = fs.readFileSync(rightFileName);
+    if(leftFile.toString() == rightFile.toString()) // this will not catch 0 padding at ends
+    {
+        console.log(`Files ${leftFileName} and ${rightFileName} are the same` );
+    }
+    else{
+        console.log(`Files ${leftFileName} and ${rightFileName} are different` );
+        process.exit(1);
+    }
+
+}
+
 // see https://kripken.github.io/emscripten-site/docs/api_reference/module.html
 Module.onRuntimeInitialized = function (){
     console.log('loaded wasm');
+    // process.chdir('./tests/rotate');
     
-    unrotated = fs.readFileSync('./tests/rotate/to_rotate.png')
-    // write to emscripten fs so wasm can see it
-    FS.writeFile('/to_rotate.png', unrotated);
-
-    // call application using cmdline
-    console.log("before convert");
-    Module['callMain'](["convert", "/to_rotate.png", "-rotate", "90", "-define", "png:include-chunk=none", "/rotated.png"]);
-    console.log("after convert");
-
-    // write data to local file system
-    rotatedData = FS.readFile('/rotated.png');
-    fs.writeFileSync('./tests/rotate/rotated.png',rotatedData);
+    RotateFile('to_rotate.png', 'rotated.png');
     
-    // validate rotated file 
-    rotatedFile = fs.readFileSync('./tests/rotate/rotated.png')
-    rotatedKnownGood = fs.readFileSync('./tests/rotate/rotatedKnownGood.png')
-    if(rotatedKnownGood.toString() == rotatedFile.toString()) // this will not catch 0 padding at ends
-    {
-        console.log("files are the same");
-        process.exit(0);
-    }
-    console.log("files are different");
-    process.exit(1);
+    RotateFile('to_rotate.png', 'rotated.pst');
+    RotateFile('rotated.pst', 'rotated.pst.png');
+
+    RotateFile('to_rotate.png', 'rotated.jpg');
+    RotateFile('rotated.jpg', 'rotated.jpg.png');
+
+    RotateFile('to_rotate.png', 'rotated.tiff');
+    RotateFile('rotated.tiff', 'rotated.tiff.png');
+
+    RotateFile('to_rotate.png', 'rotated.xcf');
+    RotateFile('rotated.xcf', 'rotated.xcf.png');
+    ValidateFilesSame('rotated.png', 'rotatedKnownGood.png');
+    ValidateFilesSame('rotated.pst.png', 'rotatedKnownGood.pst.png');
+    ValidateFilesSame('rotated.jpg.png', 'rotatedKnownGood.jpg.png');
+    ValidateFilesSame('rotated.tiff.png', 'rotatedKnownGood.tiff.png');
+    ValidateFilesSame('rotated.xcf.png', 'rotatedKnownGood.xcf.png');
 }
 
 var fs = require('fs');
@@ -36,3 +75,4 @@ var fs = require('fs');
 console.log('loading')
 
 // below is the code to load the wasm
+

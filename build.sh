@@ -4,6 +4,7 @@ export LDFLAGS="-L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg
 export CFLAGS="-O3"
 export CXXFLAGS="$CFLAGS"
 MAKE_FLAGS="-s ALLOW_MEMORY_GROWTH=1"
+
 export PKG_CONFIG_PATH="/code/libpng:/code/zlib:/code/libjpeg:/code/libtiff:/code/libtiff/libtiff:"
 export PNG_LIBS="-L/code/libpng -L/code/libpng/.libs"
 
@@ -27,12 +28,18 @@ emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS"
 
 cd /code/libtiff
 libtoolize --force
-# aclocal
+###
+aclocal
+###
+
 autoreconf --force
-# automake --add-missing
-# ./autogen
-# autoconf
-# autoreconf
+#### 
+automake --add-missing
+./autogen
+autoconf
+autoreconf
+####
+
 emconfigure ./configure --disable-shared
 emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
 
@@ -52,3 +59,4 @@ mv /code/ImageMagick/utilities/magick.wasm  /code/magick.wasm
 #produce tests
 cp /code/tests/rotate/node_header.js /code/tests/rotate/node.js
 cat /code/ImageMagick/utilities/magick.js >> /code/tests/rotate/node.js
+cp magick.wasm tests/rotate/magick.wasm
