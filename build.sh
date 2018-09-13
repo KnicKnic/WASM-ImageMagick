@@ -28,17 +28,17 @@ emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS"
 
 cd /code/libtiff
 libtoolize --force
-# ###
-# aclocal
-# ###
+###
+aclocal
+###
 
 autoreconf --force
-# #### 
-# automake --add-missing
-# ./autogen
-# autoconf
-# autoreconf
-# ####
+#### 
+automake --add-missing
+./autogen
+autoconf
+autoreconf
+####
 
 emconfigure ./configure --disable-shared
 emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
