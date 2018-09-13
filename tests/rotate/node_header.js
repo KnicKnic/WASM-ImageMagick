@@ -72,12 +72,12 @@ Module.onRuntimeInitialized = function (){
     // ValidateFilesSame('rotated.jpg.png', 'rotatedKnownGood.jpg.png');
     // ValidateFilesSame('rotated.tiff.png', 'rotatedKnownGood.tiff.png');
     
-    // psd doesnt pass, even thought it works fine
+    // psd doesnt pass, even though it works fine
     // RotateFile('to_rotate.png', 'rotated.psd');
     // RotateFile('rotated.psd', 'rotated.psd.png');
     // ValidateFilesSame('rotated.psd.png', 'rotatedKnownGood.psd.png');
 
-    // xcf doesnt pass, even thought it works fine
+    // xcf doesnt pass, even though it works fine
     // RotateFile('to_rotate.png', 'rotated.xcf');
     // RotateFile('rotated.xcf', 'rotated.xcf.png');
     // ValidateFilesSame('rotated.xcf.png', 'rotatedKnownGood.xcf.png');
