@@ -59,4 +59,4 @@ mv /code/ImageMagick/utilities/magick.wasm  /code/magick.wasm
 #produce tests
 cp /code/tests/rotate/node_header.js /code/tests/rotate/node.js
 cat /code/ImageMagick/utilities/magick.js >> /code/tests/rotate/node.js
-cp magick.wasm tests/rotate/magick.wasm
+cp /code/magick.wasm /code/tests/rotate/magick.wasm
