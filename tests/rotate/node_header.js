@@ -15,8 +15,8 @@ function ValidateFormat(fileName, formatToMatch)
     fileNameEmscripten = '/' + fileName;
     file = fs.readFileSync(fileName);
     FS.writeFile(sourceFileNameEmscripten, sourceFile);
-    // typedSourceFile =  sourceFileNameEmscripten
-    command =  ["identify", "-verbose", fileNameEmscripten];
+    
+    command =  ["identify", fileNameEmscripten];
     // couldnt get just grabbing type to work
     // command =  ["identify", "-format", '"%[page]"', fileNameEmscripten]; 
     console.log(`running command ${command}`)
@@ -92,24 +92,26 @@ Module.onRuntimeInitialized = function (){
     
     console.log('\ntesting if png processing works');
     RotateFile('to_rotate.png', 'rotated.png');
-    // ValidateFormat('to_rotate.png', 'PNG');
+    ValidateFormat('to_rotate.png', 'PNG');
     ValidateFilesSame('rotated.png', 'rotatedKnownGood.png');
 
     console.log('\ntesting if jpg is working');
     RotateFile('to_rotate.jpg', 'rotated.jpg');
-    // ValidateFormat('rotated.jpg', 'JPEG');
+    ValidateFormat('rotated.jpg', 'JPEG');
 
     console.log('\ntesting if tiff is working');
     RotateFile('to_rotate.tiff', 'rotated.tiff');
-    // ValidateFormat('rotated.tiff', 'Tiff');
+    ValidateFormat('rotated.tiff', 'TIFF');
     
 
     console.log('\ntesting if photoshop is working');
     RotateFile('to_rotate.psd', 'rotated.psd');
+    ValidateFormat('rotated.psd', 'PSD');
 
-    
-    console.log('\ntesting if gimp is working');
-    RotateFile('to_rotate.xcf', 'rotated.xcf');
+    // // gimp is not supported
+    // console.log('\ntesting if gimp is working');
+    // RotateFile('to_rotate.xcf', 'rotated.xcf');
+    // ValidateFormat('rotated.xcf', 'xcf');
 }
 
 var fs = require('fs');
