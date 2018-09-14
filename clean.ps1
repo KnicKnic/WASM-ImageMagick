@@ -1,5 +1,5 @@
 function clean(){
-	git clean -fd
+	git clean -fdx
 	git reset --hard HEAD
 }
 cd ImageMagick
@@ -11,4 +11,6 @@ clean
 cd ..\libtiff
 clean
 cd ..\zlib
+clean
+cd ..
 clean
