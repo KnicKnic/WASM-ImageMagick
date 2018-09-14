@@ -1,10 +1,44 @@
 // tell wasm runner to not execute application
+var module_output=''
 Module = {
     'noInitialRun' : true,
+    'print' : function(text) { console.log(`>> stdout >> ${text}`); module_output = text;  },
+    'printErr': function(text) { console.log(`>> stderr >> ${text}`); }
 };
 
 function getExtension(fileName){
   return fileName.substring(fileName.lastIndexOf(".")+1)
+}
+
+function ValidateFormat(fileName, formatToMatch)
+{
+    fileNameEmscripten = '/' + fileName;
+    file = fs.readFileSync(fileName);
+    FS.writeFile(sourceFileNameEmscripten, sourceFile);
+    // typedSourceFile =  sourceFileNameEmscripten
+    command =  ["identify", "-verbose", fileNameEmscripten];
+    // couldnt get just grabbing type to work
+    // command =  ["identify", "-format", '"%[page]"', fileNameEmscripten]; 
+    console.log(`running command ${command}`)
+    matched = false
+    try{
+        module_output = ''
+        a = Module['callMain'](command);
+        form = module_output.split(' ')[1]
+        console.log(`got format ${form}` )
+        if (formatToMatch == form)
+        {matched = true}
+    }
+    catch(e)
+    {
+        console.log(`failed to identify ${fileName}` )
+        console.log(`exception ${e}` )
+    }
+    if(!matched)
+    {
+        console.log(`Error matching format ${formatToMatch}`)
+        process.exit(1);
+    }    
 }
 
 function RotateFile(sourceFileName, destinationFileName)
@@ -13,22 +47,23 @@ function RotateFile(sourceFileName, destinationFileName)
     destinationFileNameEmscripten = '/' + destinationFileName;
     sourceFile = fs.readFileSync(sourceFileName);
     FS.writeFile(sourceFileNameEmscripten, sourceFile);
-    typedSourceFile = getExtension(sourceFileNameEmscripten) + ":" + sourceFileNameEmscripten
-    command =  ["convert", typedSourceFile, "-rotate", "90", destinationFileNameEmscripten];
+    command =  ["convert", sourceFileNameEmscripten, "-rotate", "90", destinationFileNameEmscripten];
     if(destinationFileName.endsWith('.png'))
     {
-        command =  ["convert", typedSourceFile, "-rotate", "90", "-define", "png:include-chunk=none", destinationFileNameEmscripten];
+        command =  ["convert", sourceFileNameEmscripten, "-rotate", "90", "-define", "png:include-chunk=none", destinationFileNameEmscripten];
     }
     console.log(`attempting to convert ${sourceFileName} to ${destinationFileName}` )
+    console.log(`running command ${command}`)
+
     try{
         a = Module['callMain'](command);
-        // console.log(`main returned  ${a}` )
     }
     catch(e)
     {
         console.log(`failed to convert ${sourceFileName} to ${destinationFileName}` )
         console.log(`exception ${e}` )
     }
+    console.log(`ran command ${command}`)
     
     console.log(`converted ${sourceFileName} to ${destinationFileName}` )
     destinationFileEmscripten = FS.readFile(destinationFileNameEmscripten);
@@ -57,30 +92,24 @@ Module.onRuntimeInitialized = function (){
     
     console.log('\ntesting if png processing works');
     RotateFile('to_rotate.png', 'rotated.png');
+    // ValidateFormat('to_rotate.png', 'PNG');
     ValidateFilesSame('rotated.png', 'rotatedKnownGood.png');
-    
+
     console.log('\ntesting if jpg is working');
-    RotateFile('to_rotate.png', 'rotated.jpg');
-    RotateFile('rotated.jpg', 'rotated.jpg.png');
+    RotateFile('to_rotate.jpg', 'rotated.jpg');
+    // ValidateFormat('rotated.jpg', 'JPEG');
 
     console.log('\ntesting if tiff is working');
-    RotateFile('to_rotate.png', 'rotated.tiff');
-    RotateFile('rotated.tiff', 'rotated.tiff.png');
-
-
-    // commenting out below as they did not seem to generate constant rotations
-    // ValidateFilesSame('rotated.jpg.png', 'rotatedKnownGood.jpg.png');
-    // ValidateFilesSame('rotated.tiff.png', 'rotatedKnownGood.tiff.png');
+    RotateFile('to_rotate.tiff', 'rotated.tiff');
+    // ValidateFormat('rotated.tiff', 'Tiff');
     
-    // psd doesnt pass, even though it works fine
-    // RotateFile('to_rotate.png', 'rotated.psd');
-    // RotateFile('rotated.psd', 'rotated.psd.png');
-    // ValidateFilesSame('rotated.psd.png', 'rotatedKnownGood.psd.png');
 
-    // xcf doesnt pass, even though it works fine
-    // RotateFile('to_rotate.png', 'rotated.xcf');
-    // RotateFile('rotated.xcf', 'rotated.xcf.png');
-    // ValidateFilesSame('rotated.xcf.png', 'rotatedKnownGood.xcf.png');
+    console.log('\ntesting if photoshop is working');
+    RotateFile('to_rotate.psd', 'rotated.psd');
+
+    
+    console.log('\ntesting if gimp is working');
+    RotateFile('to_rotate.xcf', 'rotated.xcf');
 }
 
 var fs = require('fs');
