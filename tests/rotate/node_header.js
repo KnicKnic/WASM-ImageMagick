@@ -108,10 +108,10 @@ Module.onRuntimeInitialized = function (){
     RotateFile('to_rotate.psd', 'rotated.psd');
     ValidateFormat('rotated.psd', 'PSD');
 
-    // // gimp is not supported
-    // console.log('\ntesting if gimp is working');
-    // RotateFile('to_rotate.xcf', 'rotated.xcf');
-    // ValidateFormat('rotated.xcf', 'xcf');
+    // gimp encoding is not supported
+    console.log('\ntesting if gimp is working');
+    RotateFile('to_rotate.xcf', 'rotated.xcf.png');
+    ValidateFormat('to_rotate.xcf', 'XCF');
 }
 
 var fs = require('fs');
