@@ -9,7 +9,7 @@ A simple webpage that has image in array and loads magickApi.js to rotate file
 Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
 
 ## Status
-Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
+Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
 
 * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
     * For code see [samples/cmdline](samples/cmdline)
