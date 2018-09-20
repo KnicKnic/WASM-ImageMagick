@@ -18,8 +18,4 @@ steps:
     docker run -v "$PWD":/code --rm --workdir /code node node  /code/node.js
   displayName: test wasm with nodejs
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-    echo TODO figure out how to copy build artifcats
-  displayName: 'Run a multi-line script'
+- task: PublishBuildArtifacts@1
