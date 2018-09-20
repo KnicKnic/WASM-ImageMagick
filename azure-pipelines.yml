@@ -10,6 +10,9 @@ steps:
 - script: docker build -t wasm-imagemagick-build-tools .
   displayName: build builder
 
+- script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash -C chmod -R 777 /code
+  displayName: test chmod 777
+
 - script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash ./build.sh 
   displayName: build wasm
 
@@ -18,12 +21,16 @@ steps:
     docker run -v "$PWD":/code --rm --workdir /code node node  /code/node.js
   displayName: test wasm with nodejs
   
+
+- script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash -C chmod -R 777 /code
+  displayName: run chmod 777
+  
 # Copy Files
 # Copy files from source folder to target folder using match patterns (The match patterns will only match file paths, not folder paths)
 - task: CopyFiles@2
   inputs:
     #sourceFolder: # Optional
-    contents: 'magick.js' 
+    contents: 'magick*' 
     targetFolder: $(Build.ArtifactStagingDirectory)
     #cleanTargetFolder: false # Optional
     #overWrite: false # Optional
