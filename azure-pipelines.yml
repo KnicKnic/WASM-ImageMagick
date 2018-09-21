@@ -22,19 +22,19 @@ steps:
   displayName: test wasm with nodejs
   
 
-- script: sudo chmod -R 777 .
-  displayName: run chmod 777
+- script: cp magick* $(Build.ArtifactStagingDirectory)
+  displayName: cp magick files not using copyFiles
   
 # Copy Files
 # Copy files from source folder to target folder using match patterns (The match patterns will only match file paths, not folder paths)
-- task: CopyFiles@2
-  inputs:
-    #sourceFolder: # Optional
-    contents: 'magick*' 
-    targetFolder: $(Build.ArtifactStagingDirectory)
-    #cleanTargetFolder: false # Optional
-    #overWrite: false # Optional
-    #flattenFolders: false # Optional
+#- task: CopyFiles@2
+#  inputs:
+#    #sourceFolder: # Optional
+#    contents: 'magick*' 
+#    targetFolder: $(Build.ArtifactStagingDirectory)
+#    #cleanTargetFolder: false # Optional
+#    #overWrite: false # Optional
+#    #flattenFolders: false # Optional
     
     
 - task: PublishBuildArtifacts@1
