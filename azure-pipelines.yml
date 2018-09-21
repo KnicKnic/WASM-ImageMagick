@@ -10,7 +10,7 @@ steps:
 - script: docker build -t wasm-imagemagick-build-tools .
   displayName: build builder
 
-- script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash -C chmod -R 777 /code
+- script: sudo chmod -R 777 .
   displayName: test chmod 777
 
 - script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash ./build.sh 
@@ -22,7 +22,7 @@ steps:
   displayName: test wasm with nodejs
   
 
-- script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash -C chmod -R 777 /code
+- script: sudo chmod -R 777 .
   displayName: run chmod 777
   
 # Copy Files
