@@ -10,9 +10,6 @@ steps:
 - script: docker build -t wasm-imagemagick-build-tools .
   displayName: build builder
 
-- script: sudo chmod -R 777 .
-  displayName: test chmod 777
-
 - script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash ./build.sh 
   displayName: build wasm
 
@@ -21,10 +18,11 @@ steps:
     docker run -v "$PWD":/code --rm --workdir /code node node  /code/node.js
   displayName: test wasm with nodejs
   
-
 - script: cp magick* $(Build.ArtifactStagingDirectory)
-  displayName: cp magick files not using copyFiles
+  displayName: cp magick files to artifact staging directory
   
+# # Below doesn't work due to error 
+# # Unhandled: Failed find: ENOENT: no such file or directory, stat '/home/vsts/work/1/s/libpng/compile'
 # Copy Files
 # Copy files from source folder to target folder using match patterns (The match patterns will only match file paths, not folder paths)
 #- task: CopyFiles@2
@@ -35,6 +33,14 @@ steps:
 #    #cleanTargetFolder: false # Optional
 #    #overWrite: false # Optional
 #    #flattenFolders: false # Optional
-    
-    
+
+# Publish Build Artifacts
+# Publish build artifacts to Azure Artifacts/TFS or a file share
 - task: PublishBuildArtifacts@1
+  inputs:
+    #pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+    artifactName: 'magick' 
+    #publishLocation: 'Container' # Options: container, filePath
+    #targetPath: # Required when publishLocation == FilePath
+    #parallel: false # Optional
+    #parallelCount: # Optional
