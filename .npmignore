@@ -4,4 +4,4 @@
 # But not these files...
 !.LICENSE
 !.Readme.md
-# !*/scripts/*
+!/dist/*

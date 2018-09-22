@@ -2,10 +2,11 @@
   "name": "wasm-imagemagick",
   "version": "1.1.0",
   "description": "Webassembly compilation of ImageMagick",
-  "main": "magickApi.js",
+  "main": "dist/magickApi.js",
   "scripts": {
     "test": "echo \"No tests :(\" && exit 1",
-    "postinstall": "npm i download-github-release && npx download-github-release knicknic wasm-imagemagick"
+    "postinstall": "npm i download-github-release && npx download-github-release knicknic wasm-imagemagick",
+    "prepare": "tsc --allowJs magickApi.js --outDir dist"
   },
   "repository": {
     "type": "git",
@@ -26,8 +27,10 @@
   },
   "homepage": "https://github.com/cancerberosgx/WASM-ImageMagick#readme",
   "devDependencies": {
-    "@types/node": "^10.10.3"
+    "@types/node": "^10.10.3",
+    "typescript": "^3.0.3"
   },
   "dependencies": {
+    "download-github-release": "^0.3.2"
   }
 }
