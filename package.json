@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"No tests :(\" && exit 1",
     "postinstall": "npm i --no-save download-github-release && npx download-github-release knicknic wasm-imagemagick",
-    "prepare": "tsc --allowJs magickApi.js --outDir dist"
+    "prepare": "tsc --skipLibCheck --allowJs magickApi.js --outDir dist"
   },
   "repository": {
     "type": "git",
