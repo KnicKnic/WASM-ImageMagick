@@ -1,0 +1,33 @@
+{
+  "name": "wasm-imagemagick",
+  "version": "1.1.0",
+  "description": "Webassembly compilation of ImageMagick",
+  "main": "magickApi.js",
+  "scripts": {
+    "test": "echo \"No tests :(\" && exit 1",
+    "postinstall": "npm i download-github-release && npx download-github-release knicknic wasm-imagemagick"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cancerberosgx/WASM-ImageMagick.git"
+  },
+  "keywords": [
+    "wasm",
+    "webassembly",
+    "imagemagick",
+    "browser",
+    "image",
+    "processing"
+  ],
+  "author": "KnicKnic",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/cancerberosgx/WASM-ImageMagick/issues"
+  },
+  "homepage": "https://github.com/cancerberosgx/WASM-ImageMagick#readme",
+  "devDependencies": {
+    "@types/node": "^10.10.3"
+  },
+  "dependencies": {
+  }
+}
