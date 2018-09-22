@@ -41,16 +41,16 @@ function ValidateFormat(fileName, formatToMatch)
     }    
 }
 
-function RotateFile(sourceFileName, destinationFileName)
+function ConvertImage(sourceFileName, destinationFileName, convertArgs = [])
 {
     sourceFileNameEmscripten = '/' + sourceFileName;
     destinationFileNameEmscripten = '/' + destinationFileName;
     sourceFile = fs.readFileSync(sourceFileName);
     FS.writeFile(sourceFileNameEmscripten, sourceFile);
-    command =  ["convert", sourceFileNameEmscripten, "-rotate", "90", destinationFileNameEmscripten];
+    command =  ["convert", sourceFileNameEmscripten].concat(convertArgs, [destinationFileNameEmscripten]);
     if(destinationFileName.endsWith('.png'))
     {
-        command =  ["convert", sourceFileNameEmscripten, "-rotate", "90", "-define", "png:include-chunk=none", destinationFileNameEmscripten];
+        command =  ["convert", sourceFileNameEmscripten].concat(convertArgs,  ["-define", "png:include-chunk=none", destinationFileNameEmscripten]);
     }
     console.log(`attempting to convert ${sourceFileName} to ${destinationFileName}` )
     console.log(`running command ${command}`)
@@ -62,12 +62,19 @@ function RotateFile(sourceFileName, destinationFileName)
     {
         console.log(`failed to convert ${sourceFileName} to ${destinationFileName}` )
         console.log(`exception ${e}` )
+        return false;
     }
     console.log(`ran command ${command}`)
     
     console.log(`converted ${sourceFileName} to ${destinationFileName}` )
     destinationFileEmscripten = FS.readFile(destinationFileNameEmscripten);
     fs.writeFileSync(destinationFileName,destinationFileEmscripten);
+    return true;
+}
+
+function RotateFile(sourceFileName, destinationFileName)
+{
+    return ConvertImage(sourceFileName, destinationFileName, convertArgs = ["-rotate", "90"])
 }
 
 function ValidateFilesSame(leftFileName, rightFileName)
@@ -112,6 +119,12 @@ Module.onRuntimeInitialized = function (){
     console.log('\ntesting if gimp is working');
     RotateFile('to_rotate.xcf', 'rotated.xcf.png');
     ValidateFormat('to_rotate.xcf', 'XCF');
+
+    if(!ConvertImage('FriedrichNietzsche.png', 'FriedrichNietzsche-charcoal.png', ["-charcoal", "5"]))
+    {
+        console.log("Process IMage threw");
+        process.exit(1);
+    }
 }
 
 var fs = require('fs');
