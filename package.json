@@ -5,7 +5,7 @@
   "main": "dist/magickApi.js",
   "scripts": {
     "test": "echo \"No tests :(\" && exit 1",
-    "postinstall": "npm i download-github-release && npx download-github-release knicknic wasm-imagemagick",
+    "postinstall": "npm i --no-save download-github-release && npx download-github-release knicknic wasm-imagemagick",
     "prepare": "tsc --allowJs magickApi.js --outDir dist"
   },
   "repository": {
@@ -29,8 +29,5 @@
   "devDependencies": {
     "@types/node": "^10.10.3",
     "typescript": "^3.0.3"
-  },
-  "dependencies": {
-    "download-github-release": "^0.3.2"
   }
 }
