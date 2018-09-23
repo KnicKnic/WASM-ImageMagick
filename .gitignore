@@ -3,3 +3,6 @@
 /samples/cmdline/magickApi.js
 /samples/rotate/magickApi.js
 /tests/rotate/node.js
+node_modules
+sample-nodejs-project
+/dist
