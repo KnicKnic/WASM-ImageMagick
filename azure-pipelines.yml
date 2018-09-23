@@ -37,6 +37,7 @@ steps:
 # Publish Build Artifacts
 # Publish build artifacts to Azure Artifacts/TFS or a file share
 - task: PublishBuildArtifacts@1
+  continueOnError: true
   inputs:
     #pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
     artifactName: 'magick' 
