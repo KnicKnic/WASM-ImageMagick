@@ -3,7 +3,7 @@
 rm -rf wasm-imagemagick*.tgz
 npm pack # will generate installable .tgz identical to npmjs.org's 
 
-PROJECT='sample-nodejs-project2'
+PROJECT='sample-nodejs-project'
 rm -rf $PROJECT
 mkdir -p $PROJECT
 

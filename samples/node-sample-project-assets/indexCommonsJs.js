@@ -1,6 +1,7 @@
-// a indexCommonsJs.js and index.html test asset files to test installation experience using npm install and browserify (probably webpack, rollup, typescript, etc. are very similar). 
+// a indexCommonsJs.js and index.html test asset files to test installation experience using npm install and
+// browserify (probably webpack, rollup, typescript, etc. are very similar). 
 
-// In order for this to work user needs to:
+// In order for this to work user needs to enter the following commands (see test-npm-install.sh)
 
 // mkdir myproject 
 // cp ./* myproject # copy these files in the new project
@@ -19,10 +20,11 @@
 
 const Magick = require('wasm-imagemagick')
 
-let rotatedImage = document.getElementById('rotatedImage');
+(async function(){
+  // the image element where to load output images
+  let outputImage = document.getElementById('rotatedImage');
 
-// Fetch the image to rotate, and call ImageMagick
-let DoMagickCall = async function () {
+  // fetch the input image and get its content bytes
   let fetchedSourceImage = await fetch("FriedrichNietzsche.png");
   let arrayBuffer = await fetchedSourceImage.arrayBuffer();
   let sourceBytes = new Uint8Array(arrayBuffer);
@@ -34,7 +36,7 @@ let DoMagickCall = async function () {
 
   // response can be multiple files (example split) here we know we just have one
   let firstOutputImage = processedFiles[0]
-  rotatedImage.src = URL.createObjectURL(firstOutputImage['blob'])
+  outputImage.src = URL.createObjectURL(firstOutputImage['blob'])
   console.log("created image " + firstOutputImage['name'])
-};
-DoMagickCall();
+})();
+

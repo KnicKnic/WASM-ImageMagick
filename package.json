@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cancerberosgx/WASM-ImageMagick.git"
+    "url": "git+https://github.com/KnicKnic/WASM-ImageMagick.git"
   },
   "keywords": [
     "wasm",
@@ -23,11 +23,14 @@
   "author": "KnicKnic",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/cancerberosgx/WASM-ImageMagick/issues"
+    "url": "https://github.com/KnicKnic/WASM-ImageMagick/issues"
   },
-  "homepage": "https://github.com/cancerberosgx/WASM-ImageMagick#readme",
+  "homepage": "https://github.com/KnicKnic/WASM-ImageMagick",
   "devDependencies": {
     "@types/node": "^10.10.3",
     "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    
   }
 }
