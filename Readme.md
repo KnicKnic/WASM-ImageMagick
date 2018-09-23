@@ -11,10 +11,12 @@ Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knic
 ## Status
 Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
 
-* [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
+ * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
     * For code see [samples/cmdline](samples/cmdline)
 
-* Used in [Croppy](https://knicknic.github.io/croppy/) to split webcomics from one long vertical strip into many panels.
+ * Basic playground in React & TypeScript project: [![Edit WASM-ImageMagick basic demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59)
+
+ * Used in [Croppy](https://knicknic.github.io/croppy/) to split webcomics from one long vertical strip into many panels.
     * For code see https://github.com/KnicKnic/croppy
 
 ## Usage with npm
@@ -26,24 +28,24 @@ npm install --save wasm-imagemagick
 Use it:
 
 ```js
-const Magick = require('wasm-imagemagick')
+import * as Magick from 'wasm-imagemagick';
 
 // the image element where to load output images
 const outputImage = document.getElementById('rotatedImage');
 
 // fetch the input image and get its content bytes
-const fetchedSourceImage = await fetch("FriedrichNietzsche.png");
-const sourceBytes = new Uint8Array(arrayBuffer.arrayBuffer());
+const fetchedSourceImage = await fetch("rotate.png");
+const sourceBytes = new Uint8Array(await fetchedSourceImage.arrayBuffer());
 
 // calling ImageMagick with one source image, and command to rotate & resize image
 const inputFiles = [{ 'name': 'srcFile.png', 'content': sourceBytes }]
-const command = ["convert", "srcFile.png", "-rotate", "90", "-resize", "200%", "out.png"]
+const command = ["convert", "srcFile.png", '-rotate', '90', '-resize', '200%', 'out.png']
 const processedFiles = await Magick.Call(inputFiles, command);
 
 // response can be multiple files (example split) here we know we just have one
 const firstOutputImage = processedFiles[0]
-outputImage.src = URL.createObjectURL(firstOutputImage['blob'])
-console.log("created image " + firstOutputImage['name'])
+outputImage.src = URL.createObjectURL(firstOutputImage.blob)
+console.log('created image ' + firstOutputImage.name)
 
 ```
 
@@ -56,9 +58,12 @@ cp node_modules/wasm-imagemagick/magick.js .
 
 You can then use browserify, tsc, webpack, rollup, etc to build a bundle.js file from previous example.
 
+
 ## Using it directly
 
-If you are not working in a npm development environment you can still load the library
+If you are not working in a npm development environment you can still load the library with the following code by placing these three files next to your index.html: `magick.js`, `magick.wasm` and `magickApi.js` : 
+
+
 ### Usage Details
 
 1. import magickApi.js in a javascript module
