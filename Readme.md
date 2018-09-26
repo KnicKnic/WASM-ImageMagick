@@ -80,6 +80,7 @@ If you are not working in a npm development environment you can still load the l
         1. blob: new Blob(contents)
     1. on error a string
 
+For working sample code see [samples/rotate](samples/rotate)
 
 ## Build instructions
 
