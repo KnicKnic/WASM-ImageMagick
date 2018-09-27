@@ -5,7 +5,11 @@
   "main": "dist/magickApi.js",
   "scripts": {
     "test": "node tests/rotate/node",
-    "prepare": "tsc --skipLibCheck --allowJs magickApi.js --outDir dist && cp magick.js magick.wasm dist"
+    "build-wasm": "docker build -t wasm-imagemagick-build-tools . && docker run --rm -it --workdir /code -v \"$PWD\":/code wasm-imagemagick-build-tools bash ./build.sh",
+    "build-ts": "tsc --skipLibCheck --allowJs magickApi.js --outDir dist",
+    "build": "npm run build-wasm && npm run build-ts",
+    "prepare": "npm run build && cp magick.js magick.wasm dist",
+    "clean":"sh clean.sh"
   },
   "repository": {
     "type": "git",
@@ -30,6 +34,6 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    
+
   }
 }
