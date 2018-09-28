@@ -15,7 +15,7 @@ Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](htt
 ## Demos
 
  * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
-    * For code see [samples/cmdline](samples/cmdline).
+    * For code see [samples/cmdline](samples/cmdline)
 
  * Used in [Croppy](https://knicknic.github.io/croppy/) to split webcomics from one long vertical strip into many panels.
     * For code see https://github.com/KnicKnic/croppy.
@@ -27,6 +27,11 @@ Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](htt
  * [Playground with several transformation examples and image formats](https://cancerberosgx.github.io/autumn-leaves/#/convertDemo). It also shows the output of transformations made with ImageMaick in the browser to verify wasm-imagemagick output the right thing.  
 
  * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
+
+ * [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59)
+
+ * [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z)
+
 
 ## Usage with npm
 
