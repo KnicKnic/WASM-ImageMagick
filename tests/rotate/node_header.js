@@ -33,6 +33,7 @@ function ValidateFormat(fileName, formatToMatch)
     {
         console.log(`failed to identify ${fileName}` )
         console.log(`exception ${e}` )
+        process.exit(1);
     }
     if(!matched)
     {

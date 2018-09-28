@@ -1,12 +1,15 @@
 {
   "name": "wasm-imagemagick",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Webassembly compilation of ImageMagick",
   "main": "dist/magickApi.js",
   "scripts": {
-    "test": "echo \"No tests :(\" && exit 1",
-    "postinstall": "npm i --no-save download-github-release && npx download-github-release knicknic wasm-imagemagick",
-    "prepare": "tsc --skipLibCheck --allowJs magickApi.js --outDir dist"
+    "test": "node tests/rotate/node",
+    "build-wasm": "docker build -t wasm-imagemagick-build-tools . && docker run --rm -it --workdir /code -v \"$PWD\":/code wasm-imagemagick-build-tools bash ./build.sh",
+    "build-ts": "tsc --skipLibCheck --allowJs magickApi.js --outDir dist",
+    "build": "npm run build-wasm && npm run build-ts",
+    "prepare": "npm run build && cp magick.js magick.wasm dist",
+    "clean":"sh clean.sh"
   },
   "repository": {
     "type": "git",
@@ -31,6 +34,6 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    
+
   }
 }
