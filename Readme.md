@@ -22,16 +22,11 @@ Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](htt
 
  * Basic playground (React & TypeScript project): [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59).
 
- * Basic Image Diff playground (React & TypeScript project): [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z).
+ * Image Diff Example (React & TypeScript project): [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z).
 
  * [Playground with several transformation examples and image formats](https://cancerberosgx.github.io/autumn-leaves/#/convertDemo). It also shows the output of transformations made with ImageMaick in the browser to verify wasm-imagemagick output the right thing.  
 
  * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
-
- * [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59)
-
- * [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z)
-
 
 ## Usage with npm
 
@@ -71,7 +66,6 @@ cp node_modules/wasm-imagemagick/dist/magick.js .
 ```
 
 You can then use browserify, tsc, webpack, rollup, etc to build a bundle.js file from previous example.
-
 
 ## Using it directly
 
