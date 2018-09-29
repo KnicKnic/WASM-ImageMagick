@@ -7,16 +7,16 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
-- script: docker build -t wasm-imagemagick-build-tools .
-  displayName: build builder
-
-- script: docker run --rm --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash ./build.sh 
-  displayName: build wasm
+- script: npm run build
+  displayName: npm based build
 
 - script: |
     cd tests/rotate
     docker run -v "$PWD":/code --rm --workdir /code node node  /code/node.js
   displayName: test wasm with nodejs
+
+- script: npm run test 
+  displayName: run npm tests
   
 - script: cp magick* $(Build.ArtifactStagingDirectory)
   displayName: cp magick files to artifact staging directory
