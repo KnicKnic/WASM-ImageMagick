@@ -20,7 +20,7 @@ steps:
   displayName: test wasm with nodejs
 
 - script: npm run test 
-  displayName: run npm test
+  displayName: run npm tests
   
 - script: cp magick* $(Build.ArtifactStagingDirectory)
   displayName: cp magick files to artifact staging directory
