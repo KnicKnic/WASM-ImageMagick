@@ -7,6 +7,10 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
+- script: |
+    sudo npm install -g typescript
+  displayName: install typescript
+
 - script: npm run build
   displayName: npm based build
 
