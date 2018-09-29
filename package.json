@@ -7,7 +7,7 @@
     "test": "node tests/rotate/node",
     "build-wasm": "docker build -t wasm-imagemagick-build-tools . && docker run --rm --workdir /code -v \"$PWD\":/code wasm-imagemagick-build-tools bash ./build.sh",
     "build-ts": "tsc --skipLibCheck --allowJs magickApi.js --outDir dist",
-    "build": "npm run build-ts && npm run build-wasm",
+    "build": "npm run build-wasm && npm run build-ts",
     "prepare": "npm run build && cp magick.js magick.wasm dist",
     "clean":"sh clean.sh"
   },
