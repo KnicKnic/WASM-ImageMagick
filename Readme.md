@@ -18,12 +18,15 @@ Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](htt
     * For code see [samples/cmdline](samples/cmdline)
 
  * Used in [Croppy](https://knicknic.github.io/croppy/) to split webcomics from one long vertical strip into many panels.
-    * For code see https://github.com/KnicKnic/croppy
+    * For code see https://github.com/KnicKnic/croppy.
 
- * [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59)
+ * Basic playground (React & TypeScript project): [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59).
 
- * [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z)
+ * Image Diff Example (React & TypeScript project): [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z).
 
+ * [Playground with several transformation examples and image formats](https://cancerberosgx.github.io/autumn-leaves/#/convertDemo). It also shows the output of transformations made with ImageMaick in the browser to verify wasm-imagemagick output the right thing.  
+
+ * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
 
 ## Usage with npm
 
@@ -63,7 +66,6 @@ cp node_modules/wasm-imagemagick/dist/magick.js .
 ```
 
 You can then use browserify, tsc, webpack, rollup, etc to build a bundle.js file from previous example.
-
 
 ## Using it directly
 
