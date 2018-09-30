@@ -14,14 +14,13 @@ steps:
 - script: npm run build
   displayName: run npm based build
 
-- script: |
-    cd tests/rotate
-    docker run -v "$PWD":/code --rm --workdir /code node node  /code/node.js
-  displayName: test wasm with nodejs
+# - script: |
+#    cd tests/rotate
+#    docker run -v "$PWD":/code --rm --workdir /code node node  /code/node.js
+#  displayName: test wasm with nodejs
 
-#  ## commented out because tests do not appear to work
-## - script: npm run test 
-##   displayName: run npm test
+- script: npm run test 
+  displayName: run tests
   
 - script: cp magick* $(Build.ArtifactStagingDirectory)
   displayName: cp magick files to artifact staging directory
