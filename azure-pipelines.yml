@@ -12,7 +12,7 @@ steps:
   displayName: install typescript
 
 - script: npm run build
-  displayName: npm based build
+  displayName: run npm based build
 
 - script: |
     cd tests/rotate
