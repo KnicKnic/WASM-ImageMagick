@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "allowJs": true,
+    "lib": [
+      "dom"
+    ],
+    "skipLibCheck": true
+  },
+  "include": [
+    "magickApi.js"
+  ],
+  "exclude": [
+    "node_modules", "dist"
+  ]
+}
+
