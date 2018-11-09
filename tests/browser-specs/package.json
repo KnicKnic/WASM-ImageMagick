@@ -1,0 +1,27 @@
+{
+  "name": "wasm-imagemagick-browser-spec",
+  "version": "1.0.0",
+  "description": "wasm-imagemagick tests in the browser",
+  "scripts": {
+    "prepare": "cp ../../magick.* spec/assets",
+    "test": "npm run build && gulp jasmine",
+    "test-server": "npm run build && gulp jasmine-server",
+    "build": "rm -rf dist && tsc && cp -r spec/assets dist && browserify dist/index.js -o dist/bundle.js"
+  },
+  "keywords": [],
+  "author": "sg",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/jasmine": "^2.8.11",
+    "@types/node": "^10.12.3",
+    "browserify": "^16.2.3",
+    "gulp": "^3.9.1",
+    "gulp-jasmine-browser": "^4.0.2",
+    "jasmine": "^3.3.0",
+    "puppeteer": "^1.10.0",
+    "typescript": "^3.1.6"
+  },
+  "dependencies": {
+    "wasm-imagemagick": "file:../.."
+  }
+}

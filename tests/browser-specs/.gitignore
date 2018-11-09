@@ -1,0 +1,6 @@
+node_modules
+dist
+docs-dev
+*.log
+cache
+.cache
