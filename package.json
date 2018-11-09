@@ -10,7 +10,7 @@
     "build-ts": "tsc",
     "build": "npm run build-wasm && npm run build-ts",
     "prepare": "npm run build && cp magick.js magick.wasm dist",
-    "clean":"sh clean.sh"
+    "clean": "sh clean.sh"
   },
   "repository": {
     "type": "git",
@@ -31,10 +31,8 @@
   },
   "homepage": "https://github.com/KnicKnic/WASM-ImageMagick",
   "devDependencies": {
-    "@types/node": "^10.10.3",
-    "typescript": "^3.0.3"
+    "@types/node": "^10.12.3",
+    "typescript": "^3.1.6"
   },
-  "dependencies": {
-
-  }
+  "dependencies": {}
 }
