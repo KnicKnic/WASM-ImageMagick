@@ -1,7 +1,6 @@
 describe('assets', () => {
 
-  it('rotate.png and magick.wasm resources should be available', async done => {
- 
+  it('rotate.png and magick.wasm resources should be available in orther these tests to run', async done => {
     let r = await fetch('magick.wasm')
     expect(r.ok).toBe(true)
 

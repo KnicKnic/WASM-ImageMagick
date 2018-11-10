@@ -1,9 +1,8 @@
-import * as Magick from 'wasm-imagemagick'
+import * as Magick from '../src'
 import { blobToString, buildInputFile } from './testUtil';
 
 describe('assets', () => {
-  it('Call should print image metadata as json', async done => {
-
+  it('should print image metadata as json', async done => {
     let fetchedSourceImage = await fetch("fn.png");
     let arrayBuffer = await fetchedSourceImage.arrayBuffer();
     let sourceBytes = new Uint8Array(arrayBuffer);
@@ -20,7 +19,6 @@ describe('assets', () => {
   })
 
   it('buildImputFile should work', async done => {
-
     const img = await buildInputFile('fn.png', 'srcFile.png')
     const inputFiles = [img]
     const command = ["convert", "srcFile.png", "info.json"]

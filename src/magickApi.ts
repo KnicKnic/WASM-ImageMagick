@@ -1,13 +1,21 @@
-
-export function CreatePromiseEvent () {
-    let resolver;
-    let rejecter;
-    let emptyPromise = new Promise((resolve, reject) => { resolver = resolve; rejecter = reject });
-    emptyPromise['resolve'] = resolver;
-    emptyPromise['reject'] = rejecter;
-    return emptyPromise;
-}
-
+export interface MagickFile {
+    name: string
+  }
+  
+  export interface MagickOutputFile extends MagickFile {
+    blob: Blob
+  }
+  
+  export interface MagickInputFile extends MagickFile {
+    /** 
+     * Content of the input file. 
+     * 
+     * This is declared as optional so higher level APIs can extend this interface but it must be initialized in order 
+     * to execute convert 
+     */
+    content?: Uint8Array
+  }
+  
 export function Call (inputFiles, command) {
     let request = {
         'files': inputFiles,
@@ -21,6 +29,15 @@ export function Call (inputFiles, command) {
     magickWorker.postMessage(request);
 
     magickWorkerPromisesKey = magickWorkerPromisesKey + 1
+    return emptyPromise;
+}
+
+function CreatePromiseEvent () {
+    let resolver;
+    let rejecter;
+    let emptyPromise = new Promise((resolve, reject) => { resolver = resolve; rejecter = reject });
+    emptyPromise['resolve'] = resolver;
+    emptyPromise['reject'] = rejecter;
     return emptyPromise;
 }
 

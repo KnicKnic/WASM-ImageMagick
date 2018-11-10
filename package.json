@@ -2,15 +2,21 @@
   "name": "wasm-imagemagick",
   "version": "1.1.1",
   "description": "Webassembly compilation of ImageMagick",
-  "main": "dist/magickApi.js",
-  "typings": "typings.d.ts",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
   "scripts": {
     "test": "(cd tests/rotate && node node)",
     "build-wasm": "docker build -t wasm-imagemagick-build-tools . && docker run --rm --workdir /code -v \"$PWD\":/code wasm-imagemagick-build-tools bash ./build.sh",
     "build-ts": "tsc",
     "build": "npm run build-wasm && npm run build-ts",
-    "prepare": "npm run build && cp magick.js magick.wasm dist",
-    "clean": "sh clean.sh"
+    "prepare": "npm run build && cp magick.js magick.wasm dist && cp magick.js magick.wasm spec/assets",
+    "clean": "sh clean.sh",
+
+
+    "test-browser": "npm run build-spec && gulp jasmine",
+    "test-browser-server": "npm run build && gulp jasmine-server",
+    "build-spec": "rm -rf dist && npm run build-ts && cp -r spec/assets dist && browserify dist/spec/index.js -o dist/bundle.js"
+
   },
   "repository": {
     "type": "git",
@@ -31,7 +37,13 @@
   },
   "homepage": "https://github.com/KnicKnic/WASM-ImageMagick",
   "devDependencies": {
+    "@types/jasmine": "^2.8.11",
     "@types/node": "^10.12.3",
+    "browserify": "^16.2.3",
+    "gulp": "^3.9.1",
+    "gulp-jasmine-browser": "^4.0.2",
+    "jasmine": "^3.3.0",
+    "puppeteer": "^1.10.0",
     "typescript": "^3.1.6"
   },
   "dependencies": {}

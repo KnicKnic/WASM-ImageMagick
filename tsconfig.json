@@ -2,14 +2,14 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "sourceMap": true,
-    "allowJs": true,
+    "declaration": true,
     "lib": [
       "dom", "es6"
     ],
     "skipLibCheck": true
   },
   "include": [
-    "magickApi.js"
+    "src", "spec"
   ],
   "exclude": [
     "node_modules", "dist"
