@@ -11,12 +11,9 @@
     "build": "npm run build-wasm && npm run build-ts",
     "prepare": "npm run build && cp magick.js magick.wasm dist && cp magick.js magick.wasm spec/assets",
     "clean": "sh clean.sh",
-
-
     "test-browser": "npm run build-spec && gulp jasmine",
-    "test-browser-server": "npm run build && gulp jasmine-server",
+    "test-browser-server": "npm run build-spec && gulp jasmine-server",
     "build-spec": "rm -rf dist && npm run build-ts && cp -r spec/assets dist && browserify dist/spec/index.js -o dist/bundle.js"
-
   },
   "repository": {
     "type": "git",
