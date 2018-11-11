@@ -1,5 +1,5 @@
-import { buildInputFile, compare, extractInfo } from '../src';
-import { execute, executeOne } from '../src';
+import { buildInputFile, compare, extractInfo } from '../src'
+import { execute, executeOne } from '../src'
 
 describe('execute', () => {
 
@@ -26,7 +26,7 @@ describe('execute', () => {
       const img1 = await buildInputFile('holocaust.jpg')
       const {outputFiles} = await executeOne({inputFiles: [img1], commands: ['convert holocaust.jpg -resize 444x76! output.gif']})
       expect(outputFiles[0].name).toBe('output.gif')
-      let info = await extractInfo(outputFiles[0])
+      const info = await extractInfo(outputFiles[0])
       expect(info[0].image.formatDescription.toLowerCase()).toBe('gif')
       expect(info[0].image.geometry.width).toBe(444)
       expect(info[0].image.geometry.height).toBe(76)
@@ -41,7 +41,7 @@ describe('execute', () => {
         commands: [
           ['convert', 'image1.png', '-rotate', '70', 'image2.gif'],
           // heads up: next command uses 'image2.gif' which was the output of previous command:
-          ['convert', 'image2.gif', '-scale', '23%', 'image3.jpg'],
+          ['convert', 'image2.gif', '-scale', '23%', 'image3.jpg']
         ]
       })
       const result2 = await executeOne({
@@ -58,7 +58,7 @@ describe('execute', () => {
         commands: [
           'convert image1.png -rotate 70 image2.gif',
           // heads up: next command uses 'image2.gif' which was the output of previous command:
-          'convert image2.gif -scale 23% image3.jpg',
+          'convert image2.gif -scale 23% image3.jpg'
         ]
       })
       const result2 = await executeOne({
@@ -70,5 +70,5 @@ describe('execute', () => {
     })
   })
 
-  xit('event emitter', ()=>{})
+  xit('event emitter', () => {})
 })

@@ -1,4 +1,4 @@
-import { MagickInputFile } from "./magickApi";
+import { MagickInputFile } from './magickApi'
 
 export interface ImageHome {
   get(name: string): Promise<MagickInputFile>
@@ -19,13 +19,13 @@ class ImageHomeImpl implements ImageHome {
   register(name: string, file: MagickInputFile): MagickInputFilePromise {
     const promise = new Promise(resolve => resolve(file)) as MagickInputFilePromise
     this.images[name] = promise
-    this.images[name].catch(() => { }).then(() => { 
-      promise.resolved = true 
+    this.images[name].catch(() => { }).then(() => {
+      promise.resolved = true
     })
     return promise
   }
 
-  isRegistered(name: string, andReady: boolean=true): boolean {
+  isRegistered(name: string, andReady: boolean= true): boolean {
     return this.images[name] && (andReady && this.images[name].resolved)
   }
 }

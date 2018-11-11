@@ -7,20 +7,20 @@ export interface MagickOutputFile extends MagickFile {
 }
 
 export interface MagickInputFile extends MagickFile {
-  /** 
-   * Content of the input file. 
+  /**
+   * Content of the input file.
    */
   content: Uint8Array
 }
 
 export function Call(inputFiles: MagickInputFile[], command: string[]): Promise<MagickOutputFile[]> {
-  let request = {
+  const request = {
     files: inputFiles,
     args: command,
     requestNumber: magickWorkerPromisesKey
   }
 
-  let emptyPromise = CreatePromiseEvent()
+  const emptyPromise = CreatePromiseEvent()
   magickWorkerPromises[magickWorkerPromisesKey] = emptyPromise
 
   magickWorker.postMessage(request)
@@ -32,7 +32,7 @@ export function Call(inputFiles: MagickInputFile[], command: string[]): Promise<
 function CreatePromiseEvent() {
   let resolver
   let rejecter
-  let emptyPromise = new Promise((resolve, reject) => {
+  const emptyPromise = new Promise((resolve, reject) => {
     resolver = resolve
     rejecter = reject
   })
@@ -41,19 +41,19 @@ function CreatePromiseEvent() {
   return emptyPromise
 }
 
-let magickWorker = new Worker('magick.js')
+const magickWorker = new Worker('magick.js')
 
-let magickWorkerPromises = {}
+const magickWorkerPromises = {}
 let magickWorkerPromisesKey = 1
 
 // handle responses as they stream in after being processed by image magick
-magickWorker.onmessage = function (e) {
+magickWorker.onmessage = e => {
   // display split images
-  let response = e.data
-  let getPromise = magickWorkerPromises[response.requestNumber]
+  const response = e.data
+  const getPromise = magickWorkerPromises[response.requestNumber]
   delete magickWorkerPromises[response.requestNumber]
-  let files = response.processed
-  if (files.length == 0) {
+  const files = response.processed
+  if (files.length === 0) {
     getPromise.reject('No files generated')
   }
   else {

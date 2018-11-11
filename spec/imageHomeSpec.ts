@@ -1,4 +1,4 @@
-import { buildInputFile, createImageHome } from '../src';
+import { buildInputFile, createImageHome } from '../src'
 
 describe('imageHome', () => {
   it('should allow me to register an image', async done => {

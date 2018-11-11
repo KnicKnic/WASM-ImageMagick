@@ -1,8 +1,8 @@
-import { buildInputFile, loadImageElement, compare, execute } from '../../src';
+import { buildInputFile, loadImageElement, compare, execute } from '../../src'
 
 describe('util/html', () => {
 
-  describe('loadImageElement', ()=>{
+  describe('loadImageElement', () => {
 
     it('should display an input image in an html img element', async done => {
       const img1 = await buildInputFile('fn.png')
@@ -37,5 +37,5 @@ describe('util/html', () => {
       done()
     })
   })
-  
+
 })

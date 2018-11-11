@@ -4,11 +4,13 @@ describe('assets', () => {
     expect(r.ok).toBe(true)
 
     r = await fetch('fn.png')
-    expect(r.ok).toBe(true) 
- 
+    expect(r.ok).toBe(true)
+
     r = await fetch('nonexistent.png')
     expect(r.ok).toBe(false)
 
     done()
   })
 })
+
+export default ''

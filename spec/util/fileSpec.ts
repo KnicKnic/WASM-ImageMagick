@@ -1,19 +1,19 @@
-import { blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, inputFileToOutputFile, outputFileToInputFile, getFileName } from '../../src';
+import { blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, inputFileToOutputFile, outputFileToInputFile, getFileName } from '../../src'
 
 describe('util/file', () => {
 
   describe('buildInputFile', () => {
-    async function test(urlToFnPng){
+    async function test(urlToFnPng) {
       const file = await buildInputFile(urlToFnPng)
-      let processedFiles = await Call(
+      const processedFiles = await Call(
         [file],
-        ["convert", "fn.png", "info.json"]
+        ['convert', 'fn.png', 'info.json']
       )
       expect(processedFiles[0].name).toBe('info.json')
       let info = JSON.parse(await blobToString(processedFiles[0].blob))
       expect(info[0].image.baseName).toBe('fn.png')
       expect(info[0].image.geometry.width).toBe(109)
-      let processedFiles2 = await Call([file], ["convert", "fn.png", '-scale', '77x99!', "scaled.png"]);
+      const processedFiles2 = await Call([file], ['convert', 'fn.png', '-scale', '77x99!', 'scaled.png'])
       info = await extractInfo(processedFiles2[0])
       expect(info[0].image.geometry.width).toBe(77)
 
@@ -33,12 +33,10 @@ describe('util/file', () => {
       done()
     })
 
-    xit('should support data:// urls with embedded image content', ()=>{})
+    xit('should support data:// urls with embedded image content', () => {})
   })
 
-
-
-  describe('outputFileToInputFile and inputFileToOutputFile', ()=>{
+  describe('outputFileToInputFile and inputFileToOutputFile', () => {
 
     it('outputFileToInputFile should help to use output images in next commands as input images', async done => {
       const img = await buildInputFile('holocaust.jpg')
@@ -50,7 +48,7 @@ describe('util/file', () => {
       expect(info2[0].image.geometry.width).toBe(32)
       done()
     })
-  
+
     it('outputFileToInputFile and inputFileToOutputFile should generate equal images', async done => {
       const img = await buildInputFile('holocaust.jpg')
       const img2 = await outputFileToInputFile(await inputFileToOutputFile(img), 'img2.jpg')
@@ -59,10 +57,9 @@ describe('util/file', () => {
     })
   })
 
+  describe('getFileNameExtension', () => {
 
-  describe('getFileNameExtension', ()=>{
-
-    function test(url, expected){
+    function test(url, expected) {
       expect(getFileNameExtension(url)).toBe(expected)
     }
 
@@ -79,16 +76,16 @@ describe('util/file', () => {
       test('bar.txt?foo=1&t=asdasd', 'txt')
       test('/bar.txt?foo=1&t=asdasd', 'txt')
       done()
-    })   
+    })
 
   })
 
-  describe('getFileName', ()=>{
+  describe('getFileName', () => {
 
-    function test(url, expected){
+    function test(url, expected) {
       expect(getFileName(url)).toBe(expected)
     }
-    
+
     it('should work with absolute urls with query params', async done => {
       test('http://foo.co/bar.txt', 'bar.txt')
       test('http://foo.co/', '')
@@ -103,7 +100,6 @@ describe('util/file', () => {
       test('bar.txt?foo=1&t=asdasd', 'bar.txt')
       test('/bar.txt?foo=1&t=asdasd', 'bar.txt')
       done()
-    })   
+    })
   })
 })
-

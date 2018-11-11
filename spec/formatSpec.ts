@@ -1,5 +1,5 @@
-import pmap from 'p-map';
-import { buildInputFile, compare } from '../src';
+import pmap from 'p-map'
+import { buildInputFile, compare } from '../src'
 
 describe('formats', () => {
 
@@ -9,7 +9,7 @@ describe('formats', () => {
 
     const compares = []
     formats.forEach(f1 => {
-      formats.filter(f2 => f2 != f1).forEach(async f2 => {
+      formats.filter(f2 => f2 !== f1).forEach(async f2 => {
         compares.push([`to_rotate.${f1}`, `to_rotate.${f2}`])
       })
     })
@@ -17,7 +17,7 @@ describe('formats', () => {
       return compare(await buildInputFile(c[0]), await buildInputFile(c[1]))
     })
 
-    expect(results.length).toBeGreaterThan(formats.length*2)
+    expect(results.length).toBeGreaterThan(formats.length * 2)
 
     results.forEach((r, i) => {
       expect(r).toBe(true, `compare(${compares[i][0]}, ${compares[i][1]})`)
@@ -27,7 +27,7 @@ describe('formats', () => {
 
   })
 
-  xit('extractInfo should get correct format and size', ()=>{
+  xit('extractInfo should get correct format and size', () => {
 
   })
 })

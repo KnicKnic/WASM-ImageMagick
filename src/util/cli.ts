@@ -1,4 +1,4 @@
-import { Command } from "..";
+import { Command } from '..'
 
 /** generates a valid command line command from given Call/execute Command  */
 export function arrayToCli(command: Command): string {
@@ -15,11 +15,11 @@ export function arrayToCli(command: Command): string {
 }
 
 /** generates a valie Call/execute string[] command from given command line command */
-export function cliToArray(s: string): Command {
+export function cliToArray(cliCommand: string): Command {
   let inString = false
   const spaceIndexes = [0]
-  for (let index = 0; index < s.length; index++) {
-    const c = s[index]
+  for (let index = 0; index < cliCommand.length; index++) {
+    const c = cliCommand[index]
     if (c.match(/[\s]/im) && !inString) {
       spaceIndexes.push(index)
     }
@@ -27,12 +27,12 @@ export function cliToArray(s: string): Command {
       inString = !inString
     }
   }
-  spaceIndexes.push(s.length)
+  spaceIndexes.push(cliCommand.length)
   const command = spaceIndexes
-    .map((spaceIndex, i) => s.substring(i === 0 ? 0 : spaceIndexes[i - 1], spaceIndexes[i]).trim())
+    .map((spaceIndex, i) => cliCommand.substring(i === 0 ? 0 : spaceIndexes[i - 1], spaceIndexes[i]).trim())
     .filter(s => !!s)
 
-    // remove quotes 
+    // remove quotes
     .map(s => s.startsWith(`'`) ? s.substring(1, s.length) : s)
     .map(s => s.endsWith(`'`) ? s.substring(0, s.length - 1) : s)
 
@@ -42,16 +42,14 @@ export function cliToArray(s: string): Command {
   return command
 }
 
-
 export function asCommand(c: Command[] | string[]): Command[] {
   if (!c[0]) { return [] }
-  if(typeof c[0] === 'string'){
+  if (typeof c[0] === 'string') {
     return (c as string[]) .map((subCommand: string) => cliToArray(subCommand))
-    console.log('if1', c);
-    
+    console.log('if1', c)
+
   }
-  console.log('if2', c);
+  console.log('if2', c)
   return c as Command[]
-  
-  
+
 }

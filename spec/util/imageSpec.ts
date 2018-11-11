@@ -1,4 +1,4 @@
-import { buildInputFile, compare, extractInfo, MagickInputFile, getFileNameExtension, Call, outputFileToInputFile } from '../../src';
+import { buildInputFile, compare, extractInfo, MagickInputFile, getFileNameExtension, Call, outputFileToInputFile } from '../../src'
 
 describe('util/image', () => {
 
@@ -33,7 +33,7 @@ describe('util/image', () => {
     it('extractInfo should work', async done => {
       const img = await buildInputFile('fn.png', 'srcFile.png')
       const info = await extractInfo(img)
-     
+
       expect(info[0].image.baseName).toBe('srcFile.png')
       expect(info[0].image.geometry.height).toBe(145)
       done()

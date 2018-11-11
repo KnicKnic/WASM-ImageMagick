@@ -1,4 +1,4 @@
-import { MagickInputFile, MagickOutputFile, outputFileToInputFile, Call, asCommand } from '.';
+import { MagickInputFile, MagickOutputFile, outputFileToInputFile, Call, asCommand } from '.'
 import pMap from 'p-map'
 
 export type Command = (string | number)[]
@@ -15,7 +15,7 @@ export interface ExecuteResult {
 /** execute first command in given config */
 export async function executeOne(config: ExecuteConfig): Promise<ExecuteResult> {
   const command = asCommand(config.commands)[0]
-  let t0 = performance.now()
+  const t0 = performance.now()
   executeListeners.forEach(listener => listener.beforeExecute({ command, took: performance.now() - t0, id: t0 }))
   const result = { outputFiles: await Call(config.inputFiles, command.map(c => c + '')) }
   executeListeners.forEach(listener => listener.afterExecute({ command, took: performance.now() - t0, id: t0 }))
@@ -33,38 +33,39 @@ export interface ExecuteListener {
   afterExecute?(event: ExecuteEvent): void
   beforeExecute?(event: ExecuteEvent): void
 }
-let executeListeners: ExecuteListener[] = []
+const executeListeners: ExecuteListener[] = []
 export function addExecuteListener(l: ExecuteListener) {
   executeListeners.push(l)
 }
 
-
 /**
- * Execute all commands in given config serially in order. Output files from a command become available as input files in next commands. The execution result will contain all generated outputFiles. If same file name is used later command output files will override previous ones. Example:
- * 
+ * Execute all commands in given config serially in order. Output files from a command become available as
+ * input files in next commands. The execution result will contain all generated outputFiles. If same file name
+ * is used later command output files will override previous ones. Example:
+ *
  * ```ts
-const {outputFiles} = await execute({
- inputFiles: [await buildInputFile('fn.png', 'image1.png')],
- commands: [
-   ['convert', 'image1.png', "-bordercolor", "#ffee44", "-background", "#eeff55", "+polaroid", "image2.png"], 
-   // heads up: next command uses "image2.png" which was the output of previous command:
-   ["convert", "image2.png", "-fill", "#997711", "-tint", "55"],
- ]
-})
-```
- * 
- * Alternatively it support CLI like command line instead of arrays: 
- * 
+ * const {outputFiles} = await execute({
+ *  inputFiles: [await buildInputFile('fn.png', 'image1.png')],
+ *  commands: [
+ *    ['convert', 'image1.png', "-bordercolor", "#ffee44", "-background", "#eeff55", "+polaroid", "image2.png"],
+ *    // heads up: next command uses "image2.png" which was the output of previous command:
+ *    ["convert", "image2.png", "-fill", "#997711", "-tint", "55"],
+ *  ]
+ * })
+ * ```
+ *
+ * Alternatively it support CLI like command line instead of arrays:
+ *
  * ```ts
-const {outputFiles} = await execute({
-  inputFiles: [await buildInputFile('fn.png', 'image1.png')],
-  commands: [
-    'convert image1.png -rotate 70 image2.gif',
-    // heads up: next command uses 'image2.gif' which was the output of previous command:
-    'convert image2.gif -scale 23% image3.jpg',
-  ]
-})
-```
+ * const {outputFiles} = await execute({
+ *   inputFiles: [await buildInputFile('fn.png', 'image1.png')],
+ *   commands: [
+ *     'convert image1.png -rotate 70 image2.gif',
+ *     // heads up: next command uses 'image2.gif' which was the output of previous command:
+ *     'convert image2.gif -scale 23% image3.jpg',
+ *   ]
+ * })
+ * ```
  */
 export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}

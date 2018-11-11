@@ -1,5 +1,5 @@
-import { MagickFile, MagickInputFile } from "../magickApi";
-import { asOutputFile, buildInputFile } from "./file";
+import { MagickFile, MagickInputFile } from '../magickApi'
+import { asOutputFile, buildInputFile } from './file'
 
 // utilities related to HTML (img) elements
 
@@ -21,9 +21,9 @@ async function inputFileToUint8Array(el: HTMLInputElement): Promise<{ file: File
   return Promise.all(inputFileFiles(el).map(async file => {
     const content = await new Promise<Uint8Array>(resolve => {
       const reader = new FileReader()
-      reader.addEventListener('loadend', (e) => {
+      reader.addEventListener('loadend', e => {
         resolve(new Uint8Array(reader.result as any))
-      });
+      })
       reader.readAsArrayBuffer(file)
     })
     return { file, content  }
@@ -31,7 +31,7 @@ async function inputFileToUint8Array(el: HTMLInputElement): Promise<{ file: File
 }
 
 /** will build MagickInputFile[] from given HTMLInputElement of type=file that user may used to select several files */
-export async function getInputFilesFromHtmlInputElement(el: HTMLInputElement): Promise<MagickInputFile[]>{
+export async function getInputFilesFromHtmlInputElement(el: HTMLInputElement): Promise<MagickInputFile[]> {
   const files = await inputFileToUint8Array(el)
-  return files.map(f=>({name: f.file.name, content: f.content}))
+  return files.map(f => ({name: f.file.name, content: f.content}))
 }
