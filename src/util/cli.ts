@@ -41,3 +41,17 @@ export function cliToArray(s: string): Command {
 
   return command
 }
+
+
+export function asCommand(c: Command[] | string[]): Command[] {
+  if (!c[0]) { return [] }
+  if(typeof c[0] === 'string'){
+    return (c as string[]) .map((subCommand: string) => cliToArray(subCommand))
+    console.log('if1', c);
+    
+  }
+  console.log('if2', c);
+  return c as Command[]
+  
+  
+}
