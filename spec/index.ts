@@ -1,4 +1,5 @@
-export * from './testAssetsSpec'
-export * from './callSpec'    
-export * from './compareSpec'  
-export * from './imageHomeSpec'  
+require('./testAssetsSpec')
+require('./callSpec')
+require('./compareSpec')
+require('./imageHomeSpec')
+require('./testUtilSpec')

@@ -1,7 +1,4 @@
-import { MagickInputFile } from "../src";
-
-// TODO: move this utility to ../../src
-// import { MagickInputFile, Call } from '..'
+import { MagickInputFile } from "./magickApi";
 
 export interface ImageHome {
   get(name: string): Promise<MagickInputFile>

@@ -1,4 +1,5 @@
-import { buildInputFile, compare } from './testUtil';
+import { buildInputFile } from '../src';
+import { compare } from '../src/';
 
 describe('compare', () => {
 
@@ -17,6 +18,3 @@ describe('compare', () => {
     done()
   })
 })
-
-
-export default 1

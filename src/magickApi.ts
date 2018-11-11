@@ -16,7 +16,7 @@ export interface MagickFile {
     content?: Uint8Array
   }
   
-export function Call (inputFiles, command) {
+export function Call(inputFiles: MagickInputFile[], command: string[]): Promise<MagickOutputFile[]> {
     let request = {
         'files': inputFiles,
         'args': command,
@@ -29,7 +29,7 @@ export function Call (inputFiles, command) {
     magickWorker.postMessage(request);
 
     magickWorkerPromisesKey = magickWorkerPromisesKey + 1
-    return emptyPromise;
+    return emptyPromise as Promise<MagickOutputFile[]>
 }
 
 function CreatePromiseEvent () {

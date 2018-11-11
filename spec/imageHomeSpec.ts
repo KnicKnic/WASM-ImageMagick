@@ -1,9 +1,6 @@
-// import { buildInputFile, compare } from './testUtil';
-import { createImageHome } from './imageHome';
-import { buildInputFile } from './testUtil';
+import { buildInputFile, createImageHome } from '../src';
 
 describe('imageHome', () => {
-
   it('should allow me to register an image', async done => {
     const imageHome = createImageHome()
     expect(imageHome.isRegistered('fn.png')).toBeFalsy()
@@ -13,6 +10,3 @@ describe('imageHome', () => {
     done()
   })
 })
-
-
-export default 1
