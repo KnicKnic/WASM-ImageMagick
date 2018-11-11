@@ -6,4 +6,3 @@
 node_modules
 sample-nodejs-project
 /dist
-tests/browser-spec
