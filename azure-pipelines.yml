@@ -7,6 +7,10 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
+
+- script: echo "original node version `node -v`"; echo "original npm version `npm -v`" ; sudo npm i -g nave; nave use latest ; echo "node version `node -v`"; echo "npm version `npm -v`" 
+  displayName: install node latest
+
 - script: node -v; npm -v; npm install
   displayName: npm install
 
