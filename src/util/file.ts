@@ -23,7 +23,7 @@ export function blobToString(blb: Blob): Promise<string> {
   })
 }
 
-export async function buildInputFile(url: string, name: string = url): Promise<MagickInputFile> {
+export async function buildInputFile(url: string, name: string = getFileNameFromUrl(url)): Promise<MagickInputFile> {
   let fetchedSourceImage = await fetch(url);
   let arrayBuffer = await fetchedSourceImage.arrayBuffer();
   let content = new Uint8Array(arrayBuffer);
@@ -58,4 +58,13 @@ export async function asInputFile(f: MagickFile): Promise<MagickInputFile> {
     return await outputFileToInputFile(f as MagickOutputFile)
   }
   return f as MagickInputFile
+}
+
+export function getFileNameFromUrl(url: string): string {
+  try {
+    return decodeURIComponent(new URL(url).pathname.split('/').pop())
+  } catch (error) {
+    return url
+  }
+  
 }

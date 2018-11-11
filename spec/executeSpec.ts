@@ -24,10 +24,8 @@ describe('execute', () => {
     })
   })
 
-  fdescribe('execute', () => {
-
+  describe('execute', () => {
     it('should execute commands serially and output files are available to next commands', async done => {
-
       const result = await execute({
         inputFiles: [await buildInputFile('fn.png', 'image1.png')],
         commands: [
@@ -36,7 +34,6 @@ describe('execute', () => {
           ["convert", "image2.gif", "-scale", '23%', 'image3.jpg'],
         ]
       })
-
       const result2 = await executeOne({
         inputFiles: [await buildInputFile('fn.png', 'image1.png')],
         commands: [['convert', 'image1.png', "-rotate", "70", "-scale", '23%', "image2.gif"]]

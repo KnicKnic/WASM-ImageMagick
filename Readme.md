@@ -12,6 +12,12 @@ Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knic
 
 Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
 
+Things not supported: 
+
+ * [Text](https://www.imagemagick.org/Usage/text/)
+ * [Fourier Transforms](https://www.imagemagick.org/Usage/fourier/)
+ * webp
+
 ## Demos
 
  * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
