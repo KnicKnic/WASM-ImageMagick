@@ -7,10 +7,18 @@ import fileSpec from '../spec/util/fileSpec'
 /**
  * Allow multiple execute() calls remembering previus execute() generated output files and previous given input files that can be used as input files in next calls.
  */
-export class ExecutionContext {
-  private imageHome: ImageHome
-  constructor() {
-    this.imageHome = createImageHome()
+export interface ExecutionContext {
+  execute(configOrCommands: ExecuteConfig|ExecuteCommand|string): Promise<ExecuteResult>
+  addFiles(files: MagickFile[]): void
+  getAllFiles(): Promise<MagickInputFile[]>
+}
+
+export function newExecutionContext(inheritFrom?: ExecutionContext): ExecutionContext {
+  return ExecutionContextImpl.create(inheritFrom)
+}
+
+class ExecutionContextImpl implements ExecutionContext {
+  constructor(private imageHome: ImageHome = createImageHome()) {
   }
   async execute(configOrCommands: ExecuteConfig|ExecuteCommand|string): Promise<ExecuteResult> {
     const config = asConfig(configOrCommands)
@@ -29,6 +37,12 @@ export class ExecutionContext {
   }
   async getAllFiles(): Promise<MagickInputFile[]> {
     return this.imageHome.getAll()
+  }
+  static create(inheritFrom?: ExecutionContext) {
+    if (inheritFrom && !(inheritFrom as ExecutionContextImpl).imageHome) {
+      throw new Error('Dont know how to inherith from other ExecutionContext implementation than this one')
+    }
+    return new ExecutionContextImpl(inheritFrom && (inheritFrom as ExecutionContextImpl).imageHome)
   }
 }
 
