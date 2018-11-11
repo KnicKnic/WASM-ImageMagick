@@ -1,4 +1,4 @@
-import { MagickInputFile, MagickOutputFile, MagickFile } from '../magickApi';
+import { MagickInputFile, MagickOutputFile, MagickFile } from '..';
 
 export function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
   return new Promise(resolve => {
