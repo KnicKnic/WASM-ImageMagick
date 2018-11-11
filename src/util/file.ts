@@ -1,11 +1,12 @@
-import { MagickOutputFile, MagickInputFile } from '../magickApi'
+import { MagickInputFile, MagickOutputFile } from '../magickApi';
 
 export function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
-  return new Promise(resolve=>{
+  return new Promise(resolve => {
     var fileReader = new FileReader();
-    fileReader.onload = function(event) {
+    fileReader.onload = function (event) {
       const result = (event.target as any).result as ArrayBuffer
-       resolve(new Uint8Array(result));
+      // return result
+      resolve(new Uint8Array(result));
     };
     fileReader.readAsArrayBuffer(blob);
   })
@@ -22,7 +23,7 @@ export function blobToString(blb: Blob): Promise<string> {
   })
 }
 
-export async function buildInputFile(url: string, name: string=url): Promise<MagickInputFile>{
+export async function buildInputFile(url: string, name: string = url): Promise<MagickInputFile> {
   let fetchedSourceImage = await fetch(url);
   let arrayBuffer = await fetchedSourceImage.arrayBuffer();
   let content = new Uint8Array(arrayBuffer);
@@ -45,4 +46,8 @@ export function inputFileToOutputFile(file: MagickInputFile): MagickOutputFile {
     name: file.name,
     blob: uint8ArrayToBlob(file.content),
   }
+}
+
+export function getFileNameExtension(filePathOrUrl: string) {
+  return filePathOrUrl.substring(filePathOrUrl.lastIndexOf('.') + 1, filePathOrUrl.length)
 }

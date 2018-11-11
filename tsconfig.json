@@ -6,6 +6,8 @@
     "lib": [
       "dom", "es6"
     ],
+    "target": "es6",
+    "module": "commonjs",
     "skipLibCheck": true
   },
   "include": [

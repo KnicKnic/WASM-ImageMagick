@@ -1,11 +1,14 @@
 import { MagickInputFile, Call, MagickOutputFile } from "../magickApi";
 import { blobToString, outputFileToInputFile } from "./file";
 
-export async function compare(img1: MagickInputFile, img2: MagickInputFile, error: number = 0.001): Promise<boolean> {
-  // console.log('Executing command: ',  ['convert', img1.name, img2.name, '-trim', '+repage', /* '-resize', '"256x256^!"', */ '-metric', 'RMSE', '-format', '%[distortion]', '-compare', 'info:info.txt'].join(' '));
-  const result = await Call([img1, img2], ['convert', img1.name, img2.name, '-trim', '+repage', /* '-resize', '"256x256^!"', */ '-metric', 'RMSE', '-format', '%[distortion]', '-compare', 'info:info.txt'])
+export async function compare(img1: MagickInputFile, img2: MagickInputFile, error: number = 0.01): Promise<boolean> {
+  const result = await Call(
+    [img1, img2], 
+    ['convert', img1.name, img2.name, '-trim', '+repage', '-resize', '256x256^!', '-metric', 'RMSE', '-format', '%[distortion]', '-compare', 'info:info.txt']
+    )
   const n = await blobToString(result[0].blob)
-  const identical = parseInt(n, 10)
+  const identical = parseFloat(n)
+  // debugger
   return identical <= error
 }
 

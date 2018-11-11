@@ -3,10 +3,7 @@ import { blobToString, buildInputFile, Call, extractInfo } from '../src';
 describe('call', () => {
 
   it('should print image metadata as json if output file is .json', async done => {
-    const img = await buildInputFile('fn.png', 'srcFile.png')
-    const inputFiles = [img]
-    const command = ["convert", "srcFile.png", "info.json"]
-    let processedFiles = await Call(inputFiles, command);
+    let processedFiles = await Call([await buildInputFile('fn.png', 'srcFile.png')],  ["convert", "srcFile.png", "info.json"])
     expect(processedFiles[0].name).toBe('info.json')
     const data = JSON.parse(await blobToString(processedFiles[0].blob))
     expect(data[0].image.baseName).toBe('srcFile.png')
