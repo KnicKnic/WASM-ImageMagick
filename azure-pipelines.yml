@@ -7,19 +7,15 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
-- script: |
-    sudo npm install -g typescript
-  displayName: install typescript
-
-- script: npm run build
-  displayName: run npm based build
+- script: npm install
+  displayName: npm install
 
 # - script: |
 #    cd tests/rotate
 #    docker run -v "$PWD":/code --rm --workdir /code node node  /code/node.js
 #  displayName: test wasm with nodejs
 
-- script: npm run test 
+- script: npm test
   displayName: run tests
   
 - script: cp magick* $(Build.ArtifactStagingDirectory)

@@ -1,4 +1,4 @@
-import { MagickInputFile, MagickOutputFile } from '../magickApi';
+import { MagickInputFile, MagickOutputFile, MagickFile } from '../magickApi';
 
 export function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
   return new Promise(resolve => {
@@ -34,20 +34,28 @@ export function uint8ArrayToBlob(arr: Uint8Array): Blob {
   return new Blob([arr])
 }
 
-export async function outputFileToInputFile(outputFile: MagickOutputFile): Promise<MagickInputFile> {
+export async function outputFileToInputFile(file: MagickOutputFile, name: string = file.name): Promise<MagickInputFile> {
   return {
-    name: outputFile.name,
-    content: await blobToUint8Array(outputFile.blob)
+    name,
+    content: await blobToUint8Array(file.blob)
   }
 }
 
-export function inputFileToOutputFile(file: MagickInputFile): MagickOutputFile {
+export function inputFileToOutputFile(file: MagickInputFile, name: string = file.name): MagickOutputFile {
   return {
-    name: file.name,
+    name,
     blob: uint8ArrayToBlob(file.content),
   }
 }
 
 export function getFileNameExtension(filePathOrUrl: string) {
   return filePathOrUrl.substring(filePathOrUrl.lastIndexOf('.') + 1, filePathOrUrl.length)
+}
+
+
+export async function asInputFile(f: MagickFile): Promise<MagickInputFile> {
+  if((f as MagickOutputFile).blob){
+    return await outputFileToInputFile(f as MagickOutputFile)
+  }
+  return f as MagickInputFile
 }

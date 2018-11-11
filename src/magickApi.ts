@@ -9,11 +9,8 @@ export interface MagickOutputFile extends MagickFile {
 export interface MagickInputFile extends MagickFile {
   /** 
    * Content of the input file. 
-   * 
-   * This is declared as optional so higher level APIs can extend this interface but it must be initialized in order 
-   * to execute convert.
    */
-  content?: Uint8Array
+  content: Uint8Array
 }
 
 export function Call(inputFiles: MagickInputFile[], command: string[]): Promise<MagickOutputFile[]> {

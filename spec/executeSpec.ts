@@ -24,6 +24,15 @@ describe('execute', () => {
     })
   })
 
-  xdescribe('execute', () => {
-  })
+  // xdescribe('execute', () => {
+
+  //   const result = await execute({
+  //       inputFiles: [image1],
+  //       commands: [
+  //         ['convert', 'image1.png', "-bordercolor", "#ffee44", "-background", "#eeff55", "+polaroid", "image2.png"], 
+  //         // heads up: next command uses "image2.png" which was the output of previous command:
+  //         ["convert", "image2.png", "-fill", "#997711", "-tint", "55"],
+  //       ]
+  //      })
+  // })
 })
