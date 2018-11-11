@@ -18,6 +18,11 @@ steps:
 - script: npm test
   displayName: run tests
   
+
+- script: npm run test-browser
+  displayName: run tests in browser
+
+
 - script: cp magick* $(Build.ArtifactStagingDirectory)
   displayName: cp magick files to artifact staging directory
   
