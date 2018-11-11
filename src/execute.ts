@@ -76,7 +76,7 @@ export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
   async function mapper(c: Command) {
     const thisConfig = {
       inputFiles: Object.keys(allInputFiles).map(name => allInputFiles[name]),
-      commands: [c]
+      commands: [c],
     }
     const result = await executeOne(thisConfig)
     await pMap(result.outputFiles, async f => {
@@ -88,6 +88,6 @@ export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
   const commands = asCommand(config.commands)
   await pMap(commands, mapper, { concurrency: 1 })
   return {
-    outputFiles: Object.keys(allOutputFiles).map(name => allOutputFiles[name])
+    outputFiles: Object.keys(allOutputFiles).map(name => allOutputFiles[name]),
   }
 }

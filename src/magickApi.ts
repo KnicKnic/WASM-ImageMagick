@@ -17,7 +17,7 @@ export function Call(inputFiles: MagickInputFile[], command: string[]): Promise<
   const request = {
     files: inputFiles,
     args: command,
-    requestNumber: magickWorkerPromisesKey
+    requestNumber: magickWorkerPromisesKey,
   }
 
   const emptyPromise = CreatePromiseEvent()
@@ -35,9 +35,9 @@ function CreatePromiseEvent() {
   const emptyPromise = new Promise((resolve, reject) => {
     resolver = resolve
     rejecter = reject
-  })
-  emptyPromise['resolve'] = resolver
-  emptyPromise['reject'] = rejecter
+  }) as Promise<{}> & {resolve?: any, reject?: any}
+  emptyPromise.resolve = resolver
+  emptyPromise.reject = rejecter
   return emptyPromise
 }
 

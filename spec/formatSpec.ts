@@ -1,7 +1,7 @@
 import pmap from 'p-map'
 import { buildInputFile, compare } from '../src'
 
-describe('formats', () => {
+export default describe('formats', () => {
 
   const formats = ['jpg', 'png', 'psd', 'tiff', 'xcf', 'gif', 'bmp']
 

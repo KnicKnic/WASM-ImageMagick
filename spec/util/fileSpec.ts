@@ -1,13 +1,13 @@
 import { blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, inputFileToOutputFile, outputFileToInputFile, getFileName } from '../../src'
 
-describe('util/file', () => {
+export default describe('util/file', () => {
 
   describe('buildInputFile', () => {
     async function test(urlToFnPng) {
       const file = await buildInputFile(urlToFnPng)
       const processedFiles = await Call(
         [file],
-        ['convert', 'fn.png', 'info.json']
+        ['convert', 'fn.png', 'info.json'],
       )
       expect(processedFiles[0].name).toBe('info.json')
       let info = JSON.parse(await blobToString(processedFiles[0].blob))
@@ -33,7 +33,7 @@ describe('util/file', () => {
       done()
     })
 
-    xit('should support data:// urls with embedded image content', () => {})
+    xit('should support data:// urls with embedded image content', () => { })
   })
 
   describe('outputFileToInputFile and inputFileToOutputFile', () => {

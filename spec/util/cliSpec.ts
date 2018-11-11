@@ -1,6 +1,6 @@
 import { arrayToCli, cliToArray } from '../../src'
 
-describe('util/cli', () => {
+export default describe('util/cli', () => {
 
   describe('arrayToCli', () => {
     it('should support simple commands', () => {

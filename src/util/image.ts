@@ -7,7 +7,7 @@ export async function compare(img1: MagickFile, img2: MagickFile, error: number 
      '-resize', '256x256^!',
      '-metric', 'RMSE',
       '-format', '%[distortion]',
-      '-compare', 'info:info.txt']
+      '-compare', 'info:info.txt'],
     )
   const n = await blobToString(result[0].blob)
   const identical = parseFloat(n)

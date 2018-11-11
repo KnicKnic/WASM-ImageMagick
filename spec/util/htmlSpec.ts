@@ -1,6 +1,6 @@
 import { buildInputFile, loadImageElement, compare, execute } from '../../src'
 
-describe('util/html', () => {
+export default describe('util/html', () => {
 
   describe('loadImageElement', () => {
 

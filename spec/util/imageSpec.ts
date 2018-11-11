@@ -1,6 +1,6 @@
 import { buildInputFile, compare, extractInfo, MagickInputFile, getFileNameExtension, Call, outputFileToInputFile } from '../../src'
 
-describe('util/image', () => {
+export default describe('util/image', () => {
 
   describe('compareImage', () => {
 

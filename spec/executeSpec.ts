@@ -1,7 +1,7 @@
 import { buildInputFile, compare, extractInfo } from '../src'
 import { execute, executeOne } from '../src'
 
-describe('execute', () => {
+export default describe('execute', () => {
 
   describe('executeOne', () => {
     it('should run convert -resize', async done => {
@@ -13,7 +13,7 @@ describe('execute', () => {
 
       const { outputFiles } = await executeOne({
         inputFiles: [img1],
-        commands: [['convert', 'holocaust.jpg', '-resize', '123x321!', 'resized.png']]
+        commands: [['convert', 'holocaust.jpg', '-resize', '123x321!', 'resized.png']],
       })
       info = await extractInfo(outputFiles[0])
       expect(info[0].image.formatDescription.toLowerCase()).toBe('png')
@@ -41,12 +41,12 @@ describe('execute', () => {
         commands: [
           ['convert', 'image1.png', '-rotate', '70', 'image2.gif'],
           // heads up: next command uses 'image2.gif' which was the output of previous command:
-          ['convert', 'image2.gif', '-scale', '23%', 'image3.jpg']
-        ]
+          ['convert', 'image2.gif', '-scale', '23%', 'image3.jpg'],
+        ],
       })
       const result2 = await executeOne({
         inputFiles: [await buildInputFile('fn.png', 'image1.png')],
-        commands: [['convert', 'image1.png', '-rotate', '70', '-scale', '23%', 'image2.gif']]
+        commands: [['convert', 'image1.png', '-rotate', '70', '-scale', '23%', 'image2.gif']],
       })
       expect(await compare(result.outputFiles.find(f => f.name === 'image3.jpg'), result2.outputFiles[0])).toBe(true)
       done()
@@ -58,12 +58,12 @@ describe('execute', () => {
         commands: [
           'convert image1.png -rotate 70 image2.gif',
           // heads up: next command uses 'image2.gif' which was the output of previous command:
-          'convert image2.gif -scale 23% image3.jpg'
-        ]
+          'convert image2.gif -scale 23% image3.jpg',
+        ],
       })
       const result2 = await executeOne({
         inputFiles: [await buildInputFile('fn.png', 'image1.png')],
-        commands: ['convert image1.png -rotate 70 -scale 23% image2.gif']
+        commands: ['convert image1.png -rotate 70 -scale 23% image2.gif'],
       })
       expect(await compare(result.outputFiles.find(f => f.name === 'image3.jpg'), result2.outputFiles[0])).toBe(true)
       done()

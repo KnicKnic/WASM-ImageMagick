@@ -9,16 +9,13 @@
         "max-line-length": [ true, 185 ],
         "member-access": false,
         "member-ordering": [ false ],
-        "no-bitwise": false,
         "no-empty": false,
-        "no-string-literal": false,
         "ordered-imports": false,
         "arrow-parens": [ true, "ban-single-arg-parens" ],
         "unified-signatures": false,
         "array-type": [ true, "array" ],
         "ban-types": false,
         "max-classes-per-file": false,
-        "no-unused-expression": false,
         "quotemark": [true, "single"],
         "semicolon": [true, "never"],
         "indent": [true, "spaces", 2],
@@ -32,7 +29,7 @@
             true,
             {
                 "singleline": "never",
-                "multiline": "never"
+                "multiline": "always"
             }
         ],
         "variable-name": false,

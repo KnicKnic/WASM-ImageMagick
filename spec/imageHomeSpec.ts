@@ -1,6 +1,6 @@
 import { buildInputFile, createImageHome } from '../src'
 
-describe('imageHome', () => {
+export default describe('imageHome', () => {
   it('should allow me to register an image', async done => {
     const imageHome = createImageHome()
     expect(imageHome.isRegistered('fn.png')).toBeFalsy()

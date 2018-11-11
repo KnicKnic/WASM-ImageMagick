@@ -36,14 +36,14 @@ export function uint8ArrayToBlob(arr: Uint8Array): Blob {
 export async function outputFileToInputFile(file: MagickOutputFile, name: string = file.name): Promise<MagickInputFile> {
   return {
     name,
-    content: await blobToUint8Array(file.blob)
+    content: await blobToUint8Array(file.blob),
   }
 }
 
 export function inputFileToOutputFile(file: MagickInputFile, name: string = file.name): MagickOutputFile {
   return {
     name,
-    blob: uint8ArrayToBlob(file.content)
+    blob: uint8ArrayToBlob(file.content),
   }
 }
 
