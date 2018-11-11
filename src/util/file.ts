@@ -56,6 +56,13 @@ export async function asInputFile(f: MagickFile): Promise<MagickInputFile> {
   return f as MagickInputFile
 }
 
+export async function asOutputFile(f: MagickFile): Promise<MagickOutputFile> {
+  if((f as MagickInputFile).content){
+    return await inputFileToOutputFile(f as MagickInputFile)
+  }
+  return f as MagickOutputFile
+}
+
 export function getFileName(url: string): string {
   try {
     return decodeURIComponent(new URL(url).pathname.split('/').pop())
