@@ -1,7 +1,6 @@
-import { blobToString, buildInputFile, Call, extractInfo, compare } from '../src';
-import pmap from 'p-map'
+import pmap from 'p-map';
+import { buildInputFile, compare } from '../src';
 
-// jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000
 describe('formats', () => {
 
   const formats = ['jpg', 'png', 'psd', 'tiff', 'xcf', 'gif', 'bmp']

@@ -1,9 +1,9 @@
 import { MagickInputFile, Call, MagickOutputFile, MagickFile } from "../magickApi";
 import { blobToString, outputFileToInputFile, asInputFile } from "./file";
 
-export async function compare(img1: MagickInputFile, img2: MagickInputFile, error: number = 0.01): Promise<boolean> {
+export async function compare(img1: MagickFile, img2: MagickFile, error: number = 0.01): Promise<boolean> {
   const result = await Call(
-    [img1, img2], 
+    [await asInputFile(img1), await asInputFile(img2)], 
     ['convert', img1.name, img2.name, 
     // '-trim', 
     // '+repage',
@@ -18,7 +18,7 @@ export async function compare(img1: MagickInputFile, img2: MagickInputFile, erro
   return identical <= error
 }
 
-export async function extractInfo(img: MagickInputFile|MagickOutputFile): Promise<any>{
+export async function extractInfo(img: MagickFile): Promise<any>{
   let inputImage =  await asInputFile(img)
   let processedFiles = await Call( [inputImage], ["convert", inputImage.name, "info.json"]);
   return  JSON.parse(await blobToString(processedFiles[0].blob))
