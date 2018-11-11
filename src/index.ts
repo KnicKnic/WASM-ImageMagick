@@ -1,4 +1,5 @@
+export * from './execute'
+export * from './imageHome'
 export * from './magickApi'
 export * from './util/file'
 export * from './util/image'
-export * from './imageHome'

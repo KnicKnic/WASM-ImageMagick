@@ -23,7 +23,7 @@ export function blobToString(blb: Blob): Promise<string> {
   })
 }
 
-export async function buildInputFile(url: string, name: string = getFileNameFromUrl(url)): Promise<MagickInputFile> {
+export async function buildInputFile(url: string, name: string = getFileName(url)): Promise<MagickInputFile> {
   let fetchedSourceImage = await fetch(url);
   let arrayBuffer = await fetchedSourceImage.arrayBuffer();
   let content = new Uint8Array(arrayBuffer);
@@ -48,10 +48,6 @@ export function inputFileToOutputFile(file: MagickInputFile, name: string = file
   }
 }
 
-export function getFileNameExtension(filePathOrUrl: string) {
-  return filePathOrUrl.substring(filePathOrUrl.lastIndexOf('.') + 1, filePathOrUrl.length)
-}
-
 
 export async function asInputFile(f: MagickFile): Promise<MagickInputFile> {
   if((f as MagickOutputFile).blob){
@@ -60,11 +56,21 @@ export async function asInputFile(f: MagickFile): Promise<MagickInputFile> {
   return f as MagickInputFile
 }
 
-export function getFileNameFromUrl(url: string): string {
+export function getFileName(url: string): string {
   try {
     return decodeURIComponent(new URL(url).pathname.split('/').pop())
   } catch (error) {
+    const s = `http://foo.com/${url}`
+    try {
+      return decodeURIComponent(new URL(s).pathname.split('/').pop())
+    } catch (error) {
+      return url
+    }
     return url
   }
-  
 }
+export function getFileNameExtension(filePathOrUrl: string) {
+  const s = getFileName(filePathOrUrl)
+  return s.substring(s.lastIndexOf('.') + 1, s.length)
+}
+

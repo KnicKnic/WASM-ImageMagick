@@ -1,5 +1,5 @@
 import { buildInputFile, compare, extractInfo } from '../src';
-import { execute, executeOne } from '../src/execute';
+import { execute, executeOne } from '../src';
 
 describe('execute', () => {
 
