@@ -4,7 +4,8 @@ export function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
   return new Promise(resolve=>{
     var fileReader = new FileReader();
     fileReader.onload = function(event) {
-       resolve((event.target as any).result);
+      const result = (event.target as any).result as ArrayBuffer
+       resolve(new Uint8Array(result));
     };
     fileReader.readAsArrayBuffer(blob);
   })
