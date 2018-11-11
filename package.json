@@ -11,8 +11,8 @@
     "build": "npm run build-wasm && npm run build-ts",
     "prepare": "npm run build && cp magick.js magick.wasm dist && cp magick.js magick.wasm spec/assets",
     "clean": "sh clean.sh",
-    "test-browser": "npm run test-browser-build && gulp jasmine",
-    "test-browser-server": "npm run test-browser-build && gulp jasmine-server",
+    "test-browser": "npm run test-browser-build && gulp --gulpfile spec/gulpfile.js jasmine",
+    "test-browser-server": "npm run test-browser-build && gulp --gulpfile spec/gulpfile.js jasmine-server",
     "test-browser-build": "rm -rf dist && npm run build-ts && cp -r spec/assets dist && browserify -d dist/spec/index.js -o dist/bundle.js"
   },
   "repository": {
@@ -43,6 +43,5 @@
     "puppeteer": "^1.10.0",
     "typescript": "^3.1.6"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
