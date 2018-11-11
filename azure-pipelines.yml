@@ -7,7 +7,7 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
-- script: npm install
+- script: node -v; npm -v; npm install
   displayName: npm install
 
 # - script: |

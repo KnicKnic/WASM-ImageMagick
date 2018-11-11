@@ -2,6 +2,11 @@
 *
 
 # But not these files...
-!.LICENSE
-!.Readme.md
-!/dist/src/*
+!/LICENSE
+!/Readme.md
+!/dist/**/*
+
+# ignore these in /dist:
+/dist/assets/**/*
+/dist/spec/**/
+/dist/bundle.js
