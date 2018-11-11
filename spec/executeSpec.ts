@@ -67,6 +67,16 @@ export default describe('execute', () => {
       expect(await compare(outputFiles.find(f => f.name === 'image3.jpg'), result2.outputFiles[0])).toBe(true)
       done()
     })
+
+    it('supports single string CLI like command', async done => {
+      const {outputFiles} = await execute({
+        inputFiles: [await buildInputFile('fn.png', 'image1.png')],
+        commands: 'convert image1.png -rotate 70 image2.gif',
+      })
+      expect(outputFiles[0].name).toBe('image2.gif')
+      done()
+    })
+
   })
 
   xit('event emitter', () => {})

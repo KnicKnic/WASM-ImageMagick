@@ -1,5 +1,6 @@
 export * from './execute'
 export * from './imageHome'
+export * from './executionContext'
 export * from './magickApi'
 export * from './util/file'
 export * from './util/cli'

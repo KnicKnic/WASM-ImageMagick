@@ -6,8 +6,11 @@ export type Command = (string | number)[]
 export interface ExecuteConfig {
   inputFiles: MagickInputFile[]
   /** commands could be array form like [['convert', 'foo.png', 'bar.gif']] or CLI form like ['convert foo.png bar.gif'] */
-  commands: Command[] | string[]
+  commands: ExecuteCommand
 }
+
+export type ExecuteCommand = Command[] | string[] | string
+
 export interface ExecuteResult {
   outputFiles: MagickOutputFile[]
 }

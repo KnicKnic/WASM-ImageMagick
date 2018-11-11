@@ -1,4 +1,5 @@
 import { Command } from '..'
+import { ExecuteCommand } from '../execute'
 
 /** generates a valid command line command from given Call/execute Command  */
 export function arrayToCli(command: Command): string {
@@ -42,14 +43,11 @@ export function cliToArray(cliCommand: string): Command {
   return command
 }
 
-export function asCommand(c: Command[] | string[]): Command[] {
+export function asCommand(c: ExecuteCommand): Command[] {
+  if (typeof c === 'string') {    return asCommand([c])  }
   if (!c[0]) { return [] }
   if (typeof c[0] === 'string') {
     return (c as string[]) .map((subCommand: string) => cliToArray(subCommand))
-    console.log('if1', c)
-
   }
-  console.log('if2', c)
   return c as Command[]
-
 }

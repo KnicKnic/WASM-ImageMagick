@@ -1,9 +1,11 @@
-import { MagickInputFile } from './magickApi'
+import { MagickInputFile, MagickFile } from '.'
+import { asInputFile } from './util/file'
 
 export interface ImageHome {
   get(name: string): Promise<MagickInputFile>
-  register(name: string, file: MagickInputFile): void
+  register(file: MagickFile, name?: string): void
   isRegistered(name: string): boolean
+  getAll(): Promise<MagickInputFile[]>
 }
 
 type MagickInputFilePromise = Promise<MagickInputFile> & { resolved: true }
@@ -16,8 +18,12 @@ class ImageHomeImpl implements ImageHome {
     return this.images[name]
   }
 
-  register(name: string, file: MagickInputFile): MagickInputFilePromise {
-    const promise = new Promise(resolve => resolve(file)) as MagickInputFilePromise
+  async getAll(): Promise<MagickInputFile[]> {
+    return await Promise.all(Object.keys(this.images).map(k => this.images[k]))
+  }
+
+  register(file: MagickFile, name: string = file.name): MagickInputFilePromise {
+    const promise = asInputFile(file) as MagickInputFilePromise
     this.images[name] = promise
     this.images[name].catch(() => { }).then(() => {
       promise.resolved = true

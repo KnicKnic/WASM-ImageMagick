@@ -1,25 +1,10 @@
 # Web assembly ImageMagick [![Build Status](https://dev.azure.com/oneeyedelf1/wasm-imagemagick/_apis/build/status/KnicKnic.WASM-ImageMagick)](https://dev.azure.com/oneeyedelf1/wasm-imagemagick/_build/latest?definitionId=1)
 This project is not affiliated with [ImageMagick](https://www.imagemagick.org) , but is merely recompiling the code to be [WebAssembly](https://webassembly.org/). I did this because I want to bring the power of ImageMagick to the browser.
 
-## Simple Sample
-see [samples/rotate#code](samples/rotate#code)
 
-A simple webpage that has image in array and loads magickApi.js to rotate file
+## Demos and examples
 
-Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
-
-## Status
-
-### Image formats supported
-
-Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
-
-### Features **not** supported 
-
- * [Text](https://www.imagemagick.org/Usage/text/)
- * [Fourier Transforms](https://www.imagemagick.org/Usage/fourier/)
-
-## Demos
+ * Simple example. See [samples/rotate#code](samples/rotate#code). A simple webpage that has image in array and loads magickApi.js to rotate file. Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
 
  * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
     * For code see [samples/cmdline](samples/cmdline)
@@ -34,6 +19,19 @@ Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](htt
  * [Playground with several transformation examples and image formats](https://cancerberosgx.github.io/autumn-leaves/#/convertDemo). It also shows the output of transformations made with ImageMaick in the browser to verify wasm-imagemagick output the right thing.  
 
  * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
+
+
+## Status
+
+### Image formats supported
+
+Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
+
+### Features **not** supported 
+
+ * [Text](https://www.imagemagick.org/Usage/text/)
+ * [Fourier Transforms](https://www.imagemagick.org/Usage/fourier/)
+
 
 ## Usage with npm
 
@@ -123,7 +121,7 @@ For working sample code see [samples/rotate](samples/rotate)
 
 ## Build instructions
 
-```
+```sh
 git clone --recurse-submodules https://github.com/KnicKnic/WASM-ImageMagick.git
 
 cd WASM-ImageMagick
