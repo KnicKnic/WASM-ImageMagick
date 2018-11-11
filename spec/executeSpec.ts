@@ -1,5 +1,4 @@
-import { buildInputFile, compare, extractInfo } from '../src'
-import { execute, executeOne } from '../src'
+import { buildInputFile, compare, extractInfo, execute, executeOne } from '../src'
 
 export default describe('execute', () => {
 
@@ -53,11 +52,11 @@ export default describe('execute', () => {
     })
 
     it('supports CLI like commands', async done => {
-      const result = await execute({
+      const {outputFiles} = await execute({
         inputFiles: [await buildInputFile('fn.png', 'image1.png')],
         commands: [
           'convert image1.png -rotate 70 image2.gif',
-          // heads up: next command uses 'image2.gif' which was the output of previous command:
+          // heads up: the next command uses 'image2.gif' which was the output of previous command:
           'convert image2.gif -scale 23% image3.jpg',
         ],
       })
@@ -65,7 +64,7 @@ export default describe('execute', () => {
         inputFiles: [await buildInputFile('fn.png', 'image1.png')],
         commands: ['convert image1.png -rotate 70 -scale 23% image2.gif'],
       })
-      expect(await compare(result.outputFiles.find(f => f.name === 'image3.jpg'), result2.outputFiles[0])).toBe(true)
+      expect(await compare(outputFiles.find(f => f.name === 'image3.jpg'), result2.outputFiles[0])).toBe(true)
       done()
     })
   })

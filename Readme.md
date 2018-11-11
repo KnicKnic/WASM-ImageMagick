@@ -10,13 +10,14 @@ Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knic
 
 ## Status
 
+### Image formats supported
+
 Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
 
-Things not supported: 
+### Features **not** supported 
 
  * [Text](https://www.imagemagick.org/Usage/text/)
  * [Fourier Transforms](https://www.imagemagick.org/Usage/fourier/)
- * webp
 
 ## Demos
 
@@ -40,13 +41,10 @@ Things not supported:
 npm install --save wasm-imagemagick
 ```
 
-Use it:
+Use the low-level `Call()` API:
 
 ```js
-import * as Magick from 'wasm-imagemagick'
-
-// the image element where to load output images
-const outputImage = document.getElementById('rotatedImage')
+import { Call } from 'wasm-imagemagick'
 
 // fetch the input image and get its content bytes
 const fetchedSourceImage = await fetch("rotate.png")
@@ -55,13 +53,15 @@ const sourceBytes = new Uint8Array(await fetchedSourceImage.arrayBuffer());
 // calling ImageMagick with one source image, and command to rotate & resize image
 const inputFiles = [{ 'name': 'srcFile.png', 'content': sourceBytes }]
 const command = ["convert", "srcFile.png", '-rotate', '90', '-resize', '200%', 'out.png']
-const processedFiles = await Magick.Call(inputFiles, command)
+const processedFiles = await Call(inputFiles, command)
 
 // response can be multiple files (example split) here we know we just have one
 const firstOutputImage = processedFiles[0]
+
+// create a html image element to show the output image:
+const outputImage = document.getElementById('rotatedImage')
 outputImage.src = URL.createObjectURL(firstOutputImage.blob)
 console.log('created image ' + firstOutputImage.name)
-
 ```
 
 And **don't forget to copy `magick.wasm` and `magick.js`** files to the folder where index.html is being served:
@@ -73,14 +73,32 @@ cp node_modules/wasm-imagemagick/dist/magick.js .
 
 You can then use browserify, tsc, webpack, rollup, etc to build a bundle.js file from previous example.
 
-## Using it directly
+### High level API and utilities
+
+`wasm-imagemagick` comes with some easy to use APIs for creating image files from urls, executing multiple commands reusing output imges and nicer command syntax, and utilities to handle html images, image comparission, metadata extraction,  etc. The following example is equivalent to the previous using these APIs: 
+
+```ts
+import { buildInputFile, execute, loadImageElement } from 'wasm-imagemagick'
+ 
+const {outputFiles} = await execute({
+  inputFiles: [await buildInputFile('http://some-cdn.com/foo/fn.png', 'image1.png')],
+  commands: [
+    'convert image1.png -rotate 70 image2.gif',
+    // heads up: the next command uses 'image2.gif' which was the output of previous command:
+    'convert image2.gif -scale 23% image3.jpg',
+  ],
+})
+await loadImageElement(outputFiles[0], document.getElementById('transformedImage'))
+```
+
+## Using it directly from the HTML file
 
 If you are not working in a npm development environment you can still load the library with the following code by placing these three files next to your index.html: `magick.js`, `magick.wasm` and `magickApi.js` : 
 
 ```js
 <script type="module">
 import * as Magick from './magickApi.js'
-// ...
+// ... same snippet as before
 </script>
 ```
 
