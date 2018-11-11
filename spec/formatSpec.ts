@@ -1,28 +1,34 @@
-// import { blobToString, buildInputFile, Call, extractInfo, compare } from '../src';
-// import pmap from 'p-map'
-// describe('formats', () => {
+import { blobToString, buildInputFile, Call, extractInfo, compare } from '../src';
+import pmap from 'p-map'
 
-//   const formats = ['jpg', 'png', 'psd', 'tiff', 'xcd']
+// jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000
+describe('formats', () => {
 
-//   fit('should be equal', async done=>{
-//     // expect(false).toBe(true)
-//     const promises:Promise<boolean>[] = []
-//     formats.forEach(f1=>{
-//       formats.filter(f2=>f2!=f1).forEach(async f2=>{
-//         promises.push(compare(await buildInputFile(`to_rotate.${f1}`), await buildInputFile(`to_rotate.${f2}`)))
-//       })
-//     })
-// console.log({promises});
+  const formats = ['jpg', 'png', 'psd', 'tiff', 'xcf', 'gif', 'bmp']
 
-//     const results = await pmap(promises, p=>p, {concurrency: 1})
-//     // const results = await    Promise.all(promises)
-    
-// console.log({results});
-//     results.forEach(r=>{
-//       expect(r).toBe(false)
-//     })
-//     console.log('done');
-    
-//     done()
-//   })
-// })
+  it('compare should be true for all combinations', async done => {
+
+    const compares = []
+    formats.forEach(f1 => {
+      formats.filter(f2 => f2 != f1).forEach(async f2 => {
+        compares.push([`to_rotate.${f1}`, `to_rotate.${f2}`])
+      })
+    })
+    const results = await pmap(compares, async c => {
+      return compare(await buildInputFile(c[0]), await buildInputFile(c[1]))
+    })
+
+    expect(results.length).toBeGreaterThan(formats.length*2)
+
+    results.forEach((r, i) => {
+      expect(r).toBe(true, `compare(${compares[i][0]}, ${compares[i][1]})`)
+    })
+
+    done()
+
+  })
+
+  xit('extractInfo should get correct format and size', ()=>{
+
+  })
+})
