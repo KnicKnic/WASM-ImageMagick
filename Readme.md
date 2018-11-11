@@ -96,6 +96,7 @@ import * as Magick from './magickApi.js'
 
 For working sample code see [samples/rotate](samples/rotate)
 
+
 ## Build instructions
 
 ```
@@ -109,7 +110,15 @@ docker run --rm -it --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools
 
 #windows cmd
 #docker run --rm -it --workdir /code -v %CD%:/code wasm-imagemagick-build-tools bash ./build.sh
-
 ```
 
-Produces `magick.js` & `magick.wasm` in the current folder. Along with `magickApi.js` that is all the files needed on the webserver.
+Produces `magick.js` & `magick.wasm` in the current folder.
+
+Note: `npm run build` will perform all the previous commands plus compiling the TypeScript project.
+
+
+## Run tests
+
+`npm test` will run some tests with nodejs located at `./tests/rotate`.
+
+`npm run test-browser` will run spec in a headless chrome browser. This tests are located at `./spec/`.

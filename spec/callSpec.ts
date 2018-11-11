@@ -1,4 +1,3 @@
-// import * as Magick from '../src';
 import { blobToString, buildInputFile, Call } from '../src';
 import { extractInfoAndTest } from './testUtil';
 
@@ -18,9 +17,7 @@ describe('call', () => {
   })
 
   it('should be able to resize image', async done => {
-    // console.log('SEBA');
     const img = await buildInputFile('fn.png')
-    // console.log('SEBA');
 
     await extractInfoAndTest(img, info => expect(info[0].image.geometry.height).toBe(145))
     await extractInfoAndTest(img, info => console.log(info))
