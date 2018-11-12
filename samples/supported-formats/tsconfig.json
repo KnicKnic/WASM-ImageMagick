@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "declaration": true,
+    "lib": [
+      "dom", "es6"
+    ],
+    "target": "es2018",
+    "module": "commonjs",
+    "skipLibCheck": true,
+    "jsx": "react",
+    "jsxFactory": "React.createElement"
+  },
+  "include": [
+    "src", "spec"
+  ],
+  "exclude": [
+    "node_modules", "dist"
+  ]
+}
+
