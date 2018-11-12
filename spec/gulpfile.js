@@ -1,6 +1,5 @@
 var gulp = require('gulp')
 var jasmineBrowser = require('gulp-jasmine-browser')
-var watch = require('gulp-watch')
 
 const src = ['../dist/bundle.js', '../dist/assets/**/*']
 
