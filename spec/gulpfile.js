@@ -11,7 +11,6 @@ gulp.task('jasmine', function () {
 
 gulp.task('jasmine-server', function () {
   return gulp.src(src)
-    .pipe(watch(src))
     .pipe(jasmineBrowser.specRunner({ console: true }))
     .pipe(jasmineBrowser.server({ port: 8888 }))
 })

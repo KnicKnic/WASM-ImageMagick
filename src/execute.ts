@@ -13,16 +13,22 @@ export type ExecuteCommand = Command[] | string[] | string
 
 export interface ExecuteResult {
   outputFiles: MagickOutputFile[]
+  errors?: any[]
 }
 
 /** execute first command in given config */
 export async function executeOne(config: ExecuteConfig): Promise<ExecuteResult> {
-  const command = asCommand(config.commands)[0]
-  const t0 = performance.now()
-  executeListeners.forEach(listener => listener.beforeExecute({ command, took: performance.now() - t0, id: t0 }))
-  const result = { outputFiles: await Call(config.inputFiles, command.map(c => c + '')) }
-  executeListeners.forEach(listener => listener.afterExecute({ command, took: performance.now() - t0, id: t0 }))
-  return result
+  try {
+    const command = asCommand(config.commands)[0]
+    const t0 = performance.now()
+    executeListeners.forEach(listener => listener.beforeExecute({ command, took: performance.now() - t0, id: t0 }))
+    const result = { outputFiles: await Call(config.inputFiles, command.map(c => c + '')) }
+    executeListeners.forEach(listener => listener.afterExecute({ command, took: performance.now() - t0, id: t0 }))
+    return result
+
+  } catch (error) {
+    return { outputFiles: [], errors: [error] }
+  }
 }
 
 // execute event emitter
@@ -76,6 +82,7 @@ export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
   config.inputFiles.forEach(f => {
     allInputFiles[f.name] = f
   })
+  let allErrors = []
   async function mapper(c: Command) {
     const thisConfig = {
       inputFiles: Object.keys(allInputFiles).map(name => allInputFiles[name]),
@@ -87,10 +94,12 @@ export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
       const inputFile = await outputFileToInputFile(f)
       allInputFiles[inputFile.name] = inputFile
     })
+    allErrors = allErrors.concat(result.errors)
   }
   const commands = asCommand(config.commands)
   await pMap(commands, mapper, { concurrency: 1 })
   return {
     outputFiles: Object.keys(allOutputFiles).map(name => allOutputFiles[name]),
+    errors: allErrors,
   }
 }

@@ -23,12 +23,21 @@ export default describe('execute', () => {
 
     it('should support CLI like commands', async done => {
       const img1 = await buildInputFile('holocaust.jpg')
-      const {outputFiles} = await executeOne({inputFiles: [img1], commands: ['convert holocaust.jpg -resize 444x76! output.gif']})
+      const { outputFiles } = await executeOne({ inputFiles: [img1], commands: ['convert holocaust.jpg -resize 444x76! output.gif'] })
       expect(outputFiles[0].name).toBe('output.gif')
       const info = await extractInfo(outputFiles[0])
       expect(info[0].image.formatDescription.toLowerCase()).toBe('gif')
       expect(info[0].image.geometry.width).toBe(444)
       expect(info[0].image.geometry.height).toBe(76)
+      done()
+    })
+
+    it('should return error property and empty outputFiles on error', async done => {
+      const img = await buildInputFile('fn.png')
+      const { outputFiles, errors } = await executeOne({ inputFiles: [img], commands: `convert nonexistent.png out.tiff` })
+      expect(outputFiles.length).toBe(0)
+      expect(errors).toBeDefined()
+      expect(errors.length).toBeGreaterThan(0)
       done()
     })
   })
@@ -52,7 +61,7 @@ export default describe('execute', () => {
     })
 
     it('supports CLI like commands', async done => {
-      const {outputFiles} = await execute({
+      const { outputFiles } = await execute({
         inputFiles: [await buildInputFile('fn.png', 'image1.png')],
         commands: [
           'convert image1.png -rotate 70 image2.gif',
@@ -69,7 +78,7 @@ export default describe('execute', () => {
     })
 
     it('supports single string CLI like command', async done => {
-      const {outputFiles} = await execute({
+      const { outputFiles } = await execute({
         inputFiles: [await buildInputFile('fn.png', 'image1.png')],
         commands: 'convert image1.png -rotate 70 image2.gif',
       })
@@ -77,7 +86,36 @@ export default describe('execute', () => {
       done()
     })
 
+    describe('errors', () => {
+
+      it('should return error property and empty outputFiles on error', async done => {
+        const img = await buildInputFile('fn.png')
+        const { outputFiles, errors } = await execute({ inputFiles: [img], commands: `convert nonexistent.png out.tiff` })
+        expect(outputFiles.length).toBe(0)
+        expect(errors).toBeDefined()
+        expect(errors.length).toBeGreaterThan(0)
+        done()
+      })
+
+      it('should return errors per command', async done => {
+        const img = await buildInputFile('fn.png')
+        const { outputFiles, errors } = await execute({
+          inputFiles: [img], commands: [
+            `convert fn.png out.gif`,
+            `convert nonexistent.png out.tiff`,
+            `convert out.gif foo.png`,
+          ],
+        })
+        expect(outputFiles.length).toBe(2)
+        expect(errors.length).toBe(3)
+        expect(errors.filter(error => !!error).length).toBe(1)
+        expect(errors[0]).toBeUndefined()
+        expect(errors[1]).toBeDefined()
+        expect(errors[2]).toBeUndefined()
+        done()
+      })
+    })
   })
 
-  xit('event emitter', () => {})
+  xit('event emitter', () => { })
 })
