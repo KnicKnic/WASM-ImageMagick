@@ -6,3 +6,4 @@
 node_modules
 /dist
 *.tgz
+/magickApi.js
