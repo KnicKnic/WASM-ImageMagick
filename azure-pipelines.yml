@@ -7,21 +7,35 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
-- script: |
-    sudo npm install -g typescript
-  displayName: install typescript
 
-- script: npm run build
-  displayName: run npm based build
+- script: |
+   echo "original node version `node -v`" 
+   echo "original npm version `npm -v`"
+   sudo npm i -g n    
+   sudo n latest
+   echo "installed latest node version `node -v`"
+   echo "installed latest npm version `npm -v`" 
+  displayName: install node latest
+
+- script: |
+   echo "npm install with node version `node -v`"
+   echo "npm install with npm version `npm -v`" 
+   npm install
+  displayName: npm install
 
 # - script: |
 #    cd tests/rotate
 #    docker run -v "$PWD":/code --rm --workdir /code node node  /code/node.js
 #  displayName: test wasm with nodejs
 
-- script: npm run test 
+- script: npm test
   displayName: run tests
   
+
+- script: npm run test-browser
+  displayName: run tests in browser
+
+
 - script: cp magick* $(Build.ArtifactStagingDirectory)
   displayName: cp magick files to artifact staging directory
   

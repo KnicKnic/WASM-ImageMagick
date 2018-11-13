@@ -8,7 +8,9 @@
     ],
     "target": "es2018",
     "module": "commonjs",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "jsx": "react",
+    "jsxFactory": "React.createElement"
   },
   "include": [
     "src", "spec"

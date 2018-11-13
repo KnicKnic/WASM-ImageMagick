@@ -1,0 +1,35 @@
+{
+  "name": "supported-formats",
+  "version": "1.0.0",
+  "description": "html page that transform images in different formats (not understandable by the browser), transform each of them to png and show a table with all these transformations.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc && npm run bundle",
+    "bundle": "browserify dist/index.js -o static/bundle.js",
+    "copy": "cp -r ../../spec/assets/formats ../../spec/assets/magick.* src/static/* static",
+    "clean": "rm -rf dist static",
+    "start": "npm run clean && npm run build && npm run copy && npm run watch-all",
+    "server": "http-server static",
+    "watch-all": "concurrently 'npm run watch-build' 'npm run watch-server' ",
+    "watch-build": "onchange -v 'src/**/*' -- npm run build",
+    "watch-server": "onchange -i -k -v 'static/**/*' -- npm run server"
+  },
+  "keywords": [],
+  "author": "sg",
+  "license": "ISC",
+  "dependencies": {
+    "p-map": "^2.0.0",
+    "react": "^16.6.1",
+    "react-dom": "^16.6.1",
+    "wasm-imagemagick": "file:../.."
+  },
+  "devDependencies": {
+    "http-server": "^0.11.1",
+    "onchange": "^5.1.0",
+    "@types/react": "^16.4.6",
+    "@types/react-dom": "^16.0.6",
+    "browserify": "^16.2.3",
+    "concurrently": "^4.0.1",
+    "typescript": "^3.1.6"
+  }
+}
