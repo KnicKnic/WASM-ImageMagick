@@ -4,8 +4,12 @@ import { asOutputFile, buildInputFile } from './file'
 // utilities related to HTML (img) elements
 
 export async function loadImageElement(image: MagickFile, el: HTMLImageElement) {
+  el.src = await buildImageSrc(image)
+}
+
+export async function buildImageSrc(image: MagickFile) {
   const outputFile = await asOutputFile(image)
-  el.src = URL.createObjectURL(outputFile.blob)
+  return URL.createObjectURL(outputFile.blob)
 }
 
 function inputFileFiles(el: HTMLInputElement): File[] {

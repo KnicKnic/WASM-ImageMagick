@@ -1,4 +1,4 @@
-import { asInputFile, Call, MagickFile, blobToString } from '..'
+import { asInputFile, Call, MagickFile, blobToString, MagickInputFile } from '..'
 
 export async function compare(img1: MagickFile, img2: MagickFile, error: number = 0.01): Promise<boolean> {
   const identical = await compareNumber(img1, img2)
@@ -12,10 +12,4 @@ export async function compareNumber(img1: MagickFile, img2: MagickFile): Promise
   )
   const n = await blobToString(result[0].blob)
   return parseFloat(n)
-}
-
-export async function extractInfo(img: MagickFile): Promise<any> {
-  const inputImage = await asInputFile(img)
-  const processedFiles = await Call([inputImage], ['convert', inputImage.name, 'info.json'])
-  return JSON.parse(await blobToString(processedFiles[0].blob))
 }

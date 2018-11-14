@@ -1,8 +1,5 @@
-import { ImageHome } from '.'
-import { ExecuteConfig, ExecuteResult, execute, ExecuteCommand } from './execute'
-import { createImageHome } from './imageHome'
-import { MagickInputFile, MagickFile } from './magickApi'
-import fileSpec from '../spec/util/fileSpec'
+import { ImageHome, ExecuteConfig, ExecuteResult, execute, ExecuteCommand, createImageHome, MagickInputFile, MagickFile, extractInfo } from '.'
+import pMap from 'p-map';
 
 /**
  * Allow multiple execute() calls remembering previus execute() generated output files and previous given input files that can be used as input files in next calls.
@@ -38,12 +35,21 @@ class ExecutionContextImpl implements ExecutionContext {
   async getAllFiles(): Promise<MagickInputFile[]> {
     return this.imageHome.getAll()
   }
+  async addBuiltInImages() {
+    const builtInImages = ['rose:', 'logo:', 'wizard:', 'granite:', 'netscape:']
+    
+    pMap(builtInImages, async name=>{
+      const info = extractInfo(name)
+      // const {outputFiles} = 
+    })
+  }
   static create(inheritFrom?: ExecutionContext) {
     if (inheritFrom && !(inheritFrom as ExecutionContextImpl).imageHome) {
       throw new Error('Dont know how to inherith from other ExecutionContext implementation than this one')
     }
     return new ExecutionContextImpl(inheritFrom && (inheritFrom as ExecutionContextImpl).imageHome)
   }
+
 }
 
 function asConfig(configOrCommands: ExecuteConfig|ExecuteCommand|string): ExecuteConfig {
