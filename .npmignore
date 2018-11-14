@@ -5,6 +5,7 @@
 !/LICENSE
 !/Readme.md
 !/dist/**/*
+!/magickApi.js
 
 # ignore these in /dist:
 /dist/assets/**/*

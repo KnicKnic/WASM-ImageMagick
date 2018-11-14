@@ -9,7 +9,7 @@
     "build-wasm": "docker build -t wasm-imagemagick-build-tools . && docker run --rm --workdir /code -v \"$PWD\":/code wasm-imagemagick-build-tools bash ./build.sh",
     "build-ts": "tsc",
     "build": "npm run build-wasm && npm run build-ts && npm run magickApiJs",
-    "prepare": "npm run build && cp magick.js magick.wasm dist && cp magick.js magick.wasm spec/assets",
+    "copy": "cp magick.js magick.wasm dist && cp magick.js magick.wasm spec/assets",
     "magickApiJs": "tsc src/magickApi.ts --lib dom,es6 --target es2018 --outdir .",
     "clean": "sh clean.sh",
     "test-browser": "npm run test-browser-build && gulp --gulpfile spec/gulpfile.js jasmine",

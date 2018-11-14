@@ -1,6 +1,6 @@
 import * as React from 'react';
 import pmap from 'p-map'
-import { buildInputFile, execute, loadImageElement, compare, compareNumber } from '../../../dist/src';
+import { buildInputFile, execute, loadImageElement, compare, compareNumber } from 'wasm-imagemagick';
 
 export interface AppProps {
   formats: string[]
