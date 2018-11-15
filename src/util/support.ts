@@ -1,6 +1,5 @@
 // has some heuristic information regarding features (not) supported by wasm-imagemagick, for example, image formats
 
-
 // heads up - all images spec/assets/to_rotate.* where converted using gimp unless explicitly saying otherwhise
 export const knownSupportedReadWriteImageFormats = [
   'jpg', 'png',
@@ -19,5 +18,5 @@ export const knownSupportedReadWriteImageFormats = [
 
   'txt', // generated using convert to_rotate.png  to_rotate.txt
 
-  // 'rgb', // fails because  MustSpecifyImageSize `to_rotate.rgb' 
+  // 'rgb', // fails because  MustSpecifyImageSize `to_rotate.rgb'
 ]

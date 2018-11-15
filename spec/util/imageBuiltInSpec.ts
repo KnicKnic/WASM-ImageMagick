@@ -1,5 +1,5 @@
-import { getBuiltInImages, builtInImageNames, extractInfo, execute, compare } from '../../src';
-import pMap from 'p-map';
+import { getBuiltInImages, builtInImageNames, extractInfo, execute, compare } from '../../src'
+import pMap from 'p-map'
 
 export default describe('util/imageBuiltIn', () => {
 

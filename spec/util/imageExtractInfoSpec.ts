@@ -1,4 +1,4 @@
-import { buildInputFile, extractInfo } from '../../src';
+import { buildInputFile, extractInfo } from '../../src'
 
 export default describe('util/imageExtractInfo', () => {
 

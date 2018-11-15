@@ -1,5 +1,5 @@
-import { MagickFile, MagickInputFile } from '../magickApi';
-import { asOutputFile } from './file';
+import { MagickFile, MagickInputFile } from '../magickApi'
+import { asOutputFile } from './file'
 
 // utilities related to HTML (img) elements
 

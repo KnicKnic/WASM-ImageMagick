@@ -1,15 +1,14 @@
 import pmap from 'p-map'
 import { buildInputFile, compare, execute, executeOne, extractInfo, knownSupportedReadWriteImageFormats } from '../src'
 
-
 export default describe('formats', () => {
 
   const formats = knownSupportedReadWriteImageFormats
   const descriptions = {
-    psd: 'Adobe Photoshop bitmap file'
+    psd: 'Adobe Photoshop bitmap file',
   }
 
-  describe('compare and assert on info', ()=>{
+  describe('compare and assert on info', () => {
 
     let jasmineTimeout
 
@@ -17,11 +16,11 @@ export default describe('formats', () => {
       jasmineTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
       jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000
     })
-  
+
     afterAll(() => {
       jasmine.DEFAULT_TIMEOUT_INTERVAL = jasmineTimeout
     })
-  
+
     it('compare should be true for all combinations', async done => {
       const compares = []
       formats.forEach(f1 => {
@@ -38,9 +37,9 @@ export default describe('formats', () => {
       })
       done()
     })
-  
+
     it('info format should match', async done => {
-  
+
       const mimeTypes = {
         jpg: 'image/jpeg',
         png: 'image/png',
@@ -68,11 +67,10 @@ export default describe('formats', () => {
       })
       done()
     })
-  
+
   })
 
-
-  describe('particular formats not supported or working', ()=>{
+  describe('particular formats not supported or working', () => {
 
     it('svg is not supported', async done => {
       const img = await buildInputFile('react.svg')
@@ -82,7 +80,7 @@ export default describe('formats', () => {
       expect(errors.length).toBeGreaterThan(0)
       done()
     })
-  
+
     it('djvu doesn\'t work even read only', async done => {
       const img = await buildInputFile('formats/to_rotate.djvu')
       const { outputFiles, errors } = await executeOne({ inputFiles: [img], commands: `convert to_rotate.djvu out.tiff` })

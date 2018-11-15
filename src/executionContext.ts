@@ -1,6 +1,6 @@
 import { ImageHome, ExecuteConfig, ExecuteResult, execute, ExecuteCommand, createImageHome, MagickInputFile, MagickFile, extractInfo } from '.'
-import pMap from 'p-map';
-import { asOutputFile, asInputFile, getBuiltInImages } from './util';
+import pMap from 'p-map'
+import { asOutputFile, asInputFile, getBuiltInImages } from './util'
 
 /**
  * Allow multiple execute() calls remembering previus execute() generated output files and previous given input files that can be used as input files in next calls.
@@ -12,7 +12,6 @@ export interface ExecutionContext {
   addBuiltInImages(): Promise<MagickFile[]>
   getFile(name: string): Promise<MagickInputFile>
 }
-
 
 class ExecutionContextImpl implements ExecutionContext {
 
@@ -39,17 +38,16 @@ class ExecutionContextImpl implements ExecutionContext {
   }
 
   async getAllFiles(): Promise<MagickInputFile[]> {
-    const all= await this.imageHome.getAll()
+    const all = await this.imageHome.getAll()
     return all.concat(this.builtInImages)
   }
 
   async getFile(name: string): Promise<MagickInputFile> {
-    return (await this.imageHome.get(name)) || this.builtInImages.find(i=>i.name===name)
+    return (await this.imageHome.get(name)) || this.builtInImages.find(i => i.name === name)
   }
 
-
   async addBuiltInImages() {
-    if(!this.builtInImages.length){
+    if (!this.builtInImages.length) {
       this.builtInImages = await getBuiltInImages()
   //     const builtInImages = ['rose:', 'logo:', 'wizard:', 'granite:', 'netscape:']
   //     this.builtInImages = await pMap(builtInImages, async name=>{
@@ -60,9 +58,9 @@ class ExecutionContextImpl implements ExecutionContext {
   //       return await asInputFile(outputFiles[0])
   //     })
     }
-    return this.builtInImages   
+    return this.builtInImages
   }
-  
+
   static create(inheritFrom?: ExecutionContext) {
     if (inheritFrom && !(inheritFrom as ExecutionContextImpl).imageHome) {
       throw new Error('Dont know how to inherith from other ExecutionContext implementation than this one')

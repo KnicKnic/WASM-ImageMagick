@@ -65,22 +65,22 @@ export function addExecuteListener(l: ExecuteListener) {
  * ```
  *
  * An alternative syntax with CLI-like strings is also supported:
- * 
+ *
  * ```ts
  * const {outputFiles} = await execute({inputFiles: [], commands: [
  *   'convert rose: -rotate 70 image2.gif',
  *   'convert image2.gif -resize 33 image3.gif'
  * ] })
  * ```
- * 
- * Or if it's only one command using just a string: 
- * 
+ *
+ * Or if it's only one command using just a string:
+ *
  * ```ts
  * const {outputFiles} = await execute({inputFiles: [foo], commands: `convert 'my face image.png' \\( +clone -channel R -fx B \\) +swap -channel B -fx v.R bar.gif`})
  * ```
- * 
- * Note: in string syntax you must use single quotes for CLI arguments that need so (like 'my face image.png'). no multiline with \ is supported. 
- * 
+ *
+ * Note: in string syntax you must use single quotes for CLI arguments that need so (like 'my face image.png'). no multiline with \ is supported.
+ *
  * ```
  */
 export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {

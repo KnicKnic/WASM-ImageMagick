@@ -1,10 +1,11 @@
-import { buildInputFile, Call, compare, MagickInputFile, outputFileToInputFile } from '../../src';
+import { buildInputFile, Call, compare, MagickInputFile, outputFileToInputFile } from '../../src'
 
 export default describe('util/imageCompare', () => {
 
   async function test(img1: MagickInputFile | string, img2: MagickInputFile | string, expectedResult: boolean) {
     const result = await compare(img1, img2)
-    expect(result).toBe(expectedResult, `Expected compareImage(${typeof img1 === 'string' ? img1 : img1.name} and ${typeof img2 === 'string' ? img2 : img2.name}) to return ${expectedResult} but returned ${result}`)
+    expect(result).toBe(expectedResult,
+      `Expected compareImage(${typeof img1 === 'string' ? img1 : img1.name} and ${typeof img2 === 'string' ? img2 : img2.name}) to return ${expectedResult} but returned ${result}`)
   }
 
   it('should return true if image is the same', async done => {

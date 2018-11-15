@@ -6,7 +6,9 @@ export async function compare(img1: MagickFile | string, img2: MagickFile | stri
 }
 
 export async function compareNumber(img1: MagickFile | string, img2: MagickFile | string): Promise<number> {
-  let name1: string, imgs: MagickInputFile[] = [], name2: string
+  const imgs: MagickInputFile[] = []
+  let name1: string
+  let name2: string
   if (typeof img1 !== 'string') {
     const inputFile = await asInputFile(img1)
     imgs.push(inputFile)
@@ -23,8 +25,7 @@ export async function compareNumber(img1: MagickFile | string, img2: MagickFile 
   else {
     name2 = img2
   }
-  const result = await Call(
-    imgs,
+  const result = await Call(imgs,
     ['convert', name1, name2, '-resize', '256x256^!', '-metric', 'RMSE', '-format', '%[distortion]', '-compare', 'info:info.txt'],
   )
   const n = await blobToString(result[0].blob)
