@@ -12,19 +12,21 @@ export interface ExecuteConfig {
 
 export type ExecuteCommand = Command[] | string[] | string
 
-export interface ExecuteResultOne {
-  outputFiles: MagickOutputFile[]
-  errors?: any[]
-  stderr?: string[]
-  stdout?: string[]
-  exitCode?: number
+export interface ExecuteResultOne extends CallResult {
+  // outputFiles: MagickOutputFile[]
+  errors: any[]
+  // stderr: string[]
+  // stdout: string[]
+  exitCode: number
 }
 
 /** execute first command in given config */
 export async function executeOne(config: ExecuteConfig): Promise<ExecuteResultOne> {
-  let result: ExecuteResultOne = {
+  let result: CallResult = {
     stderr: [],
+    stdout: [],
     outputFiles: [],
+    exitCode: 1,
   }
   try {
     config.inputFiles = config.inputFiles || []
@@ -39,7 +41,7 @@ export async function executeOne(config: ExecuteConfig): Promise<ExecuteResultOn
     return { ...result, errors: [undefined] }
 
   } catch (error) {
-    return { ...result, errors: [error + ', exit code: ' + result.exitCode + ', stderr: ' + result.stderr.join('\n') ] }
+    return { ...result, errors: [error + ', exit code: ' + result.exitCode + ', stderr: ' + result.stderr.join('\n')] }
   }
 }
 
@@ -50,11 +52,14 @@ export interface ExecuteEvent {
   took: number
   id: number
 }
+
 export interface ExecuteListener {
   afterExecute?(event: ExecuteEvent): void
   beforeExecute?(event: ExecuteEvent): void
 }
+
 const executeListeners: ExecuteListener[] = []
+
 export function addExecuteListener(l: ExecuteListener) {
   executeListeners.push(l)
 }
@@ -128,11 +133,13 @@ export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
   }
   const commands = asCommand(config.commands)
   await pMap(commands, mapper, { concurrency: 1 })
+  const resultWithError = results.find(r => r.exitCode !== 0)
   return {
     outputFiles: Object.keys(allOutputFiles).map(name => allOutputFiles[name]),
     errors: allErrors,
     results,
     stdout: allStdout,
     stderr: allStderr,
+    exitCode: resultWithError ? resultWithError.exitCode : 0,
   }
 }

@@ -113,6 +113,7 @@ export default describe('execute', () => {
         })
         expect(result.outputFiles.length).toBe(2)
         expect(result.errors.length).toBe(4)
+        expect(result.exitCode).not.toBe(0)
         expect(result.errors[0]).toBeUndefined()
         expect(result.errors[1]).toBeDefined()
         expect(result.errors[2]).toBeUndefined()
@@ -123,6 +124,7 @@ export default describe('execute', () => {
 
         expect(result.results[3].stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
         expect(result.results[3].errors[0]).toBeUndefined()
+        expect(result.results[3].exitCode).toBe(0)
 
         expect(result.results[1].errors[0]).toBeDefined()
         expect(result.results[1].stderr.join('\n')).toContain(`'nonExistent.png': No such file or directory`)

@@ -67,12 +67,7 @@ magickWorker.onmessage = e => {
     outputFiles: response.outputFiles,
     stdout: response.stdout,
     stderr: response.stderr,
-    exitCode: response.exitCode,
+    exitCode: response.exitCode || 0,
   }
-  // if (response.exitCode) {
-  //   promise.reject(result)
-  // }
-  // else {
   promise.resolve(result)
-  // }
 }

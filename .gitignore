@@ -2,6 +2,8 @@
 **/magick.wasm
 /samples/cmdline/magickApi.js
 /samples/rotate/magickApi.js
+/tests/rotate/rotated.*
+/tests/rotate/FriedrichNietzsche-charcoal.png
 /tests/rotate/node.js
 node_modules
 /dist
