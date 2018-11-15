@@ -1,10 +1,8 @@
-import pmap from 'p-map'
-import * as React from 'react'
-import { style } from 'typestyle'
-import {
-  arrayToCli, buildImageSrc, cliToArray, ExecutionContext, extractInfo, getBuiltInImages, getInputFilesFromHtmlInputElement,
-  MagickFile, MagickInputFile,
-} from 'wasm-imagemagick'
+import { sampleCommandTemplates } from 'imagemagick-browser';
+import pmap from 'p-map';
+import * as React from 'react';
+import { style } from 'typestyle';
+import { arrayToCli, buildImageSrc, buildInputFile, cliToArray, ExecutionContext, extractInfo, getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, MagickInputFile } from 'wasm-imagemagick';
 
 export interface AppProps {
   context: ExecutionContext
@@ -47,6 +45,7 @@ export class App extends React.Component<AppProps, AppState> {
   protected styles = {
     textarea: style({
       width: '100%',
+      height: '90px',
     }),
     infoTextarea: style({
       width: '400px',
@@ -75,9 +74,10 @@ export class App extends React.Component<AppProps, AppState> {
           <h4>Images available (#{this.state.files.length}) :</h4>
           <div>Show images and info: <input type='checkbox' checked={this.state.showImagesAndInfo} onChange={this.showImagesAndInfoChange.bind(this)}></input></div>
 
+          <div><label>Add images: <input title='Add images' type='file' onChange={this.addImagesInputChanged.bind(this)}></input></label>  </div>
+
           <div><button onClick={this.addBuiltInImages.bind(this)} disabled={this.state.builtInImagesAdded}>Add built-in images</button></div>
 
-          <div><label>Add images: <input title='Add images' type='file' onChange={this.addImagesInputChanged.bind(this)}></input></label>  </div>
 
           <ul className={(this.state.showImagesAndInfo || '') && this.styles.imagesList}>{this.state.files.map((f, i) =>
             <li>
@@ -96,12 +96,21 @@ export class App extends React.Component<AppProps, AppState> {
             </li>)}
           </ul>
         </div>
+
         <div>Command (String syntax):
           <textarea className={this.styles.textarea} onChange={this.commandStringChange.bind(this)} value={this.state.commandString}></textarea>
         </div>
         <div>Command (Array syntax):
           <textarea className={this.styles.textarea} onChange={this.commandArrayChange.bind(this)} value={this.state.commandArray}></textarea>
           {(this.state.jsonError || '') && <div>Execution error: {this.state.jsonError} <br />See browser console for more information.</div>}
+        </div>
+        <div>
+          Or select one example
+        <select onChange={this.selectExample.bind(this)}>
+            {sampleCommandTemplates.map(t =>
+              <option>{t.name}</option>)}
+          </select>
+
         </div>
         <div>
           <button onClick={this.execute.bind(this)}>Execute</button>
@@ -121,6 +130,23 @@ export class App extends React.Component<AppProps, AppState> {
         <h5>stderr:</h5>
         <textarea className={this.styles.stdioTextarea} value={this.state.stderr}></textarea>
       </div>)
+  }
+
+  async componentDidMount() {
+    if (!this.state.files.find(f => f.name === this.defaultImage)) {
+      await this.addInputFiles([await buildInputFile(this.defaultImage)])
+    }
+  }
+
+  private selectExampleCounter = 0
+  private defaultImage = 'fn.png'
+  protected async selectExample(e: React.ChangeEvent<HTMLSelectElement>) {
+    const template = sampleCommandTemplates[e.target.selectedIndex]
+    const img = this.state.files.find(i => i.name === this.defaultImage)
+    const info = await extractInfo(img)
+    const context = { ...template.defaultTemplateContext, imageWidth: info[0].image.geometry.width, imageHeight: info[0].image.geometry.height }
+    const command = template.template(context)[0].map(s => s === '$INPUT' ? this.defaultImage : s === '$OUTPUT' ? `output_${this.selectExampleCounter++}.gif` : s)
+    this.setState({ ...this.state, commandArray: JSON.stringify(command), commandString: arrayToCli(command) })
   }
 
   protected commandStringChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
