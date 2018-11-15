@@ -13,20 +13,32 @@ export interface MagickInputFile extends MagickFile {
   content: Uint8Array
 }
 
-export function Call(inputFiles: MagickInputFile[], command: string[]): Promise<MagickOutputFile[]> {
+export async function Call(inputFiles: MagickInputFile[], command: string[]): Promise<MagickOutputFile[]> {
+  const result = await call(inputFiles, command)
+  return result.outputFiles
+}
+
+export interface CallResult {
+  outputFiles: MagickOutputFile[]
+  stdout: string[]
+  stderr: string[]
+  exitCode: number
+}
+
+export function call(inputFiles: MagickInputFile[], command: string[]): Promise<CallResult> {
   const request = {
     files: inputFiles,
     args: command,
     requestNumber: magickWorkerPromisesKey,
   }
 
-  const emptyPromise = CreatePromiseEvent()
-  magickWorkerPromises[magickWorkerPromisesKey] = emptyPromise
+  const promise = CreatePromiseEvent()
+  magickWorkerPromises[magickWorkerPromisesKey] = promise
 
   magickWorker.postMessage(request)
 
-  magickWorkerPromisesKey = magickWorkerPromisesKey + 1
-  return emptyPromise as Promise<MagickOutputFile[]>
+  magickWorkerPromisesKey++
+  return promise as Promise<CallResult>
 }
 
 function CreatePromiseEvent() {
@@ -35,7 +47,7 @@ function CreatePromiseEvent() {
   const emptyPromise = new Promise((resolve, reject) => {
     resolver = resolve
     rejecter = reject
-  }) as Promise<{}> & {resolve?: any, reject?: any}
+  }) as Promise<{}> & { resolve?: any, reject?: any }
   emptyPromise.resolve = resolver
   emptyPromise.reject = rejecter
   return emptyPromise
@@ -46,17 +58,21 @@ const magickWorker = new Worker('magick.js')
 const magickWorkerPromises = {}
 let magickWorkerPromisesKey = 1
 
-// handle responses as they stream in after being processed by image magick
+// handle responses as they stream in after being outputFiles by image magick
 magickWorker.onmessage = e => {
-  // display split images
   const response = e.data
-  const getPromise = magickWorkerPromises[response.requestNumber]
+  const promise = magickWorkerPromises[response.requestNumber]
   delete magickWorkerPromises[response.requestNumber]
-  const files = response.processed
-  if (files.length === 0) {
-    getPromise.reject('No files generated')
+  const result = {
+    outputFiles: response.outputFiles,
+    stdout: response.stdout,
+    stderr: response.stderr,
+    exitCode: response.exitCode,
   }
-  else {
-    getPromise.resolve(files)
-  }
+  // if (response.exitCode) {
+  //   promise.reject(result)
+  // }
+  // else {
+  promise.resolve(result)
+  // }
 }

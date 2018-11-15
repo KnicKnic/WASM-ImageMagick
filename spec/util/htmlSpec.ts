@@ -36,6 +36,10 @@ export default describe('util/html', () => {
       // expect(await compare(img1, img2)).toBe(true)
       done()
     })
+
+    xit('buildImageSrc should return png in case forceBrowserSupport=true and image is not gif, png, jpg, webp', () => {
+
+    })
   })
 
 })

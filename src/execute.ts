@@ -1,5 +1,6 @@
-import { MagickInputFile, MagickOutputFile, outputFileToInputFile, Call, asCommand } from '.'
+import { MagickInputFile, MagickOutputFile, outputFileToInputFile, call, asCommand } from '.'
 import pMap from 'p-map'
+import { CallResult } from './magickApi'
 
 export type Command = (string | number)[]
 
@@ -11,24 +12,34 @@ export interface ExecuteConfig {
 
 export type ExecuteCommand = Command[] | string[] | string
 
-export interface ExecuteResult {
+export interface ExecuteResultOne {
   outputFiles: MagickOutputFile[]
   errors?: any[]
+  stderr?: string[]
+  stdout?: string[]
+  exitCode?: number
 }
 
 /** execute first command in given config */
-export async function executeOne(config: ExecuteConfig): Promise<ExecuteResult> {
+export async function executeOne(config: ExecuteConfig): Promise<ExecuteResultOne> {
+  let result: ExecuteResultOne = {
+    stderr: [],
+    outputFiles: [],
+  }
   try {
     config.inputFiles = config.inputFiles || []
     const command = asCommand(config.commands)[0]
     const t0 = performance.now()
     executeListeners.forEach(listener => listener.beforeExecute({ command, took: performance.now() - t0, id: t0 }))
-    const result = { outputFiles: await Call(config.inputFiles, command.map(c => c + '')) }
+    result = await call(config.inputFiles, command.map(c => c + ''))
     executeListeners.forEach(listener => listener.afterExecute({ command, took: performance.now() - t0, id: t0 }))
-    return result
+    if (result.exitCode) {
+      return { ...result, errors: ['exit code: ' + result.exitCode + ' stderr: ' + result.stderr.join('\n')] }
+    }
+    return { ...result, errors: [undefined] }
 
   } catch (error) {
-    return { outputFiles: [], errors: [error] }
+    return { ...result, errors: [error + ', exit code: ' + result.exitCode + ', stderr: ' + result.stderr.join('\n') ] }
   }
 }
 
@@ -47,6 +58,14 @@ const executeListeners: ExecuteListener[] = []
 export function addExecuteListener(l: ExecuteListener) {
   executeListeners.push(l)
 }
+
+
+
+export interface ExecuteResult extends ExecuteResultOne {
+  results: ExecuteResultOne[]
+  breakOnError?: boolean
+}
+
 
 /**
  * Execute all commands in given config serially in order. Output files from a command become available as
@@ -91,23 +110,32 @@ export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
     allInputFiles[f.name] = f
   })
   let allErrors = []
+  const results: ExecuteResultOne[] = []
+  let allStdout = []
+  let allStderr = []
   async function mapper(c: Command) {
     const thisConfig = {
       inputFiles: Object.keys(allInputFiles).map(name => allInputFiles[name]),
       commands: [c],
     }
     const result = await executeOne(thisConfig)
+    results.push(result)
+    allErrors = allErrors.concat(result.errors || [])
+    allStdout = allStdout.concat(result.stdout || [])
+    allStderr = allStderr.concat(result.stderr || [])
     await pMap(result.outputFiles, async f => {
       allOutputFiles[f.name] = f
       const inputFile = await outputFileToInputFile(f)
       allInputFiles[inputFile.name] = inputFile
     })
-    allErrors = allErrors.concat(result.errors)
   }
   const commands = asCommand(config.commands)
   await pMap(commands, mapper, { concurrency: 1 })
   return {
     outputFiles: Object.keys(allOutputFiles).map(name => allOutputFiles[name]),
     errors: allErrors,
+    results,
+    stdout: allStdout,
+    stderr: allStderr,
   }
 }

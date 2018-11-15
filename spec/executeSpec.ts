@@ -33,11 +33,11 @@ export default describe('execute', () => {
     })
 
     it('should return error property and empty outputFiles on error', async done => {
-      const img = await buildInputFile('fn.png')
-      const { outputFiles, errors } = await executeOne({ inputFiles: [img], commands: `convert nonexistent.png out.tiff` })
+      const { outputFiles, errors, exitCode, stderr } = await executeOne({ inputFiles: [await buildInputFile('fn.png')], commands: `convert nonExistent.png out.tiff` })
+      expect(exitCode).not.toBe(0)
       expect(outputFiles.length).toBe(0)
-      expect(errors).toBeDefined()
-      expect(errors.length).toBeGreaterThan(0)
+      expect(stderr.join('\n')).toContain(`'nonExistent.png': No such file or directory`)
+      expect(errors.length).toBe(1)
       done()
     })
   })
@@ -85,33 +85,48 @@ export default describe('execute', () => {
       expect(outputFiles[0].name).toBe('image2.gif')
       done()
     })
-
+    
     describe('errors', () => {
 
       it('should return error property and empty outputFiles on error', async done => {
         const img = await buildInputFile('fn.png')
-        const { outputFiles, errors } = await execute({ inputFiles: [img], commands: `convert nonexistent.png out.tiff` })
-        expect(outputFiles.length).toBe(0)
-        expect(errors).toBeDefined()
-        expect(errors.length).toBeGreaterThan(0)
+        const result = await execute({ inputFiles: [img], commands: `convert nonExistent.png out.tiff` })
+        expect(result.outputFiles.length).toBe(0)
+        expect(result.results.length).toBe(1)
+        expect(result.stderr.join('\n')).toContain(`'nonExistent.png': No such file or directory`)
+        expect(result.errors.length).toBe(1)
+
+        expect(result.results[0].exitCode).not.toBe(0)
+        expect(result.results[0].stderr.join('\n')).toContain(`'nonExistent.png': No such file or directory`)
         done()
       })
 
       it('should return errors per command', async done => {
         const img = await buildInputFile('fn.png')
-        const { outputFiles, errors } = await execute({
+        const result = await execute({
           inputFiles: [img], commands: [
             `convert fn.png out.gif`,
-            `convert nonexistent.png out.tiff`,
+            `convert nonExistent.png out.tiff`,
             `convert out.gif foo.png`,
+            `identify rose:`
           ],
         })
-        expect(outputFiles.length).toBe(2)
-        expect(errors.length).toBe(3)
-        expect(errors.filter(error => !!error).length).toBe(1)
-        expect(errors[0]).toBeUndefined()
-        expect(errors[1]).toBeDefined()
-        expect(errors[2]).toBeUndefined()
+        expect(result.outputFiles.length).toBe(2)
+        expect(result.errors.length).toBe(4)
+        expect(result.errors[0]).toBeUndefined()
+        expect(result.errors[1]).toBeDefined()
+        expect(result.errors[2]).toBeUndefined()
+        expect(result.errors[3]).toBeUndefined()
+
+        expect(result.stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
+        expect(result.stderr.join('\n')).toContain(`'nonExistent.png': No such file or directory`)
+
+        expect(result.results[3].stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
+        expect(result.results[3].errors[0]).toBeUndefined()
+
+        expect(result.results[1].errors[0]).toBeDefined()
+        expect(result.results[1].stderr.join('\n')).toContain(`'nonExistent.png': No such file or directory`)
+
         done()
       })
     })
