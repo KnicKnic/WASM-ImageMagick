@@ -14,6 +14,7 @@ export interface ExecutionContext {
   // /** add built-in images like `rose:` to this execution context so they are present in getAllFiles() */
   addBuiltInImages(): Promise<void>
   getFile(name: string): Promise<MagickInputFile>
+  removeFiles(names: string[]): MagickInputFile[]
 }
 
 class ExecutionContextImpl implements ExecutionContext {
@@ -50,9 +51,13 @@ class ExecutionContextImpl implements ExecutionContext {
     return this.imageHome.addBuiltInImages()
   }
 
+  removeFiles(names: string[]): MagickInputFile[] {
+    return this.imageHome.remove(names)
+  }
+  
   static create(inheritFrom?: ExecutionContext) {
     if (inheritFrom && !(inheritFrom as ExecutionContextImpl).imageHome) {
-      throw new Error('Dont know how to inherith from other ExecutionContext implementation than this one')
+      throw new Error('Dont know how to inherit from other ExecutionContext implementation than this one')
     }
     return new ExecutionContextImpl(inheritFrom && (inheritFrom as ExecutionContextImpl).imageHome)
   }

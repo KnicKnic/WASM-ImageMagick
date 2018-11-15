@@ -2,6 +2,7 @@ import { MagickInputFile, MagickFile, asInputFile, getBuiltInImages } from '.'
 import pMap from 'p-map'
 
 export interface ImageHome {
+  remove(names: string[]): MagickInputFile[];
   get(name: string): Promise<MagickInputFile>
   register(file: MagickFile, name?: string): void
   isRegistered(name: string): boolean
@@ -20,6 +21,17 @@ class ImageHomeImpl implements ImageHome {
     return this.images[name]
   }
 
+  remove(names: string[]): MagickInputFile[] {
+    const result = []
+    Object.keys(this.images).forEach(name=>{
+      if(names.indexOf(name)!==-1) {
+        result.push(this.images[name])
+        delete this.images[name]
+      }
+    })
+    return result
+  }
+  
   async getAll(): Promise<MagickInputFile[]> {
     return await Promise.all(Object.keys(this.images).map(k => this.images[k]))
   }
