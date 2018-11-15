@@ -79,4 +79,14 @@ export default describe('executionContext', () => {
     expect(all1.map(f => f.name)).toEqual(all2.map(f => f.name))
     done()
   })
+
+  it('should addBuiltInImages()', async done =>{
+    let all = await context.getAllFiles()
+    expect(all.find(i=>i.name==='rose:')).toBeUndefined() 
+    const builtIn = await context.addBuiltInImages()
+    expect(builtIn.find(i=>i.name==='rose:')).toBeDefined() 
+    all = await context.getAllFiles()
+    expect(all.find(i=>i.name==='rose:')).toBeDefined() 
+    done()
+  })
 })

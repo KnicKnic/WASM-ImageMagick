@@ -4,7 +4,7 @@ import pMap from 'p-map'
 export type Command = (string | number)[]
 
 export interface ExecuteConfig {
-  inputFiles: MagickInputFile[]
+  inputFiles?: MagickInputFile[]
   /** commands could be array form like [['convert', 'foo.png', 'bar.gif']] or CLI form like ['convert foo.png bar.gif'] */
   commands: ExecuteCommand
 }
@@ -19,6 +19,7 @@ export interface ExecuteResult {
 /** execute first command in given config */
 export async function executeOne(config: ExecuteConfig): Promise<ExecuteResult> {
   try {
+    config.inputFiles = config.inputFiles || []
     const command = asCommand(config.commands)[0]
     const t0 = performance.now()
     executeListeners.forEach(listener => listener.beforeExecute({ command, took: performance.now() - t0, id: t0 }))
@@ -63,20 +64,27 @@ export function addExecuteListener(l: ExecuteListener) {
  * })
  * ```
  *
- * Alternatively it support CLI like command line instead of arrays:
- *
+ * An alternative syntax with CLI-like strings is also supported:
+ * 
  * ```ts
- * const {outputFiles} = await execute({
- *   inputFiles: [await buildInputFile('fn.png', 'image1.png')],
- *   commands: [
- *     'convert image1.png -rotate 70 image2.gif',
- *     // heads up: next command uses 'image2.gif' which was the output of previous command:
- *     'convert image2.gif -scale 23% image3.jpg',
- *   ]
- * })
+ * const {outputFiles} = await execute({inputFiles: [], commands: [
+ *   'convert rose: -rotate 70 image2.gif',
+ *   'convert image2.gif -resize 33 image3.gif'
+ * ] })
+ * ```
+ * 
+ * Or if it's only one command using just a string: 
+ * 
+ * ```ts
+ * const {outputFiles} = await execute({inputFiles: [foo], commands: `convert 'my face image.png' \\( +clone -channel R -fx B \\) +swap -channel B -fx v.R bar.gif`})
+ * ```
+ * 
+ * Note: in string syntax you must use single quotes for CLI arguments that need so (like 'my face image.png'). no multiline with \ is supported. 
+ * 
  * ```
  */
 export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
+  config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}
   const allInputFiles: { [name: string]: MagickInputFile } = {}
   config.inputFiles.forEach(f => {

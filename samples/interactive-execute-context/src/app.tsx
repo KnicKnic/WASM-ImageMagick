@@ -94,10 +94,10 @@ export class App extends React.Component<AppProps, AppState> {
     this.setState({ ...this.state, commandString: e.target.value, commandArray })
   }
 
-  async componentDidMount() {
-    const builtInImages = ['rose:', 'logo:', 'wizard:', 'granite:', 'netscape:']
-    const files = await pmap(builtInImages, i=>)
-  }
+  // async componentDidMount() {
+  //   const builtInImages = ['rose:', 'logo:', 'wizard:', 'granite:', 'netscape:']
+  //   const files = await pmap(builtInImages, i=>)
+  // }
   protected async execute() {
     const { outputFiles } = await this.props.context.execute(this.state.commandString)
     this.state.outputFiles = outputFiles

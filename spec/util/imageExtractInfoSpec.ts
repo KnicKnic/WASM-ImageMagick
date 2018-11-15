@@ -11,7 +11,7 @@ export default describe('util/imageExtractInfo', () => {
     done()
   })
 
-  fit('should extract info from built-in image rose:', async done => {
+  it('should extract info from built-in images', async done => {
     const info = await extractInfo('rose:')
     expect(info[0].image.geometry.width).toBe(70)
     expect(info[0].image.geometry.height).toBe(46)

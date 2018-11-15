@@ -1,7 +1,7 @@
 import { asInputFile, Call, MagickFile, blobToString, MagickInputFile } from '..'
 
 /**
- * Execute convert $IMG info.json to extract image metadata. Returns the parsed info.json file contents
+ * Execute `convert $IMG info.json` to extract image metadata. Returns the parsed info.json file contents
  * 
  * TODO: support several input images - we are already returning an array
  * @param img could be a string in case you want to extract information about built in images like `rose:`
