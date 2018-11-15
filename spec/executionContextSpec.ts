@@ -83,8 +83,7 @@ export default describe('executionContext', () => {
   it('should addBuiltInImages()', async done => {
     let all = await context.getAllFiles()
     expect(all.find(i => i.name === 'rose:')).toBeUndefined()
-    const builtIn = await context.addBuiltInImages()
-    expect(builtIn.find(i => i.name === 'rose:')).toBeDefined()
+    await context.addBuiltInImages()
     all = await context.getAllFiles()
     expect(all.find(i => i.name === 'rose:')).toBeDefined()
     done()

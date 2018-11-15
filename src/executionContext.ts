@@ -1,21 +1,22 @@
-import { ImageHome, ExecuteConfig, ExecuteResult, execute, ExecuteCommand, createImageHome, MagickInputFile, MagickFile, extractInfo } from '.'
-import pMap from 'p-map'
-import { asOutputFile, asInputFile, getBuiltInImages } from './util'
+import { createImageHome, execute, ExecuteCommand, ExecuteConfig, ExecuteResult, ImageHome, MagickFile, MagickInputFile } from '.'
+import { getBuiltInImages } from './util'
 
 /**
- * Allow multiple execute() calls remembering previus execute() generated output files and previous given input files that can be used as input files in next calls.
+ * Allow multiple execute() calls remembering previus execute() generated output files and previous given input files that
+ * can be used as input files in next calls.
  */
 export interface ExecutionContext {
   execute(configOrCommands: ExecuteConfig|ExecuteCommand|string): Promise<ExecuteResult>
+  /** programmatically add new files so they are available if following execute() calls */
   addFiles(files: MagickFile[]): void
+  /** get all the files currently available in this context */
   getAllFiles(): Promise<MagickInputFile[]>
-  addBuiltInImages(): Promise<MagickFile[]>
+  // /** add built-in images like `rose:` to this execution context so they are present in getAllFiles() */
+  addBuiltInImages(): Promise<void>
   getFile(name: string): Promise<MagickInputFile>
 }
 
 class ExecutionContextImpl implements ExecutionContext {
-
-  private builtInImages: MagickInputFile[] = []
 
   constructor(private imageHome: ImageHome = createImageHome()) {
   }
@@ -39,26 +40,14 @@ class ExecutionContextImpl implements ExecutionContext {
 
   async getAllFiles(): Promise<MagickInputFile[]> {
     const all = await this.imageHome.getAll()
-    return all.concat(this.builtInImages)
+    return all// .concat(this.builtInImages)
   }
 
   async getFile(name: string): Promise<MagickInputFile> {
-    return (await this.imageHome.get(name)) || this.builtInImages.find(i => i.name === name)
+    return (await this.imageHome.get(name))// || this.builtInImages.find(i => i.name === name)
   }
-
   async addBuiltInImages() {
-    if (!this.builtInImages.length) {
-      this.builtInImages = await getBuiltInImages()
-  //     const builtInImages = ['rose:', 'logo:', 'wizard:', 'granite:', 'netscape:']
-  //     this.builtInImages = await pMap(builtInImages, async name=>{
-  //       const info = await extractInfo(name)
-  //       // const outputName = `output1.${info[0].image.format.toLowerCase()}`
-  //       const {outputFiles} = await execute({commands:`convert ${name} ${`output1.${info[0].image.format.toLowerCase()}`}`} )
-  //       outputFiles[0].name = name
-  //       return await asInputFile(outputFiles[0])
-  //     })
-    }
-    return this.builtInImages
+    return this.imageHome.addBuiltInImages()
   }
 
   static create(inheritFrom?: ExecutionContext) {
