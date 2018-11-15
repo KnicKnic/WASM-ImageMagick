@@ -54,7 +54,7 @@ class ExecutionContextImpl implements ExecutionContext {
   removeFiles(names: string[]): MagickInputFile[] {
     return this.imageHome.remove(names)
   }
-  
+
   static create(inheritFrom?: ExecutionContext) {
     if (inheritFrom && !(inheritFrom as ExecutionContextImpl).imageHome) {
       throw new Error('Dont know how to inherit from other ExecutionContext implementation than this one')
