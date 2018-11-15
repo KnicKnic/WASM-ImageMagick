@@ -6,16 +6,18 @@ export default describe('util/cli', () => {
     it('should support simple commands', () => {
       expect(arrayToCli(['convert', 'foo.png', '-sharpen', '10x8', 'bar.gif']))
       .toBe('convert foo.png -sharpen 10x8 bar.gif')
-
     })
+
     it('should escape parenthesis', () => {
       expect(arrayToCli(['convert', 'foo.png', '(', '+clone', '-channel', 'R', '-fx', 'B', ')', '+swap', '-channel', 'B', '-fx', 'v.R', 'bar.gif']))
       .toBe(`convert foo.png \\( +clone -channel R -fx B \\) +swap -channel B -fx v.R bar.gif`)
     })
+
     it('should quote arguments with spaces', () => {
       expect(arrayToCli(['convert', 'input foo.png', '(', '+clone', '-channel', 'R', '-fx', 'B', ')', '+swap', '-channel', 'B', '-fx', 'v.R', 'output bar.gif']))
       .toBe(`convert 'input foo.png' \\( +clone -channel R -fx B \\) +swap -channel B -fx v.R 'output bar.gif'`)
     })
+
   })
 
   describe('cliToArray', () => {
@@ -34,6 +36,7 @@ export default describe('util/cli', () => {
       expect(cliToArray(`convert foo.png \\( +clone -channel R -fx B \\) +swap -channel B -fx v.R bar.gif`))
       .toEqual(['convert', 'foo.png', '(', '+clone', '-channel', 'R', '-fx', 'B', ')', '+swap', '-channel', 'B', '-fx', 'v.R', 'bar.gif'])
     })
+
   })
 
 })

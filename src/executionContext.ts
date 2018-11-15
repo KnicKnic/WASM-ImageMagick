@@ -39,13 +39,13 @@ class ExecutionContextImpl implements ExecutionContext {
   }
 
   async getAllFiles(): Promise<MagickInputFile[]> {
-    const all = await this.imageHome.getAll()
-    return all// .concat(this.builtInImages)
+    return await this.imageHome.getAll()
   }
 
   async getFile(name: string): Promise<MagickInputFile> {
-    return (await this.imageHome.get(name))// || this.builtInImages.find(i => i.name === name)
+    return await this.imageHome.get(name)
   }
+
   async addBuiltInImages() {
     return this.imageHome.addBuiltInImages()
   }
