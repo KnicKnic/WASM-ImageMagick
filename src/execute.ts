@@ -59,13 +59,10 @@ export function addExecuteListener(l: ExecuteListener) {
   executeListeners.push(l)
 }
 
-
-
 export interface ExecuteResult extends ExecuteResultOne {
   results: ExecuteResultOne[]
   breakOnError?: boolean
 }
-
 
 /**
  * Execute all commands in given config serially in order. Output files from a command become available as

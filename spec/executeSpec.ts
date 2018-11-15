@@ -85,7 +85,7 @@ export default describe('execute', () => {
       expect(outputFiles[0].name).toBe('image2.gif')
       done()
     })
-    
+
     describe('errors', () => {
 
       it('should return error property and empty outputFiles on error', async done => {
@@ -108,7 +108,7 @@ export default describe('execute', () => {
             `convert fn.png out.gif`,
             `convert nonExistent.png out.tiff`,
             `convert out.gif foo.png`,
-            `identify rose:`
+            `identify rose:`,
           ],
         })
         expect(result.outputFiles.length).toBe(2)
