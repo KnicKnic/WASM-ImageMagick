@@ -31,7 +31,7 @@ export class App extends React.Component<AppProps, AppState> {
 
   state: AppState = {
     commandString: 'identify rose:',
-    commandArray: '["identify", "rose:"]',
+    commandArray: JSON.stringify(cliToArray('identify rose:')),
     jsonError: '',
     files: [],
     imgSrcs: [],

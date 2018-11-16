@@ -15,8 +15,10 @@ export function arrayToCli(command: Command): string {
     .join(' ')
 }
 
-/** generates a valie Call/execute string[] command from given command line command */
-export function cliToArray(cliCommand: string): Command {
+/** generates a valid Call/execute string[] command from given command line command.
+ * This works only for a single command
+ */
+export function cliToArrayOne(cliCommand: string): Command {
   let inString = false
   const spaceIndexes = [0]
   for (let index = 0; index < cliCommand.length; index++) {
@@ -43,11 +45,35 @@ export function cliToArray(cliCommand: string): Command {
   return command
 }
 
+/** generates a valid Call/execute string[] command from given command line command.
+ * This works for strings containing multiple commands in different lines.
+ * TODO: respect '\' character for continue the same command in a new line
+ */
+export function cliToArray(cliCommand: string): Command[] {
+  const lines = cliCommand.split('\n')
+    .map(s => s.trim()).map(cliToArrayOne)
+    .filter(a => a && a.length)
+  const result = []
+  let currentCommand: Command = []
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    if (line[line.length - 1] !== '\\') {
+      currentCommand = currentCommand.concat(line)
+      result.push(currentCommand)
+      currentCommand = []
+    }
+    else {
+      currentCommand = currentCommand.concat(line.slice(0, line.length - 1))
+    }
+  }
+  return result
+}
+
 export function asCommand(c: ExecuteCommand): Command[] {
-  if (typeof c === 'string') {    return asCommand([c])  }
+  if (typeof c === 'string') { return asCommand([c]) }
   if (!c[0]) { return [] }
   if (typeof c[0] === 'string') {
-    return (c as string[]) .map((subCommand: string) => cliToArray(subCommand))
+    return (c as string[]).map((subCommand: string) => cliToArrayOne(subCommand))
   }
   return c as Command[]
 }
