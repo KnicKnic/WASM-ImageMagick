@@ -4,9 +4,10 @@ export default describe('call', () => {
 
   describe('call', () => {
 
-    it('should resolve with stderr on errors', async done => {
+    it('should resolve with stderr on errors and exitCode !=0', async done => {
       const result = await call([], ['convert', 'nonExistent.png', 'foo.gif'])
       expect(result.stderr.join('\n')).toContain(`'nonExistent.png': No such file or directory`)
+      expect(result.exitCode).not.toBe(0)
       done()
     })
 
