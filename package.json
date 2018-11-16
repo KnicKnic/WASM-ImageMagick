@@ -6,10 +6,10 @@
   "typings": "dist/src/index.d.ts",
   "scripts": {
     "build-wasm": "docker build -t wasm-imagemagick-build-tools . && docker run --rm --workdir /code -v \"$PWD\":/code wasm-imagemagick-build-tools bash ./build.sh",
-    "build-ts": "tsc && npm run magickApiJs",
+    "build-ts": "tsc",
     "build": "npm run build-wasm && npm run build-ts",
-    "prepare": "npm run build && npm run copy",
-    "copy": "cp magick.js magick.wasm dist && cp magick.js magick.wasm spec/assets",
+    "prepare": "npm run build && npm run copy && npm run magickApiJs",
+    "copy": "cp magick.js magick.wasm dist && cp magick.js magick.wasm spec/assets && cp -r spec/assets dist",
     "magickApiJs": "tsc src/magickApi.ts --lib dom,es6 --target es2018 --outdir .",
     "clean": "sh clean.sh",
 
@@ -20,14 +20,13 @@
     "test": "npm run test-node && npm run test-browser",
     "test-node": "cd tests/rotate && node node",
 
-    "test-browser": "rm -rf dist && npm run test-browser-build && gulp --gulpfile spec/gulpfile.js jasmine",
-    "test-browser-server": "rm -rf dist && npm run test-browser-build && gulp --gulpfile spec/gulpfile.js jasmine-server",
-    "test-browser-build": "npm run build-ts && cp -r spec/assets dist && npm run test-browser-bundle",
-    "test-browser-bundle": "browserify -d dist/spec/index.js -o dist/bundle.js",
+    "test-browser": "rm -rf dist && npm run test-browser-build  && npm run copy && gulp --gulpfile spec/gulpfile.js jasmine",
+    "test-browser-server": "rm -rf dist && npm run test-browser-build && npm run copy && gulp --gulpfile spec/gulpfile.js jasmine-server",
+    "test-browser-build": "npm run build-ts && browserify -d dist/spec/index.js -o dist/bundle.js",
 
     "test-browser-start": "rm -rf dist && npm run build-ts && npm run copy && npm run test-browser-watch-all",
     "test-browser-watch-all": "concurrently 'npm run test-browser-watch-build' 'npm run test-browser-watch-server' ",
-    "test-browser-watch-build": "onchange -v 'src/**/*' 'spec/**/*' -- npm run test-browser-build",
+    "test-browser-watch-build": "onchange -i -v 'src/**/*' 'spec/**/*' -- npm run test-browser-build",
     "test-browser-watch-server": "onchange  -k -v 'dist/bundle.js' -- gulp --gulpfile spec/gulpfile.js jasmine-server"
   },
   "repository": {
