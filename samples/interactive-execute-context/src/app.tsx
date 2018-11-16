@@ -1,11 +1,8 @@
-import { sampleCommandTemplates } from 'imagemagick-browser'
-import pMap from 'p-map'
-import * as React from 'react'
-import { style } from 'typestyle'
-import {
-  arrayToCli, buildImageSrc, buildInputFile, cliToArray, ExecutionContext, extractInfo, getBuiltInImages,
-  getInputFilesFromHtmlInputElement, MagickFile, MagickInputFile,
-} from 'wasm-imagemagick'
+import pMap from 'p-map';
+import * as React from 'react';
+import { style } from 'typestyle';
+import { arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo, getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, MagickInputFile } from 'wasm-imagemagick';
+import { commandExamples, Example } from './commandExamples';
 
 export interface AppProps {
   context: ExecutionContext
@@ -25,6 +22,7 @@ export interface AppState {
   stdout: string
   stderr: string
   exitCode: number
+  prettyJSON: boolean
 }
 
 export class App extends React.Component<AppProps, AppState> {
@@ -43,6 +41,7 @@ export class App extends React.Component<AppProps, AppState> {
     stdout: '',
     stderr: '',
     exitCode: 0,
+    prettyJSON: false,
   }
 
   protected styles = {
@@ -123,13 +122,18 @@ export class App extends React.Component<AppProps, AppState> {
           <div>Command (Array syntax):
             <textarea className={this.styles.textarea} onChange={this.commandArrayChange.bind(this)} value={this.state.commandArray}></textarea>
             {(this.state.jsonError || '') && <div>Execution error: {this.state.jsonError} <br />See browser console for more information.</div>}
+            <label>Pretty JSON ? <input type='checkbox' onChange={this.prettyJSONChange.bind(this)}></input></label>
           </div>
           <div>
             Or select one example
-          <select disabled={this.state.files.length === 0} onChange={this.selectExampleChange.bind(this)}>
-              {sampleCommandTemplates.map(t =>
+            <select disabled={this.state.files.length === 0} onChange={this.selectExampleChange.bind(this)}>
+              {commandExamples.map(t =>
                 <option>{t.name}</option>)}
             </select>
+            {/* <select disabled={this.state.files.length === 0} onChange={this.selectExampleChange.bind(this)}>
+              {sampleCommandTemplates.map(t =>
+                <option>{t.name}</option>)}
+            </select> */}
           </div>
         </div>
 
@@ -161,6 +165,13 @@ export class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  protected async prettyJSONChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const arr = JSON.parse(this.state.commandArray)
+    const prettyJSON = e.target.checked
+    const commandArray = prettyJSON ? JSON.stringify(arr, null, 2) : JSON.stringify(arr)
+    this.setState({ ...this.state, commandArray, prettyJSON })
+  }
+
   removeImage(e: React.MouseEvent<HTMLButtonElement>) {
     const name = e.currentTarget.getAttribute('data-image')
     this.props.context.removeFiles([name])
@@ -176,7 +187,8 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   protected commandStringChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    const commandArray = JSON.stringify(cliToArray(e.target.value)) // TODO: validate
+    const commandArray = this.state.prettyJSON ? JSON.stringify(cliToArray(e.target.value), null, 2) : JSON.stringify(cliToArray(e.target.value))
+    // TODO: validate
     this.setState({ ...this.state, commandString: e.target.value, commandArray })
   }
 
@@ -232,13 +244,17 @@ export class App extends React.Component<AppProps, AppState> {
     await this.updateImages()
   }
 
-  private selectExampleCounter = 0
   protected async selectExampleChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const template = sampleCommandTemplates[e.target.selectedIndex]
-    const img = this.state.files[0]
-    const info = await extractInfo(img)
-    const context = { ...template.defaultTemplateContext, imageWidth: info[0].image.geometry.width, imageHeight: info[0].image.geometry.height }
-    const command = template.template(context)[0].map(s => s === '$INPUT' ? img.name : s === '$OUTPUT' ? `output${this.selectExampleCounter++}.png` : s)
-    this.setState({ ...this.state, commandArray: JSON.stringify(command), commandString: arrayToCli(command) })
+    const example = commandExamples[e.currentTarget.selectedIndex]
+    const command = await this.commandExampleAsCommand(example)
+    const commandString = typeof example.command === 'string' ? example.command : arrayToCli(command)
+    this.setState({ ...this.state, commandArray: JSON.stringify(command), commandString })
   }
+
+  protected async commandExampleAsCommand(example: Example): Promise<Command[]> {
+    const c = example.command as any
+    const command = typeof c === 'function' ? await c(this.state.files) : asCommand(c)
+    return command
+  }
+
 }

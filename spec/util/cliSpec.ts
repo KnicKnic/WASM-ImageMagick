@@ -1,4 +1,4 @@
-import { arrayToCli, cliToArray } from '../../src'
+import { arrayToCli, cliToArray, asCommand } from '../../src'
 
 export default describe('util/cli', () => {
 
@@ -52,11 +52,6 @@ compare -compose src rose: reconstruct.jpg difference.png
     })
 
     it('should support multiple commands separated by new line and respect the \\ character to continue the same command in another line', () => {
-      console.log(cliToArray(`
-      convert foo.png \\( +clone -channel R -fx B \\) \\
-        +swap -channel B -fx v.R bar.gif
-      convert bar.gif -resize 50% out.tiff
-            `))
 
       expect(cliToArray(`
 convert foo.png \\( +clone -channel R -fx B \\) \\
@@ -69,6 +64,33 @@ convert bar.gif -resize 50% out.tiff
 
     })
 
+    describe('asCommand', () => {
+      it('should support multiple commands separated by new line and respect the \\ character to continue the same command in another line - all in the same string - no arrays', () => {
+
+        expect(asCommand(`
+  convert foo.png \\( +clone -channel R -fx B \\) \\
+    +swap -channel B -fx v.R bar.gif
+  convert bar.gif -resize 50% out.tiff
+        `))
+        .toEqual([
+          ['convert', 'foo.png', '(', '+clone', '-channel', 'R', '-fx', 'B', ')', '+swap', '-channel', 'B', '-fx', 'v.R', 'bar.gif'],
+          ['convert', 'bar.gif', '-resize', '50%', 'out.tiff']])
+
+      })
+
+      it('should support multiple commands separated by new line and respect the \\ character to continue the same command in another line - all as an array of 1 element', () => {
+
+        expect(asCommand([`
+  convert foo.png \\( +clone -channel R -fx B \\) \\
+    +swap -channel B -fx v.R bar.gif
+  convert bar.gif -resize 50% out.tiff
+        `]))
+        .toEqual([
+          ['convert', 'foo.png', '(', '+clone', '-channel', 'R', '-fx', 'B', ')', '+swap', '-channel', 'B', '-fx', 'v.R', 'bar.gif'],
+          ['convert', 'bar.gif', '-resize', '50%', 'out.tiff']])
+
+      })
+    })
   })
 
 })

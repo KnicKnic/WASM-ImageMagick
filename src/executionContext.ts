@@ -24,6 +24,7 @@ class ExecutionContextImpl implements ExecutionContext {
 
   async execute(configOrCommands: ExecuteConfig|ExecuteCommand|string): Promise<ExecuteResult> {
     const config = asConfig(configOrCommands)
+    // debugger
     config.inputFiles.forEach(f => {
       this.imageHome.register(f)
     })
