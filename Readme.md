@@ -4,14 +4,6 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
 
 ## Demos and examples
 
- * Simple example. See [samples/rotate#code](samples/rotate#code). A simple webpage that has image in array and loads magickApi.js to rotate file. Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
-
- * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
-    * For code see [samples/cmdline](samples/cmdline)
-
- * Used in [Croppy](https://knicknic.github.io/croppy/) to split webcomics from one long vertical strip into many panels.
-    * For code see https://github.com/KnicKnic/croppy.
-
  * Basic playground (React & TypeScript project): [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59).
 
  * Image Diff Example (React & TypeScript project): [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z).
@@ -20,6 +12,13 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
 
  * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
 
+ * Simple example. See [samples/rotate#code](samples/rotate#code). A simple webpage that has image in array and loads magickApi.js to rotate file. Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
+
+ * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
+    * For code see [samples/cmdline](samples/cmdline)
+
+ * Used in [Croppy](https://knicknic.github.io/croppy/) to split webcomics from one long vertical strip into many panels.
+    * For code see https://github.com/KnicKnic/croppy.
 
 ## Status
 

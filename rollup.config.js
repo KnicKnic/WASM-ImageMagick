@@ -136,6 +136,35 @@ const UMDEs6config = {
   ),
 }
 
+
+
+const FESMEs5config = {
+  ...CommonConfig,
+  input: resolve(PATHS.entry.esm5, 'index.js'),
+  output: [
+    {
+      file: getOutputFileName(
+        resolve(PATHS.bundles, `${pkg.name}.esm-es5.js`),
+        ifProduction()
+      ),
+      format: 'es',
+      sourcemap: true,
+    },
+  ],
+  plugins: removeEmpty(
+    ([...plugins, ifProduction(terser()), babel({
+      include: 'node_modules/**', babelrc: false, presets: [
+        [
+          "@babel/preset-env",
+          {
+            "targets": "ie 10"
+          }
+        ]
+      ]
+    })])
+  ),
+}
+
 const FESMEs6config = {
   ...CommonConfig,
   input: resolve(PATHS.entry.esm6, 'index.js'),
@@ -175,6 +204,7 @@ const FESMEs2018config = {
 export default [
   UMDEs5config,
   UMDEs6config,
+  FESMEs5config,
   FESMEs6config,
   FESMEs2018config
 ]

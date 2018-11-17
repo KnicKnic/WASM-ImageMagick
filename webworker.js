@@ -1,4 +1,4 @@
-// This file helps make the compiled js file be imported as a web worker which is done by magickApi.js
+// This file helps make the compiled js file be imported as a web worker by the src/magickApi.ts file
 
 const stdout = []
 const stderr = []

@@ -5,9 +5,11 @@
 !/LICENSE
 !/Readme.md
 !/dist/**/*
-!/magickApi.js
 
 # ignore these in /dist:
 /dist/assets/**/*
 /dist/spec/**/
+/dist/esm5/**/
+/dist/esm6/**/
+/dist/esm2018/**/
 /dist/bundle.js
