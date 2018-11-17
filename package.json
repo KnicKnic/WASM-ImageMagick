@@ -26,7 +26,6 @@
     "test-browser-watch-all": "concurrently 'npm run test-browser-watch-build' 'npm run test-browser-watch-server' ",
     "test-browser-watch-build": "onchange -i -v 'src/**/*' 'spec/**/*' -- npm run test-browser-build",
     "test-browser-watch-server": "onchange  -k -v 'dist/bundle.js' -- gulp --gulpfile spec/gulpfile.js jasmine-server",
-
     "apidocs": "typedoc --options typedoc.js --theme markdown"
   },
   "repository": {
@@ -55,7 +54,7 @@
     "@types/shelljs": "^0.8.0",
     "browserify": "^16.2.3",
     "concurrently": "^4.0.1",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-jasmine-browser": "^4.0.2",
     "jasmine": "^3.3.0",
     "onchange": "^5.1.0",
@@ -79,6 +78,7 @@
     "webpack-config-utils": "^2.3.1"
   },
   "dependencies": {
-    "p-map": "^2.0.0"
+    "p-map": "^2.0.0",
+    "plugin-error": "^1.0.1"
   }
 }
