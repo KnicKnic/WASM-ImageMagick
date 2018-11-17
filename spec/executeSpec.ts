@@ -129,6 +129,13 @@ export default describe('execute', () => {
       done()
     })
 
+    it('can access stdout', async done => {
+      const { stdout } = await execute(`identify rose:`)
+      expect(stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
+      done()
+    })
+    
+
     describe('errors', () => {
 
       it('should return error property and empty outputFiles on error', async done => {

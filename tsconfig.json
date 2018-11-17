@@ -12,9 +12,6 @@
   },
   "include": [
     "src", "spec"
-  ],
-  "exclude": [
-    "node_modules", "dist"
   ]
 }
 

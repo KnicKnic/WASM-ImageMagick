@@ -19,14 +19,14 @@
   }
   </style>
 
-  <h1>Testing /dist/bundles/index.esm.js import directly from html page </h1>
+  <h1>Testing wasm-imagemagick.umd-es5.js without libraries </h1>
 
-  <p>You can import the library in modern browsers importing it as a JavaScript standard module: </p>
+  <p>in this case, when no libraries are detected the global variable <code>['wasm-imagemagick']</code> is available, so you can use it like this: </p>
 
-  <pre>
-&lt;script type="module">
-  import { execute, loadImageElement, buildInputFile } from '../../dist/esm2018/wasm-imagemagick.esm-es6.js'
-  </pre>
+<pre>
+const { execute, loadImageElement, buildInputFile } = window['wasm-imagemagick']
+</pre>
+
   <div>
     <p>Image URL: </p>
     <input id="imageUrl" type="text" value="../rotate/FriedrichNietzsche.png">
@@ -52,10 +52,12 @@ convert \
   <button id="execute">Execute</button>
 
   <div id="imagesContainer"></div>
-  <script type="module">
-    import { execute, loadImageElement, buildInputFile } from '../../dist/bundles/wasm-imagemagick.esm-es2018.js'
-    // import { execute, loadImageElement, buildInputFile } from '../../dist/bundles/wasm-imagemagick.esm-es6.js'
-    // import { execute, loadImageElement, buildInputFile } from '../../dist/esm2018/index.js'
+
+  <script src="../../dist/bundles/wasm-imagemagick.umd-es5.js"></script>
+
+  <script>
+
+    const { execute, loadImageElement, buildInputFile } = window['wasm-imagemagick']
 
     async function renderImages(images) {
       document.querySelector('#imagesContainer').innerHTML = ''

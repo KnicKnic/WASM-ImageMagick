@@ -4,7 +4,7 @@ import nodeResolve from 'rollup-plugin-node-resolve'
 import json from 'rollup-plugin-json'
 import commonjs from 'rollup-plugin-commonjs'
 import replace from 'rollup-plugin-replace'
-import  uglify  from 'rollup-plugin-uglify-es'
+import uglify from 'rollup-plugin-uglify-es'
 import { terser } from 'rollup-plugin-terser'
 import { getIfUtils, removeEmpty } from 'webpack-config-utils'
 
@@ -13,9 +13,12 @@ import pkg from './package.json'
 const env = process.env.NODE_ENV || 'development'
 const { ifProduction } = getIfUtils(env)
 
-const LIB_NAME = pascalCase(normalizePackageName(pkg.name))
+const LIB_NAME = pkg.name//pascalCase(normalizePackageName(pkg.name))
 const ROOT = resolve(__dirname, '.')
 const DIST = resolve(ROOT, 'dist')
+
+console.log(LIB_NAME);
+
 
 /**
  * Object literals are open-ended for js checking, so we need to be explicit
@@ -24,6 +27,7 @@ const PATHS = {
   entry: {
     esm5: resolve(DIST, 'esm5'),
     esm2018: resolve(DIST, 'esm2018'),
+    esm6: resolve(DIST, 'esm6'),
   },
   bundles: resolve(DIST, 'bundles'),
 }
@@ -31,33 +35,30 @@ const PATHS = {
 
 // helpers
 
-function dashToCamelCase(myStr) {
-  return myStr.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
-}
+// function dashToCamelCase(myStr) {
+//   return myStr.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
+// }
 
-function toUpperCase(myStr) {
-  return `${myStr.charAt(0).toUpperCase()}${myStr.substr(1)}`
-}
+// function toUpperCase(myStr) {
+//   return `${myStr.charAt(0).toUpperCase()}${myStr.substr(1)}`
+// }
 
-function pascalCase(myStr) {
-  return toUpperCase(dashToCamelCase(myStr))
-}
+// function pascalCase(myStr) {
+//   return toUpperCase(dashToCamelCase(myStr))
+// }
 
-function normalizePackageName(rawPackageName) {
-  const scopeEnd = rawPackageName.indexOf('/') + 1
+// function normalizePackageName(rawPackageName) {
+//   const scopeEnd = rawPackageName.indexOf('/') + 1
 
-  return rawPackageName.substring(scopeEnd)
-}
+//   return rawPackageName.substring(scopeEnd)
+// }
 
 function getOutputFileName(fileName, isProd = false) {
   return isProd ? fileName.replace(/\.js$/, '.min.js') : fileName
 }
 
 
-
-
-
-const external = Object.keys(pkg.peerDependencies||{}) || []
+const external = Object.keys(pkg.peerDependencies || {}) || []
 
 const plugins = ([
   // Allow json resolution
@@ -89,12 +90,42 @@ const CommonConfig = {
   external,
 }
 
-const UMDconfig = {
+import babel from 'rollup-plugin-babel';
+const UMDEs5config = {
+  ...CommonConfig,
+  input: resolve(PATHS.entry.esm5, 'index.js'),
+
+  output: {
+    file: getOutputFileName(
+      resolve(PATHS.bundles, `${pkg.name}.umd-es5.js`),
+      ifProduction()
+    ),
+    format: 'umd',
+    name: LIB_NAME,
+    sourcemap: true,
+    amd: {
+      id: 'wasm-imagemagick'
+    }
+  },
+  plugins: removeEmpty(([...plugins, ifProduction(uglify()), babel({
+    include: 'node_modules/**', babelrc: false, presets: [
+      [
+        "@babel/preset-env",
+        {
+          "targets": "ie 10"
+        }
+      ]
+    ]
+  })])
+  ),
+}
+
+const UMDEs6config = {
   ...CommonConfig,
   input: resolve(PATHS.entry.esm5, 'index.js'),
   output: {
     file: getOutputFileName(
-      resolve(PATHS.bundles, `${LIB_NAME}.umd-es5.js`),
+      resolve(PATHS.bundles, `${pkg.name}.umd-es6.js`),
       ifProduction()
     ),
     format: 'umd',
@@ -105,13 +136,13 @@ const UMDconfig = {
   ),
 }
 
-const FESMconfig = {
+const FESMEs6config = {
   ...CommonConfig,
-  input: resolve(PATHS.entry.esm2018, 'index.js'),
+  input: resolve(PATHS.entry.esm6, 'index.js'),
   output: [
     {
       file: getOutputFileName(
-        resolve(PATHS.bundles, `${LIB_NAME}.esm-es2018.js`),
+        resolve(PATHS.bundles, `${pkg.name}.esm-es6.js`),
         ifProduction()
       ),
       format: 'es',
@@ -119,11 +150,32 @@ const FESMconfig = {
     },
   ],
   plugins: removeEmpty(
-   ([...plugins, ifProduction(terser())])
+    ([...plugins, ifProduction(terser())])
   ),
 }
 
-export default [UMDconfig
-  , FESMconfig
+const FESMEs2018config = {
+  ...CommonConfig,
+  input: resolve(PATHS.entry.esm2018, 'index.js'),
+  output: [
+    {
+      file: getOutputFileName(
+        resolve(PATHS.bundles, `${pkg.name}.esm-es2018.js`),
+        ifProduction()
+      ),
+      format: 'es',
+      sourcemap: true,
+    },
+  ],
+  plugins: removeEmpty(
+    ([...plugins, ifProduction(terser())])
+  ),
+}
+
+export default [
+  UMDEs5config,
+  UMDEs6config,
+  FESMEs6config,
+  FESMEs2018config
 ]
 
