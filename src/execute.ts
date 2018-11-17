@@ -46,7 +46,7 @@ export interface ExecuteConfig {
  *
  * If you need to escape arguments like file names with spaces, use single quotes `'`, like the output file in the previous example `'star inward.gif'`
  */
-export type ExecuteCommand = Command[] | string[] | string
+export type ExecuteCommand = Command[] | Command | string
 
 export interface ExecuteResultOne extends CallResult {
   errors: any[]
@@ -85,6 +85,9 @@ export function isExecuteCommand(arg: any): arg is ExecuteConfig {
   return !!arg.commands
 }
 
+/**
+ * Transform  `configOrCommand: ExecuteConfig | ExecuteCommand` to a valid ExecuteConfig object
+ */
 export function asExecuteConfig(arg: ExecuteConfig | ExecuteCommand): ExecuteConfig {
   if (isExecuteCommand(arg)) {
     return arg

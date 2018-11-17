@@ -149,6 +149,11 @@ require(['wasm-imagemagick'], function (WasmImagemagick) {
 [See working example](https://github.com/KnicKnic/WASM-ImageMagick/blob/master/tests/bundles/umd-test-nolibrary.html)
 
 
+## API reference documentation
+
+[API Reference Documentation](./apidocs)
+
+
 ## Build instructions
 
 ```sh
