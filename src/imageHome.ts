@@ -1,5 +1,6 @@
 import { MagickInputFile, MagickFile, asInputFile, getBuiltInImages } from '.'
 import pMap from 'p-map'
+import { values } from './util/misc';
 
 export interface ImageHome {
   remove(names: string[]): MagickInputFile[]
@@ -33,7 +34,7 @@ class ImageHomeImpl implements ImageHome {
   }
 
   async getAll(): Promise<MagickInputFile[]> {
-    return await Promise.all(Object.keys(this.images).map(k => this.images[k]))
+    return await Promise.all(values(this.images))
   }
 
   register(file: MagickFile, name: string = file.name): MagickInputFilePromise {

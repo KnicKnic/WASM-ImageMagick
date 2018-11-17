@@ -1,6 +1,7 @@
 import { MagickInputFile, MagickOutputFile, outputFileToInputFile, call, asCommand } from '.'
 import pMap from 'p-map'
 import { CallResult } from './magickApi'
+import { values } from './util/misc';
 
 export type Command = (string | number)[]
 
@@ -21,7 +22,8 @@ export interface ExecuteResultOne extends CallResult {
 }
 
 /** execute first command in given config */
-export async function executeOne(config: ExecuteConfig): Promise<ExecuteResultOne> {
+export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand): Promise<ExecuteResultOne> {
+  const config = asExecuteConfig(configOrCommand)
   let result: CallResult = {
     stderr: [],
     stdout: [],
@@ -43,6 +45,30 @@ export async function executeOne(config: ExecuteConfig): Promise<ExecuteResultOn
   } catch (error) {
     return { ...result, errors: [error + ', exit code: ' + result.exitCode + ', stderr: ' + result.stderr.join('\n')] }
   }
+}
+
+export function isExecuteCommand(arg: any): arg is ExecuteConfig {
+  return !!arg.commands
+}
+
+export function asExecuteConfig(arg: ExecuteConfig | ExecuteCommand): ExecuteConfig {
+  if (isExecuteCommand(arg)) {
+    return arg
+  }
+  return {
+    inputFiles: [], 
+    commands: arg,
+  }
+}
+/**
+ * Assumes the command won't fail so returns one output file directly or undefined if it's not found (or error occurs)
+ * @param configOrCommand 
+ * @param outputFileName optionally user can give the desired output file name
+ */
+export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig | ExecuteCommand, outputFileName?: string): Promise<MagickOutputFile | undefined> {
+  const config = asExecuteConfig(configOrCommand)
+  const result = await execute(config)
+  return outputFileName ? result.outputFiles.find(f => f.name === outputFileName) : result.outputFiles.length && result.outputFiles[0]
 }
 
 // execute event emitter
@@ -104,7 +130,9 @@ export interface ExecuteResult extends ExecuteResultOne {
  *
  * ```
  */
-export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
+
+export async function execute(configOrCommand: ExecuteConfig | ExecuteCommand): Promise<ExecuteResult> {
+  const config = asExecuteConfig(configOrCommand)
   config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}
   const allInputFiles: { [name: string]: MagickInputFile } = {}
@@ -117,7 +145,7 @@ export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
   let allStderr = []
   async function mapper(c: Command) {
     const thisConfig = {
-      inputFiles: Object.keys(allInputFiles).map(name => allInputFiles[name]),
+      inputFiles: values(allInputFiles),
       commands: [c],
     }
     const result = await executeOne(thisConfig)
@@ -135,7 +163,7 @@ export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
   await pMap(commands, mapper, { concurrency: 1 })
   const resultWithError = results.find(r => r.exitCode !== 0)
   return {
-    outputFiles: Object.keys(allOutputFiles).map(name => allOutputFiles[name]),
+    outputFiles: values(allOutputFiles),
     errors: allErrors,
     results,
     stdout: allStdout,
@@ -143,3 +171,4 @@ export async function execute(config: ExecuteConfig): Promise<ExecuteResult> {
     exitCode: resultWithError ? resultWithError.exitCode : 0,
   }
 }
+

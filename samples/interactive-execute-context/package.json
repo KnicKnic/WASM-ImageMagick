@@ -4,11 +4,12 @@
   "description": "html page that transform images in different formats (not understandable by the browser), transform each of them to png and show a table with all these transformations.",
   "main": "dist/index.js",
   "scripts": {
+    "all": "npm run clean && npm run build && npm run copy",
     "build": "tsc && npm run bundle",
     "bundle": "browserify dist/index.js -o static/bundle.js",
     "copy": "cp -r ../../spec/assets/fn.png ../../spec/assets/magick.* src/static/* static",
     "clean": "rm -rf dist static",
-    "start": "npm run clean && npm run build && npm run copy && npm run watch-all",
+    "start": "npm run all && npm run watch-all",
     "server": "http-server static",
     "watch-all": "concurrently 'npm run watch-build' 'npm run watch-server' ",
     "watch-build": "onchange -v 'src/**/*' -- npm run build",

@@ -1,5 +1,6 @@
 import { Command } from '..'
 import { ExecuteCommand } from '../execute'
+import { flat } from './misc';
 
 /** generates a valid command line command from given Call/execute Command. Works in a single command  */
 export function arrayToCliOne(command: Command): string {
@@ -82,8 +83,4 @@ export function asCommand(c: ExecuteCommand): Command[] {
     return flat((c as string[]).map((subCommand: string) => cliToArray(subCommand)))
   }
   return c as Command[]
-}
-
-export function flat<T>(arr: T[][]): T[] {
-  return arr.reduce((a, b) => a.concat(b))
 }

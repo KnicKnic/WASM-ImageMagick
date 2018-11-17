@@ -1,4 +1,5 @@
-import { buildInputFile, compare, extractInfo, execute, executeOne } from '../src'
+import { buildInputFile, compare, execute, executeAndReturnOutputFile, executeOne, extractInfo } from '../src'
+import { showImages } from './testUtil'
 
 export default describe('execute', () => {
 
@@ -71,9 +72,51 @@ export default describe('execute', () => {
       })
       const result2 = await executeOne({
         inputFiles: [await buildInputFile('fn.png', 'image1.png')],
-        commands: ['convert image1.png -rotate 70 -scale 23% image2.gif'],
+        commands: ['convert image1.png -rotate 70 -scale 23% image2.png'],
       })
-      expect(await compare(outputFiles.find(f => f.name === 'image3.jpg'), result2.outputFiles[0])).toBe(true)
+      const image3 = outputFiles.find(f => f.name === 'image3.jpg')
+      const image2 = result2.outputFiles[0]
+      // await showImages([image3,image2])
+      expect(await compare(image3, image2)).toBe(true)
+      done()
+    })
+
+    it('supports just a command when no input files are necessary', async done => {
+      const { outputFiles } = await execute([
+        'convert rose: -rotate 70 image2.gif',
+        'convert image2.gif -scale 23% image3.jpg',
+      ])
+      const result2 = await execute('convert rose: -rotate 70 -scale 23% image2.png')
+      const image3 = outputFiles.find(f => f.name === 'image3.jpg')
+      const image2 = result2.outputFiles[0]
+      await showImages([image3, image2])
+
+      expect(await compare(image3, image2)).toBe(true)
+      done()
+    })
+
+    it('convert won\'t replace input files', async done => {
+      const input = await buildInputFile('fn.png')
+      const result = await execute({
+        inputFiles: [input],
+        commands: ['convert fn.png -rotate 10 fn.png'],
+      })
+      const output = result.outputFiles.find(f => f.name === 'fn.png')
+      expect(output).toBeUndefined()
+      done()
+    })
+
+    it('mogrify will replace input files', async done => {
+      const input = await buildInputFile('fn.png')
+      const result = await execute({
+        inputFiles: [input],
+        commands: ['mogrify -rotate 10 fn.png'],
+      })
+      const output = result.outputFiles.find(f => f.name === 'fn.png')
+      expect(output).toBeDefined()
+      const converted = await executeAndReturnOutputFile({ inputFiles: [input], commands: 'convert fn.png -rotate 10 output.png' })
+      // await showImages([output, converted])
+      expect(await compare(output, converted)).toBe(true)
       done()
     })
 
@@ -131,6 +174,22 @@ export default describe('execute', () => {
 
         done()
       })
+    })
+  })
+
+  describe('executeAndReturnOutputFile', () => {
+    it('should support using just a command when input files are not necessary', async done => {
+      const out = await executeAndReturnOutputFile('convert rose: -rotate 55 -resize 55% out.png')
+      expect(out.name).toBe('out.png')
+
+      const out2 = await executeAndReturnOutputFile(`
+      convert rose: -rotate 55 out1.png
+      convert out1.png -resize 55% out2.png
+      `, 'out2.png')
+      expect(out2.name).toBe('out2.png')
+      expect(await compare(out, out2)).toBe(true)
+
+      done()
     })
   })
 

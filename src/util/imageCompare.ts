@@ -1,6 +1,6 @@
 import { asInputFile, Call, MagickFile, blobToString, MagickInputFile } from '..'
 
-export async function compare(img1: MagickFile | string, img2: MagickFile | string, error: number = 0.01): Promise<boolean> {
+export async function compare(img1: MagickFile | string, img2: MagickFile | string, error: number = 0.015): Promise<boolean> {
   const identical = await compareNumber(img1, img2)
   return identical <= error
 }
