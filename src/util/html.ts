@@ -3,7 +3,7 @@ import { asInputFile, asOutputFile, execute, getFileNameExtension, MagickFile, M
 // utilities related to HTML (img) elements
 
 /**
- * Will load given html img element src with the inline image content. In case forceBrowserSupport=true
+ * Will load given html img element src with the inline image content.
  * @param image the image to be loaded
  * @param el the html image element in which to load the image
  * @param forceBrowserSupport if true and the image extension is not supported by browsers, it will convert the image to png
@@ -13,10 +13,8 @@ export async function loadImageElement(image: MagickFile, el: HTMLImageElement, 
   el.src = await buildImageSrc(image, forceBrowserSupport)
 }
 
-const browserSupportedImageExtensions = ['gif', 'png', 'jpg', 'webp']
-
 /**
- * Return a string with the inline image content, suitable to be used to assign to an html img src attribute. See oadImageElement.
+ * Return a string with the inline image content, suitable to be used to assign to an html img src attribute. See {@link loadImageElement}.
  * @param forceBrowserSupport if true and the image extension is not supported by browsers, it will convert the image to png
  * and return that src so it can be shown in browsers
  */
@@ -31,6 +29,15 @@ export async function buildImageSrc(image: MagickFile, forceBrowserSupport: bool
   const outputFile = await asOutputFile(img)
   return URL.createObjectURL(outputFile.blob)
 }
+/**
+ * Build `MagickInputFile[]` from given HTMLInputElement of type=file that user may used to select several files
+ */
+export async function getInputFilesFromHtmlInputElement(el: HTMLInputElement): Promise<MagickInputFile[]> {
+  const files = await inputFileToUint8Array(el)
+  return files.map(f => ({ name: f.file.name, content: f.content }))
+}
+
+const browserSupportedImageExtensions = ['gif', 'png', 'jpg', 'webp']
 
 function inputFileFiles(el: HTMLInputElement): File[] {
   const files = []
@@ -52,10 +59,4 @@ async function inputFileToUint8Array(el: HTMLInputElement): Promise<{ file: File
     })
     return { file, content }
   }))
-}
-
-/** will build MagickInputFile[] from given HTMLInputElement of type=file that user may used to select several files */
-export async function getInputFilesFromHtmlInputElement(el: HTMLInputElement): Promise<MagickInputFile[]> {
-  const files = await inputFileToUint8Array(el)
-  return files.map(f => ({ name: f.file.name, content: f.content }))
 }

@@ -1,4 +1,4 @@
-import { buildInputFile, loadImageElement, compare, execute, Call, executeOne } from '../../src'
+import { buildInputFile, compare, executeOne, loadImageElement } from '../../src'
 
 export default describe('util/html', () => {
 
@@ -7,11 +7,9 @@ export default describe('util/html', () => {
     it('should display an input and output images in an html img element', async done => {
       const img1 = await buildInputFile('fn.png')
       let el = document.createElement('img')
-      // document.body.appendChild(el)
       expect(el.src).toBeFalsy()
       await loadImageElement(img1, el)
       expect(el.src).toBeTruthy()
-      // expect('visually check in the browser').toBe('visually check in the browser')
 
       let img2 = await buildInputFile(el.src, 'image2.png')
       expect(await compare(img1, img2)).toBe(true)
@@ -20,11 +18,9 @@ export default describe('util/html', () => {
       const out = outputFiles[0]
 
       el = document.createElement('img')
-      // document.body.appendChild(el)
       expect(el.src).toBeFalsy()
       await loadImageElement(out, el)
       expect(el.src).toBeTruthy()
-      // expect('visually check in the browser').toBe('visually check in the browser')
 
       img2 = await buildInputFile(el.src, 'image2.png')
       expect(await compare(out, img2)).toBe(true)

@@ -1,6 +1,10 @@
 // has some heuristic information regarding features (not) supported by wasm-imagemagick, for example, image formats
 
-// heads up - all images spec/assets/to_rotate.* where converted using gimp unless explicitly saying otherwhise
+// heads up - all images spec/assets/to_rotate.* where converted using gimp unless explicitly saying otherwise
+
+/**
+ * list of image formats that are known to be supported by wasm-imagemagick. See `spec/formatSpec.ts`
+ */
 export const knownSupportedReadWriteImageFormats = [
   'jpg', 'png',
   'psd',

@@ -1,7 +1,7 @@
 {
-  "name": "supported-formats",
+  "name": "interactive-execute-context",
   "version": "1.0.0",
-  "description": "html page that transform images in different formats (not understandable by the browser), transform each of them to png and show a table with all these transformations.",
+  "description": "html page that let the user enter commands and store/show files so they can be reused in later commands. Shows a collection of command examples using different command syntaxes",
   "main": "dist/index.js",
   "scripts": {
     "all": "npm run clean && npm run build && npm run copy",

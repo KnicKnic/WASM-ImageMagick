@@ -5,7 +5,6 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "module": "dist/bundles/wasm-imagemagick.esm-es5.js",
-  "browser": "dist/bundles/wasm-imagemagick.umd-es5.js",
   "scripts": {
     "build-wasm": "docker build -t wasm-imagemagick-build-tools . && docker run --rm --workdir /code -v \"$PWD\":/code wasm-imagemagick-build-tools bash ./build.sh",
     "build-ts": "rm -rf dist && tsc && npm run bundle",
@@ -20,13 +19,15 @@
     "generateImEnums": "npx ts-node scripts/generateImEnums.ts",
     "test": "npm run test-node && npm run test-browser",
     "test-node": "cd tests/rotate && node node",
-    "test-browser-build": "tsc && browserify --no-browser-field -d dist/spec/index.js -o dist/bundle.js",
+    "test-browser-build": "tsc && browserify -d dist/spec/index.js -o dist/bundle.js",
     "test-browser": "rm -rf dist && npm run test-browser-build  && npm run copy && gulp --gulpfile spec/gulpfile.js jasmine",
     "test-browser-server": "rm -rf dist && npm run test-browser-build && npm run copy && gulp --gulpfile spec/gulpfile.js jasmine-server",
     "test-browser-start": "rm -rf dist && tsc && npm run copy && npm run test-browser-watch-all",
     "test-browser-watch-all": "concurrently 'npm run test-browser-watch-build' 'npm run test-browser-watch-server' ",
     "test-browser-watch-build": "onchange -i -v 'src/**/*' 'spec/**/*' -- npm run test-browser-build",
-    "test-browser-watch-server": "onchange  -k -v 'dist/bundle.js' -- gulp --gulpfile spec/gulpfile.js jasmine-server"
+    "test-browser-watch-server": "onchange  -k -v 'dist/bundle.js' -- gulp --gulpfile spec/gulpfile.js jasmine-server",
+
+    "apidocs": "rm -rf apidocs && typedoc --options typedoc.js --theme markdown"
   },
   "repository": {
     "type": "git",
@@ -72,6 +73,8 @@
     "ts-node": "^7.0.1",
     "ts-simple-ast": "^19.0.0",
     "tslint": "^5.11.0",
+    "typedoc": "^0.13.0",
+    "typedoc-plugin-markdown": "^1.1.18",
     "typescript": "^3.1.6",
     "webpack-config-utils": "^2.3.1"
   },

@@ -1,4 +1,4 @@
-import { buildInputFile, Call, compare, MagickInputFile, outputFileToInputFile } from '../../src'
+import { buildInputFile, Call, compare, MagickInputFile, asInputFile } from '../../src'
 
 export default describe('util/imageCompare', () => {
 
@@ -20,15 +20,15 @@ export default describe('util/imageCompare', () => {
 
   it('should return true if images are equal but different formats', async done => {
     const result = await Call([await buildInputFile('fn.png')], ['convert', 'fn.png', 'fn.jpg'])
-    const img1 = await outputFileToInputFile(result[0])
+    const img1 = await asInputFile(result[0])
     const img2 = await buildInputFile('fn.png', 'img2.png')
     await test(img1, img2, true)
     done()
   })
 
   it('should let me work with builtin images', async done => {
-    await test('rose:', await outputFileToInputFile((await Call([], ['convert', 'rose:', 'fn.png']))[0]), true)
-    await test('rose:', await outputFileToInputFile((await Call([], ['convert', 'wizard:', 'fn.png']))[0]), false)
+    await test('rose:', await asInputFile((await Call([], ['convert', 'rose:', 'fn.png']))[0]), true)
+    await test('rose:', await asInputFile((await Call([], ['convert', 'wizard:', 'fn.png']))[0]), false)
     done()
   })
 

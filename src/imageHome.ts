@@ -2,13 +2,33 @@ import { MagickInputFile, MagickFile, asInputFile, getBuiltInImages } from '.'
 import pMap from 'p-map'
 import { values } from './util/misc'
 
+/**
+ * Manager for `MagickFiles`.
+ */
 export interface ImageHome {
-  remove(names: string[]): MagickInputFile[]
+  /**
+   * Get a file by name.
+   */
   get(name: string): Promise<MagickInputFile>
+
+  /**
+   * Programmatically add new files.
+   */
   register(file: MagickFile, name?: string): void
   isRegistered(name: string): boolean
+  /**
+   * Get all the files currently available in this context.
+   */
   getAll(): Promise<MagickInputFile[]>
+  /** 
+   * Add ImageMagick built-in images like `rose:`, `logo:`, etc to this execution context so they are present in `getAll()`.
+   */
   addBuiltInImages(): Promise<void>
+  /**
+   * Remove files by name. 
+   * @returns the files actually removed.
+   */
+  remove(names: string[]): MagickInputFile[]
 }
 
 type MagickInputFilePromise = Promise<MagickInputFile> & { resolved: true }
@@ -46,7 +66,7 @@ class ImageHomeImpl implements ImageHome {
     return promise
   }
 
-  isRegistered(name: string, andReady: boolean= true): boolean {
+  isRegistered(name: string, andReady: boolean = true): boolean {
     return this.images[name] && (andReady && this.images[name].resolved)
   }
 
@@ -58,4 +78,4 @@ class ImageHomeImpl implements ImageHome {
   }
 
 }
-export function createImageHome() {return new ImageHomeImpl()}
+export function createImageHome() { return new ImageHomeImpl() }

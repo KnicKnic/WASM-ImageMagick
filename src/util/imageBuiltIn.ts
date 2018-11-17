@@ -1,9 +1,12 @@
 import pMap from 'p-map'
-import { MagickInputFile, extractInfo , execute, asInputFile} from '..'
+import { asInputFile, execute, extractInfo, MagickInputFile } from '..'
 
 let builtInImages: MagickInputFile[]
 export const builtInImageNames = ['rose:', 'logo:', 'wizard:', 'granite:', 'netscape:']
 
+/**
+ * Gets ImageMagick built-in images like `rose:`, `logo:`, etc in the form of {@link MagickInputFile}s
+ */
 export async function getBuiltInImages(): Promise<MagickInputFile[]> {
   if (!builtInImages) {
     builtInImages = await pMap(builtInImageNames, async name => {

@@ -2,8 +2,10 @@ import { Command } from '..'
 import { ExecuteCommand } from '../execute'
 import { flat } from './misc'
 
-/** generates a valid command line command from given Call/execute Command. Works in a single command  */
-export function arrayToCliOne(command: Command): string {
+/**
+ * Generates a valid command line command from given `string[]` command. Works with a single command.
+ */
+function arrayToCliOne(command: Command): string {
   return command
     .map(c => c + '')
 
@@ -16,16 +18,20 @@ export function arrayToCliOne(command: Command): string {
     .join(' ')
 }
 
-/** generates a valid command line command from given Call/execute Command . Works with multiple commands */
-export function arrayToCli(command: Command|Command[]): string {
-  const cmd  = typeof command[0] === 'string' ? [command as Command] : command as Command[]
+/**
+ * Generates a valid command line string from given `string[]` that is compatible with  {@link call}. Works with multiple
+ * commands by separating  them with new lines and support comand splitting in new lines using `\`.
+ * See {@link ExecuteCommand} for more information.
+ */
+export function arrayToCli(command: Command | Command[]): string {
+  const cmd = typeof command[0] === 'string' ? [command as Command] : command as Command[]
   return cmd.map(arrayToCliOne).join('\n')
 }
 
-/** generates a valid Call/execute string[] command from given command line command.
- * This works only for a single command
+/**
+ * Generates a command in the form of array of strings, compatible with {@link call} from given command line string . The string must contain only one command (no newlines).
  */
-export function cliToArrayOne(cliCommand: string): Command {
+function cliToArrayOne(cliCommand: string): Command {
   let inString = false
   const spaceIndexes = [0]
   for (let index = 0; index < cliCommand.length; index++) {
@@ -52,9 +58,10 @@ export function cliToArrayOne(cliCommand: string): Command {
   return command
 }
 
-/** generates a valid Call/execute string[] command from given command line command.
- * This works for strings containing multiple commands in different lines.
- * TODO: respect '\' character for continue the same command in a new line
+/**
+ * Generates a command in the form of `string[][]` that is compatible with {@link call} from given command line string.
+ * This works for strings containing multiple commands in different lines. and also respect `\` character for continue the same
+ * command in a new line. See {@link ExecuteCommand} for more information.
  */
 export function cliToArray(cliCommand: string): Command[] {
   const lines = cliCommand.split('\n')
@@ -76,6 +83,9 @@ export function cliToArray(cliCommand: string): Command[] {
   return result
 }
 
+/**
+ * Makes sure that given {@link ExecuteCommand}, in whatever syntax, is transformed to the form `string[][]` that is compatible with {@link call}
+ */
 export function asCommand(c: ExecuteCommand): Command[] {
   if (typeof c === 'string') { return asCommand([c]) }
   if (!c[0]) { return [] }
