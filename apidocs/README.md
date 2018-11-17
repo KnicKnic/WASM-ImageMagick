@@ -101,17 +101,17 @@ else {
 
 **Ƭ Command**: *( `string` &#124; `number`)[]*
 
-*Defined in [execute.ts:7](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L7)*
+*Defined in [execute.ts:7](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/execute.ts#L7)*
 
 ___
 <a id="executecommand"></a>
 
 ###  ExecuteCommand
 
-**Ƭ ExecuteCommand**: * [Command](#command)[] &#124; `string`[] &#124; `string`
+**Ƭ ExecuteCommand**: * [Command](#command)[] &#124; [Command](#command) &#124; `string`
 *
 
-*Defined in [execute.ts:49](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L49)*
+*Defined in [execute.ts:49](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/execute.ts#L49)*
 
 Commands could have the following syntaxes:
 
@@ -155,7 +155,7 @@ ___
 
 **● builtInImageNames**: *`string`[]* =  ['rose:', 'logo:', 'wizard:', 'granite:', 'netscape:']
 
-*Defined in [util/imageBuiltIn.ts:5](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/imageBuiltIn.ts#L5)*
+*Defined in [util/imageBuiltIn.ts:5](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/imageBuiltIn.ts#L5)*
 
 ___
 <a id="knownsupportedreadwriteimageformats"></a>
@@ -182,7 +182,7 @@ ___
   // 'rgb', // fails because  MustSpecifyImageSize `to_rotate.rgb'
 ]
 
-*Defined in [util/support.ts:8](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/support.ts#L8)*
+*Defined in [util/support.ts:8](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/support.ts#L8)*
 
 list of image formats that are known to be supported by wasm-imagemagick. See `spec/formatSpec.ts`
 
@@ -196,7 +196,7 @@ ___
 
 ▸ **Call**(inputFiles: *[MagickInputFile](interfaces/magickinputfile.md)[]*, command: *`string`[]*): `Promise`<[MagickOutputFile](interfaces/magickoutputfile.md)[]>
 
-*Defined in [magickApi.ts:27](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/magickApi.ts#L27)*
+*Defined in [magickApi.ts:27](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/magickApi.ts#L27)*
 
 [call](#call) shortcut that only returns the output files.
 
@@ -216,7 +216,7 @@ ___
 
 ▸ **addExecuteListener**(l: *[ExecuteListener](interfaces/executelistener.md)*): `void`
 
-*Defined in [execute.ts:125](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L125)*
+*Defined in [execute.ts:128](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/execute.ts#L128)*
 
 **Parameters:**
 
@@ -233,7 +233,7 @@ ___
 
 ▸ **arrayToCli**(command: * [Command](#command) &#124; [Command](#command)[]*): `string`
 
-*Defined in [util/cli.ts:26](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/cli.ts#L26)*
+*Defined in [util/cli.ts:26](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/cli.ts#L26)*
 
 Generates a valid command line string from given `string[]` that is compatible with [call](#call). Works with multiple commands by separating them with new lines and support comand splitting in new lines using `\`. See [ExecuteCommand](#executecommand) for more information.
 
@@ -252,7 +252,7 @@ ___
 
 ▸ **asCommand**(c: *[ExecuteCommand](#executecommand)*): [Command](#command)[]
 
-*Defined in [util/cli.ts:89](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/cli.ts#L89)*
+*Defined in [util/cli.ts:89](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/cli.ts#L89)*
 
 Makes sure that given [ExecuteCommand](#executecommand), in whatever syntax, is transformed to the form `string[][]` that is compatible with [call](#call)
 
@@ -271,7 +271,9 @@ ___
 
 ▸ **asExecuteConfig**(arg: * [ExecuteConfig](interfaces/executeconfig.md) &#124; [ExecuteCommand](#executecommand)*): [ExecuteConfig](interfaces/executeconfig.md)
 
-*Defined in [execute.ts:88](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L88)*
+*Defined in [execute.ts:91](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/execute.ts#L91)*
+
+Transform `configOrCommand: ExecuteConfig | ExecuteCommand` to a valid ExecuteConfig object
 
 **Parameters:**
 
@@ -288,7 +290,7 @@ ___
 
 ▸ **asInputFile**(f: *[MagickFile](interfaces/magickfile.md)*, name?: *`string`*): `Promise`<[MagickInputFile](interfaces/magickinputfile.md)>
 
-*Defined in [util/file.ts:54](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/file.ts#L54)*
+*Defined in [util/file.ts:54](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/file.ts#L54)*
 
 **Parameters:**
 
@@ -306,7 +308,7 @@ ___
 
 ▸ **asOutputFile**(f: *[MagickFile](interfaces/magickfile.md)*, name?: *`string`*): `Promise`<[MagickOutputFile](interfaces/magickoutputfile.md)>
 
-*Defined in [util/file.ts:66](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/file.ts#L66)*
+*Defined in [util/file.ts:66](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/file.ts#L66)*
 
 **Parameters:**
 
@@ -324,7 +326,7 @@ ___
 
 ▸ **blobToString**(blb: *`Blob`*): `Promise`<`string`>
 
-*Defined in [util/file.ts:14](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/file.ts#L14)*
+*Defined in [util/file.ts:14](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/file.ts#L14)*
 
 **Parameters:**
 
@@ -341,7 +343,7 @@ ___
 
 ▸ **buildImageSrc**(image: *[MagickFile](interfaces/magickfile.md)*, forceBrowserSupport?: *`boolean`*): `Promise`<`string`>
 
-*Defined in [util/html.ts:21](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/html.ts#L21)*
+*Defined in [util/html.ts:21](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/html.ts#L21)*
 
 Return a string with the inline image content, suitable to be used to assign to an html img src attribute. See [loadImageElement](#loadimageelement).
 
@@ -361,7 +363,7 @@ ___
 
 ▸ **buildInputFile**(url: *`string`*, name?: *`string`*): `Promise`<[MagickInputFile](interfaces/magickinputfile.md)>
 
-*Defined in [util/file.ts:29](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/file.ts#L29)*
+*Defined in [util/file.ts:29](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/file.ts#L29)*
 
 Builds a new [MagickInputFile](interfaces/magickinputfile.md) by fetching the content of given url and optionally naming the file using given name or extracting the file name from the url otherwise.
 
@@ -381,7 +383,7 @@ ___
 
 ▸ **call**(inputFiles: *[MagickInputFile](interfaces/magickinputfile.md)[]*, command: *`string`[]*): `Promise`<[CallResult](interfaces/callresult.md)>
 
-*Defined in [magickApi.ts:57](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/magickApi.ts#L57)*
+*Defined in [magickApi.ts:57](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/magickApi.ts#L57)*
 
 Low level execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) ends up calling this one. It accept only one command and only in the form of array of strings.
 
@@ -401,7 +403,7 @@ ___
 
 ▸ **cliToArray**(cliCommand: *`string`*): [Command](#command)[]
 
-*Defined in [util/cli.ts:66](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/cli.ts#L66)*
+*Defined in [util/cli.ts:66](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/cli.ts#L66)*
 
 Generates a command in the form of `string[][]` that is compatible with [call](#call) from given command line string. This works for strings containing multiple commands in different lines. and also respect `\` character for continue the same command in a new line. See [ExecuteCommand](#executecommand) for more information.
 
@@ -420,7 +422,7 @@ ___
 
 ▸ **compare**(img1: * [MagickFile](interfaces/magickfile.md) &#124; `string`*, img2: * [MagickFile](interfaces/magickfile.md) &#124; `string`*, fuzz?: *`number`*): `Promise`<`boolean`>
 
-*Defined in [util/imageCompare.ts:6](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/imageCompare.ts#L6)*
+*Defined in [util/imageCompare.ts:6](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/imageCompare.ts#L6)*
 
 Compare the two images and return true if they are equal visually. Optionally, a margin of error can be provided using `fuzz`
 
@@ -441,7 +443,7 @@ ___
 
 ▸ **compareNumber**(img1: * [MagickFile](interfaces/magickfile.md) &#124; `string`*, img2: * [MagickFile](interfaces/magickfile.md) &#124; `string`*): `Promise`<`number`>
 
-*Defined in [util/imageCompare.ts:11](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/imageCompare.ts#L11)*
+*Defined in [util/imageCompare.ts:11](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/imageCompare.ts#L11)*
 
 **Parameters:**
 
@@ -459,7 +461,7 @@ ___
 
 ▸ **createImageHome**(): `ImageHomeImpl`
 
-*Defined in [imageHome.ts:81](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/imageHome.ts#L81)*
+*Defined in [imageHome.ts:81](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/imageHome.ts#L81)*
 
 **Returns:** `ImageHomeImpl`
 
@@ -470,7 +472,7 @@ ___
 
 ▸ **execute**(configOrCommand: * [ExecuteConfig](interfaces/executeconfig.md) &#124; [ExecuteCommand](#executecommand)*): `Promise`<[ExecuteResult](interfaces/executeresult.md)>
 
-*Defined in [execute.ts:159](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L159)*
+*Defined in [execute.ts:162](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/execute.ts#L162)*
 
 Execute all commands in given config serially in order. Output files from a command become available as input files in next commands. In the following example we execute two commands. Notice how the second one uses `image2.png` which was the output file of the first one:
 
@@ -509,7 +511,7 @@ ___
 
 ▸ **executeAndReturnOutputFile**(configOrCommand: * [ExecuteConfig](interfaces/executeconfig.md) &#124; [ExecuteCommand](#executecommand)*, outputFileName?: *`string`*): `Promise`< [MagickOutputFile](interfaces/magickoutputfile.md) &#124; `undefined`>
 
-*Defined in [execute.ts:104](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L104)*
+*Defined in [execute.ts:107](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/execute.ts#L107)*
 
 `execute()` shortcut that useful for commands that return only one output file or when only one particular output file is relevant.
 
@@ -531,7 +533,7 @@ ___
 
 ▸ **executeOne**(configOrCommand: * [ExecuteConfig](interfaces/executeconfig.md) &#124; [ExecuteCommand](#executecommand)*): `Promise`<[ExecuteResultOne](interfaces/executeresultone.md)>
 
-*Defined in [execute.ts:59](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L59)*
+*Defined in [execute.ts:59](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/execute.ts#L59)*
 
 Execute first command in given config.
 
@@ -550,7 +552,7 @@ ___
 
 ▸ **extractInfo**(img: * [MagickFile](interfaces/magickfile.md) &#124; `string`*): `Promise`<`ExtractInfoResult`[]>
 
-*Defined in [util/imageExtractInfo.ts:8](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/imageExtractInfo.ts#L8)*
+*Defined in [util/imageExtractInfo.ts:8](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/imageExtractInfo.ts#L8)*
 
 Execute `convert $IMG info.json` to extract image metadata. Returns the parsed info.json file contents
 
@@ -569,7 +571,7 @@ ___
 
 ▸ **getBuiltInImages**(): `Promise`<[MagickInputFile](interfaces/magickinputfile.md)[]>
 
-*Defined in [util/imageBuiltIn.ts:10](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/imageBuiltIn.ts#L10)*
+*Defined in [util/imageBuiltIn.ts:10](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/imageBuiltIn.ts#L10)*
 
 Gets ImageMagick built-in images like `rose:`, `logo:`, etc in the form of [MagickInputFile](interfaces/magickinputfile.md)s
 
@@ -582,7 +584,7 @@ ___
 
 ▸ **getFileName**(url: *`string`*): `string`
 
-*Defined in [util/file.ts:78](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/file.ts#L78)*
+*Defined in [util/file.ts:78](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/file.ts#L78)*
 
 **Parameters:**
 
@@ -599,7 +601,7 @@ ___
 
 ▸ **getFileNameExtension**(filePathOrUrl: *`string`*): `string`
 
-*Defined in [util/file.ts:90](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/file.ts#L90)*
+*Defined in [util/file.ts:90](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/file.ts#L90)*
 
 **Parameters:**
 
@@ -616,7 +618,7 @@ ___
 
 ▸ **getInputFilesFromHtmlInputElement**(el: *`HTMLInputElement`*): `Promise`<[MagickInputFile](interfaces/magickinputfile.md)[]>
 
-*Defined in [util/html.ts:35](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/html.ts#L35)*
+*Defined in [util/html.ts:35](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/html.ts#L35)*
 
 Build `MagickInputFile[]` from given HTMLInputElement of type=file that user may used to select several files
 
@@ -635,7 +637,7 @@ ___
 
 ▸ **isExecuteCommand**(arg: *`any`*): `boolean`
 
-*Defined in [execute.ts:84](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L84)*
+*Defined in [execute.ts:84](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/execute.ts#L84)*
 
 **Parameters:**
 
@@ -652,7 +654,7 @@ ___
 
 ▸ **loadImageElement**(image: *[MagickFile](interfaces/magickfile.md)*, el: *`HTMLImageElement`*, forceBrowserSupport?: *`boolean`*): `Promise`<`void`>
 
-*Defined in [util/html.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/util/html.ts#L12)*
+*Defined in [util/html.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/util/html.ts#L12)*
 
 Will load given html img element src with the inline image content.
 
@@ -673,7 +675,7 @@ ___
 
 ▸ **newExecutionContext**(inheritFrom?: *[ExecutionContext](interfaces/executioncontext.md)*): [ExecutionContext](interfaces/executioncontext.md)
 
-*Defined in [executionContext.ts:88](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/executionContext.ts#L88)*
+*Defined in [executionContext.ts:88](https://github.com/KnicKnic/WASM-ImageMagick/blob/8afda0e/src/executionContext.ts#L88)*
 
 **Parameters:**
 

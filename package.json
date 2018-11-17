@@ -27,7 +27,7 @@
     "test-browser-watch-build": "onchange -i -v 'src/**/*' 'spec/**/*' -- npm run test-browser-build",
     "test-browser-watch-server": "onchange  -k -v 'dist/bundle.js' -- gulp --gulpfile spec/gulpfile.js jasmine-server",
 
-    "apidocs": "rm -rf apidocs && typedoc --options typedoc.js --theme markdown"
+    "apidocs": "typedoc --options typedoc.js --theme markdown"
   },
   "repository": {
     "type": "git",
