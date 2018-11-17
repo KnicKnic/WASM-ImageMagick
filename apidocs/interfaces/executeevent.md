@@ -24,7 +24,7 @@
 
 **● command**: *[Command](../#command)*
 
-*Defined in [execute.ts:113](https://github.com/KnicKnic/WASM-ImageMagick/blob/7684a1c/src/execute.ts#L113)*
+*Defined in [execute.ts:113](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L113)*
 
 ___
 <a id="id"></a>
@@ -33,7 +33,7 @@ ___
 
 **● id**: *`number`*
 
-*Defined in [execute.ts:115](https://github.com/KnicKnic/WASM-ImageMagick/blob/7684a1c/src/execute.ts#L115)*
+*Defined in [execute.ts:115](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L115)*
 
 ___
 <a id="took"></a>
@@ -42,7 +42,7 @@ ___
 
 **● took**: *`number`*
 
-*Defined in [execute.ts:114](https://github.com/KnicKnic/WASM-ImageMagick/blob/7684a1c/src/execute.ts#L114)*
+*Defined in [execute.ts:114](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L114)*
 
 ___
 

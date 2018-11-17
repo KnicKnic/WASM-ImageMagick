@@ -23,7 +23,7 @@
 
 **● commands**: *[ExecuteCommand](../#executecommand)*
 
-*Defined in [execute.ts:13](https://github.com/KnicKnic/WASM-ImageMagick/blob/7684a1c/src/execute.ts#L13)*
+*Defined in [execute.ts:13](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L13)*
 
 ___
 <a id="inputfiles"></a>
@@ -32,7 +32,7 @@ ___
 
 **● inputFiles**: *[MagickInputFile](magickinputfile.md)[]*
 
-*Defined in [execute.ts:10](https://github.com/KnicKnic/WASM-ImageMagick/blob/7684a1c/src/execute.ts#L10)*
+*Defined in [execute.ts:10](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/execute.ts#L10)*
 
 ___
 

@@ -27,7 +27,7 @@ Represents output files generated when an ImageMagick command executes.
 
 **● blob**: *`Blob`*
 
-*Defined in [magickApi.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/7684a1c/src/magickApi.ts#L12)*
+*Defined in [magickApi.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/magickApi.ts#L12)*
 
 ___
 <a id="name"></a>
@@ -38,7 +38,7 @@ ___
 
 *Inherited from [MagickFile](magickfile.md).[name](magickfile.md#name)*
 
-*Defined in [magickApi.ts:5](https://github.com/KnicKnic/WASM-ImageMagick/blob/7684a1c/src/magickApi.ts#L5)*
+*Defined in [magickApi.ts:5](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/magickApi.ts#L5)*
 
 ___
 

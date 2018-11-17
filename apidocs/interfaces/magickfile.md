@@ -28,7 +28,7 @@ Base class for ImageMagick input and output files.
 
 **● name**: *`string`*
 
-*Defined in [magickApi.ts:5](https://github.com/KnicKnic/WASM-ImageMagick/blob/7684a1c/src/magickApi.ts#L5)*
+*Defined in [magickApi.ts:5](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/magickApi.ts#L5)*
 
 ___
 
