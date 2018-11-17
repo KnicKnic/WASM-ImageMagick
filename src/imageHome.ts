@@ -1,6 +1,6 @@
 import { MagickInputFile, MagickFile, asInputFile, getBuiltInImages } from '.'
 import pMap from 'p-map'
-import { values } from './util/misc';
+import { values } from './util/misc'
 
 export interface ImageHome {
   remove(names: string[]): MagickInputFile[]

@@ -4,7 +4,7 @@
     "sourceMap": true,
     "declaration": true,
     "lib": [
-      "dom", "es6"
+      "dom", "es2018"
     ],
     "target": "es2018",
     "module": "commonjs",

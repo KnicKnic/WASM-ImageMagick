@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>test dist/bundles/index.esm.js</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+  <style>
+    textarea{
+    width: 100%; 
+    height: 250px;
+  }
+  input{
+    width: 100%
+  }
+  </style>
+
+  <h1>Testing /dist/bundles/index.esm.js import directly from html page </h1>
+  <div>
+    <p>Image URL: </p>
+    <input id="imageUrl" type="text" value="../rotate/FriedrichNietzsche.png">
+  </div>
+  <div>
+    <p>Commands. </p>
+    <textarea id="commandText">
+convert FriedrichNietzsche.png -rotate 33 -resize 100x90! out.png
+convert out.png -charcoal 1 charcoal1.gif
+convert out.png -charcoal 2 charcoal2.gif
+convert \
+  charcoal1.gif \
+  \( \
+    -clone 0 charcoal2.gif -compose difference \
+    -composite -threshold 5% -fill red \
+    -opaque white -transparent black \
+  \) \
+  -compose over -composite \
+  pcharcoaldiff.png
+    </textarea>
+  </div>
+
+  <button id="execute">Execute</button>
+
+  <div id="imagesContainer"></div>
+  <script type="module">
+
+    // import { execute, loadImageElement, buildInputFile } from '../../dist/bundles/index.esm.js'
+    import { execute, loadImageElement, buildInputFile } from '../../dist/bundles/index.esm.js'
+    
+    async function renderImages(images) {
+      document.querySelector('#imagesContainer').innerHTML = ''
+      images.forEach(async imageFile => {
+        const container = document.createElement('div')
+        container.innerText = `"${imageFile.name}" : `
+        const img = document.createElement('img')
+        img.alt = img.title = imageFile.name
+        container.appendChild(img)
+        document.querySelector('#imagesContainer').appendChild(container)
+        await loadImageElement(imageFile, img)
+      })
+    }
+
+    export async function main() {
+      const input = await buildInputFile(document.querySelector('#imageUrl').value)
+      const commands = document.querySelector('#commandText').value
+      const result = await execute({ inputFiles: [input], commands })
+      await renderImages([input].concat(result.outputFiles))
+    }
+
+    document.querySelector('#execute').addEventListener('click', main)
+
+    main()
+  </script>
+</body>
+
+</html>

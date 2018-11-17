@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "es5",
+    "rootDir": "src",
+    "lib": [
+      "dom",
+      "es2015"
+    ],
+    "strict": false,
+    "strictNullChecks": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "sourceMap": true,
+    "stripInternal": true,
+    "outDir": "dist/esm5",
+    "resolveJsonModule": true,
+    "importHelpers": true,
+  },
+  "exclude": [
+    "spec", "samples", "scripts"
+  ],
+  "compileOnSave": false
+}

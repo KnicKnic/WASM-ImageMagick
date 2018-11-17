@@ -1,6 +1,6 @@
 import { Command } from '..'
 import { ExecuteCommand } from '../execute'
-import { flat } from './misc';
+import { flat } from './misc'
 
 /** generates a valid command line command from given Call/execute Command. Works in a single command  */
 export function arrayToCliOne(command: Command): string {

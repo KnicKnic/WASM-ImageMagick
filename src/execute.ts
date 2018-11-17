@@ -1,7 +1,7 @@
 import { MagickInputFile, MagickOutputFile, outputFileToInputFile, call, asCommand } from '.'
 import pMap from 'p-map'
 import { CallResult } from './magickApi'
-import { values } from './util/misc';
+import { values } from './util/misc'
 
 export type Command = (string | number)[]
 
@@ -56,13 +56,13 @@ export function asExecuteConfig(arg: ExecuteConfig | ExecuteCommand): ExecuteCon
     return arg
   }
   return {
-    inputFiles: [], 
+    inputFiles: [],
     commands: arg,
   }
 }
 /**
  * Assumes the command won't fail so returns one output file directly or undefined if it's not found (or error occurs)
- * @param configOrCommand 
+ * @param configOrCommand
  * @param outputFileName optionally user can give the desired output file name
  */
 export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig | ExecuteCommand, outputFileName?: string): Promise<MagickOutputFile | undefined> {
@@ -171,4 +171,3 @@ export async function execute(configOrCommand: ExecuteConfig | ExecuteCommand): 
     exitCode: resultWithError ? resultWithError.exitCode : 0,
   }
 }
-
