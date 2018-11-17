@@ -11,6 +11,27 @@ export const commandExamples: Example[] = [
 
 
   {
+    name: 'identify simple',
+    description: `runs identify program to print to stdout image info`,
+    command: `identify rose:`.trim(),
+  },
+  
+
+  {
+    name: 'extract pixel color',
+    description: `extract pixel color at 0,0 and save it to info.txt file`,
+    command: `convert logo: -format '%[pixel:p{0,0}]' info:info.txt  `.trim(),
+  },
+
+  {
+    name: 'extract image information',
+    description: `extract image information in json format and store it in output file roseinfo.json`,
+    command: `convert rose: roseInfo.json  `.trim(),
+  },
+  
+
+
+  {
     name: 'simple append',
     description: `simple append+ command that joins two images`,
     command: `

@@ -1,8 +1,12 @@
 import pMap from 'p-map';
 import * as React from 'react';
 import { style } from 'typestyle';
-import { arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo, getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, MagickInputFile } from 'wasm-imagemagick';
+import {
+  arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo,
+  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText
+} from 'wasm-imagemagick';
 import { commandExamples, Example } from './commandExamples';
+import { blobToString } from 'imagemagick-browser';
 
 export interface AppProps {
   context: ExecutionContext
@@ -23,6 +27,7 @@ export interface AppState {
   stderr: string
   exitCode: number
   prettyJSON: boolean
+  isImageArray: boolean[]
 }
 
 export class App extends React.Component<AppProps, AppState> {
@@ -42,6 +47,7 @@ export class App extends React.Component<AppProps, AppState> {
     stderr: '',
     exitCode: 0,
     prettyJSON: false,
+    isImageArray: []
   }
 
   protected styles = {
@@ -100,11 +106,18 @@ export class App extends React.Component<AppProps, AppState> {
                     <td>
                       <button data-image={f.name} onClick={this.removeImage.bind(this)}>remove</button>
                     </td>
-                    <td>{(this.state.showImagesAndInfo || '') &&
-                      <img alt={f.name} src={this.state.imgSrcs[i]}></img>}
+                    <td>{
+                      this.state.showImagesAndInfo && this.state.isImageArray[i] ?
+                        <img alt={f.name} src={this.state.imgSrcs[i]}></img> :
+                        this.state.showImagesAndInfo ?
+                          <textarea className={this.styles.infoTextarea} value={this.state.imgSrcs[i]}></textarea> : ''
+                    }
                     </td>
-                    <td>{(this.state.showImagesAndInfo || '') &&
-                      <textarea className={this.styles.infoTextarea} value={JSON.stringify(this.state.filesInfo[i][0].image, null, 2)}></textarea>}
+                    <td>{(this.state.showImagesAndInfo && this.state.isImageArray[i]) ?
+                      <textarea className={this.styles.infoTextarea} value={JSON.stringify(this.state.filesInfo[i][0].image, null, 2)}></textarea> :
+                      this.state.showImagesAndInfo ?
+                        <span>text file</span> :
+                        ''}
                     </td>
                   </tr>,
                 )}
@@ -130,10 +143,6 @@ export class App extends React.Component<AppProps, AppState> {
               {commandExamples.map(t =>
                 <option>{t.name}</option>)}
             </select>
-            {/* <select disabled={this.state.files.length === 0} onChange={this.selectExampleChange.bind(this)}>
-              {sampleCommandTemplates.map(t =>
-                <option>{t.name}</option>)}
-            </select> */}
           </div>
         </div>
 
@@ -145,7 +154,9 @@ export class App extends React.Component<AppProps, AppState> {
           <p>Output Files (#{this.state.outputFiles.length}) </p>
           {(this.state.outputFiles.length || '') && <ul>{this.state.outputFiles.map((f, i) =>
             <li><div>{f.name}</div>
-              <img src={this.state.outputFileSrcs[i]}></img>
+              {this.state.isImageArray[this.state.files.findIndex(f2 => f2.name === f.name)] ?
+                <img src={this.state.outputFileSrcs[i]}></img> :
+                <textarea className={this.styles.infoTextarea} value={this.state.outputFileSrcs[i]}></textarea>}
             </li>,
           )}
           </ul>}
@@ -233,10 +244,11 @@ export class App extends React.Component<AppProps, AppState> {
 
   protected async updateImages() {
     const files = await this.props.context.getAllFiles()
-    const imgSrcs = this.state.showImagesAndInfo ? await pMap(files, f => buildImageSrc(f, true)) : this.state.imgSrcs
-    const filesInfo = this.state.showImagesAndInfo ? await pMap(files, f => extractInfo(f)) : this.state.filesInfo
-    const outputFileSrcs = await pMap(this.state.outputFiles, f => buildImageSrc(f, true))
-    this.setState({ ...this.state, files, imgSrcs, outputFileSrcs, filesInfo })
+    const isImageArray = await pMap(files, isImage)
+    const imgSrcs = this.state.showImagesAndInfo ? await pMap(files, (f, i) => buildFileSrc(f, isImageArray[i])) : this.state.imgSrcs
+    const filesInfo = this.state.showImagesAndInfo ? await pMap(files, (f, i) => isImageArray[i] ? extractInfo(f) : undefined) : this.state.filesInfo
+    const outputFileSrcs = await pMap(this.state.outputFiles, (f, i) => buildFileSrc(f))
+    this.setState({ ...this.state, files, imgSrcs, outputFileSrcs, filesInfo, isImageArray })
   }
 
   protected async showImagesAndInfoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -257,4 +269,14 @@ export class App extends React.Component<AppProps, AppState> {
     return command
   }
 
+}
+
+
+async function buildFileSrc(file: MagickFile, isImage_?: boolean): Promise<string> {
+  if (typeof isImage_ === 'undefined' ? await isImage(file) : isImage_) {
+    return await buildImageSrc(file, true)
+  }
+  else {
+    return await readFileAsText(file)
+  }
 }

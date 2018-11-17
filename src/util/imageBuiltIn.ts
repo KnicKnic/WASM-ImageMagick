@@ -18,3 +18,11 @@ export async function getBuiltInImages(): Promise<MagickInputFile[]> {
   }
   return builtInImages
 }
+
+/**
+ * shortcut of {@link getBuiltInImages} to get a single image by name
+ */
+export async function getBuiltInImage(name: string): Promise<MagickInputFile> {
+  const images = await getBuiltInImages()
+  return images.find(f=>f.name===name)
+}

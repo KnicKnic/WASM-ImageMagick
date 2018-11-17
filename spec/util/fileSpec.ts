@@ -1,4 +1,4 @@
-import { blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, getFileName, asInputFile, asOutputFile } from '../../src'
+import { blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, getFileName, asInputFile, asOutputFile, executeAndReturnOutputFile, isImage, readFileAsText, getPixelColor, getBuiltInImages, getBuiltInImage } from '../../src'
 
 export default describe('util/file', () => {
 
@@ -53,6 +53,21 @@ export default describe('util/file', () => {
       const img = await buildInputFile('holocaust.jpg')
       const img2 = await asInputFile(await asOutputFile(img), 'img2.jpg')
       expect(await compare(img, img2)).toBe(true)
+      done()
+    })
+  })
+
+  describe('readFileAsText and isImage, getPixelColor, getBuiltInImage', () => { // TODO: separate
+
+    it('basic test', async done => {
+      const file = await executeAndReturnOutputFile(`convert logo: -format '%[pixel:p{0,0}]' info:info.txt`)
+      expect(await isImage(file)).toBe(false)
+      expect(await readFileAsText(file)).toBe('white')
+      const file2 = await buildInputFile('fn.png')
+      expect(await isImage(file2)).toBe(true)
+      expect(await readFileAsText(file2)).toContain('PNG')
+
+      expect(await getPixelColor(await getBuiltInImage('logo:'), 0, 0)).toBe('white')
       done()
     })
   })

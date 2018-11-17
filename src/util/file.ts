@@ -1,4 +1,5 @@
 import { MagickInputFile, MagickOutputFile, MagickFile } from '..'
+import { execute } from '../execute';
 
 function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
   return new Promise(resolve => {
@@ -22,6 +23,33 @@ export function blobToString(blb: Blob): Promise<string> {
   })
 }
 
+export function isInputFile(file: MagickFile): file is MagickInputFile {
+  return !!(file as MagickInputFile).content
+}
+export function isOutputFile(file: MagickFile): file is MagickOutputFile {
+  return !!(file as MagickOutputFile).blob
+}
+
+function uint8ArrayToString(arr: Uint8Array, charset: string = 'utf-8'): string {
+  return new TextDecoder(charset).decode(arr)
+}
+
+/**
+ * Read files as string. Useful when files contains plain text like in the output file info.txt of `convert logo: -format '%[pixel:p{0,0}]' info:info.txt`
+ */
+export async function readFileAsText(file: MagickFile): Promise<string> {
+  if (isInputFile(file)) {
+    return uint8ArrayToString(file.content)
+  }
+  if (isOutputFile(file)) {
+    return await blobToString(file.blob)
+  }
+}
+
+export async function isImage(file: MagickFile): Promise<boolean> {
+  const {exitCode} = await execute({inputFiles: [await asInputFile(file)], commands: `identify ${file.name}`})
+  return exitCode===0
+}
 /**
  * Builds a new {@link MagickInputFile} by fetching the content of given url and optionally naming the file using given name 
  * or extracting the file name from the url otherwise.
@@ -53,8 +81,8 @@ function inputFileToOutputFile(file: MagickInputFile, name: string = file.name):
 
 export async function asInputFile(f: MagickFile, name: string = f.name): Promise<MagickInputFile> {
   let inputFile: MagickInputFile
-  if ((f as MagickOutputFile).blob) {
-    inputFile = await outputFileToInputFile(f as MagickOutputFile)
+  if (isOutputFile(f)) {
+    inputFile = await outputFileToInputFile(f)
   }
   else {
     inputFile = f as MagickInputFile
@@ -65,8 +93,8 @@ export async function asInputFile(f: MagickFile, name: string = f.name): Promise
 
 export async function asOutputFile(f: MagickFile, name: string = f.name): Promise<MagickOutputFile> {
   let outputFile: MagickOutputFile
-  if ((f as MagickInputFile).content) {
-    outputFile = inputFileToOutputFile(f as MagickInputFile)
+  if (isInputFile(f)) {
+    outputFile = inputFileToOutputFile(f)
   }
   else {
     outputFile = f as MagickOutputFile
