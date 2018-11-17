@@ -2,7 +2,7 @@
 
 # Interface: CallResult
 
-The result of calling [call](../#call). Also the base class of results of calling [execute()](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute).
+The result of calling [call](../#call). Also the base class of results of calling [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute).
 
 ## Hierarchy
 

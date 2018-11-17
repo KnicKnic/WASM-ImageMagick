@@ -4,7 +4,7 @@
 
 ## Getting started
 
-Let's consider the following [execute()](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) call:
+Let's consider the following [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) call:
 
 ```ts
 const { outputFiles, exitCode, stderr} = await execute({
@@ -22,7 +22,7 @@ else {
 }
 ```
 
- * See [execute()](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) and {@link executeAndReturnOutputFile} for information on how to execute commands. Also {@link ExecuteResult} and {@link ExecuteConfig}. 
+ * See [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) and {@link executeAndReturnOutputFile} for information on how to execute commands. Also {@link ExecuteResult} and {@link ExecuteConfig}. 
 
  * See {@link ExecuteCommand} for information about command syntaxes supported. Some utilities related to commands are {@link asCommand}, {@link cliToArray}, {@link arrayToCli}
 

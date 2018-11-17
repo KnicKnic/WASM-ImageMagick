@@ -63,7 +63,7 @@ ___
 
 *Defined in [executionContext.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/executionContext.ts#L12)*
 
-This behaves almost the same as [execute()](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute).
+This behaves almost the same as [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute).
 
 **Parameters:**
 

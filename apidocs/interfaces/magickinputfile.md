@@ -2,7 +2,7 @@
 
 # Interface: MagickInputFile
 
-Represents input files that need to be provided to [call](../#call) or [execute()](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute).
+Represents input files that need to be provided to [call](../#call) or [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute).
 
 Can be builded using [buildInputFile](../#buildinputfile)
 

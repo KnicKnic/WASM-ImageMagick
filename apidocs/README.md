@@ -5,7 +5,7 @@ wasm-imagemagick reference API
 Getting started
 ---------------
 
-Let's consider the following [execute()](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) call:
+Let's consider the following [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) call:
 
 ```ts
 const { outputFiles, exitCode, stderr} = await execute({
@@ -23,7 +23,7 @@ else {
 }
 ```
 
-*   See [execute()](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) and [executeAndReturnOutputFile](#executeandreturnoutputfile) for information on how to execute commands. Also [ExecuteResult](interfaces/executeresult.md) and [ExecuteConfig](interfaces/executeconfig.md).
+*   See [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) and [executeAndReturnOutputFile](#executeandreturnoutputfile) for information on how to execute commands. Also [ExecuteResult](interfaces/executeresult.md) and [ExecuteConfig](interfaces/executeconfig.md).
     
 *   See [ExecuteCommand](#executecommand) for information about command syntaxes supported. Some utilities related to commands are [asCommand](#ascommand), [cliToArray](#clitoarray), [arrayToCli](#arraytocli)
     
@@ -383,7 +383,7 @@ ___
 
 *Defined in [magickApi.ts:57](https://github.com/KnicKnic/WASM-ImageMagick/blob/a680377/src/magickApi.ts#L57)*
 
-Low level execution function. All the other functions like [execute()](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) ends up calling this one. It accept only one command and only in the form of array of strings.
+Low level execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) ends up calling this one. It accept only one command and only in the form of array of strings.
 
 **Parameters:**
 
