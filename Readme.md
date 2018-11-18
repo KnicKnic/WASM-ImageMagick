@@ -12,6 +12,8 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
 
  * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
 
+ * [Interactive execute context demo](https://cancerberosgx.github.io/demos/WASM-ImageMagick/interactive-execute-context/). Add images, execute commands using different syntaxes, manage and reuse output/input images, and choose commands examples to learn ImageMagick. 
+
  * Simple example. See [samples/rotate#code](samples/rotate#code). A simple webpage that has image in array and loads magickApi.js to rotate file. Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
 
  * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
@@ -20,41 +22,37 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
  * Used in [Croppy](https://knicknic.github.io/croppy/) to split webcomics from one long vertical strip into many panels.
     * For code see https://github.com/KnicKnic/croppy.
 
+
+
 ## Status
 
 ### Image formats supported
 
-Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
+Supports PNG, TIFF, JPEG, BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/), and more! 
+
+See a list of known supported formats in this [demo](https://cancerberosgx.github.io/demos/WASM-ImageMagick/supported-formats/)
 
 ### Features **not** supported 
 
  * [Text](https://www.imagemagick.org/Usage/text/)
  * [Fourier Transforms](https://www.imagemagick.org/Usage/fourier/)
+ * Formats not listed above, particularly webp.
 
 
-## Usage with npm
 
-```sh
-npm install --save wasm-imagemagick
-```
+## API
 
-**IMPORTANT:  
+[API Reference Documentation](./apidocs)
 
-**Don't forget to copy `magick.wasm` and `magick.js`** files to the folder where your `index.html` is being served:
-
-```sh
-cp node_modules/wasm-imagemagick/dist/magick.wasm .
-cp node_modules/wasm-imagemagick/dist/magick.js .
-```
 
 ### High level API and utilities
 
-`wasm-imagemagick` comes with some easy to use APIs for creating image files from urls, executing multiple commands reusing output images and nicer command syntax, and utilities to handle files, html images, input elements, image comparison, metadata extraction, etc. The following example is equivalent to the previous using these APIs: 
+`wasm-imagemagick` comes with some easy to use APIs for creating image files from urls, executing multiple commands reusing output images and nicer command syntax, and utilities to handle files, html images, input elements, image comparison, metadata extraction, etc. Refer to [API Reference Documentation](./apidocs) for details.
 
 ```ts
 import { buildInputFile, execute, loadImageElement } from 'wasm-imagemagick'
 
-const {outputFiles} = await execute({
+const { outputFiles, exitCode} = await execute({
   inputFiles: [await buildInputFile('http://some-cdn.com/foo/fn.png', 'image1.png')],
   commands: [
     'convert image1.png -rotate 70 image2.gif',
@@ -62,7 +60,8 @@ const {outputFiles} = await execute({
     'convert image2.gif -scale 23% image3.jpg',
   ],
 })
-await loadImageElement(outputFiles[0], document.getElementById('outputImage'))
+if(exitCode !== 0)
+    await loadImageElement(outputFiles[0], document.getElementById('outputImage'))
 ```
 
 ### Accessing stdout, stderr, exitCode
@@ -84,7 +83,7 @@ else
 
 ### low-level example
 
-As demonstration purposes, the following example doesn't use any helper provided by the library, only the `call()` function which only accept one command, in array syntax only:
+As demonstration purposes, the following example doesn't use any helper provided by the library, only the low level `call()` function which only accept one command, in array syntax only:
 
 ```js
 import { call } from 'wasm-imagemagick'
@@ -97,21 +96,56 @@ const image = { name: 'srcFile.png', content }
 const command = ["convert", "srcFile.png", '-rotate', '90', '-resize', '200%', 'out.png']
 const result = await call([image], command)
 
+// is there any errors ?
+if(result.exitCode !== 0)
+    return alert('There was an error: ' + result.stderr.join('\n'))
+
 // response can be multiple files (example split) here we know we just have one
-const firstOutputImage = result.processedFiles[0]
+const outputImage = result.processedFiles[0]
 
 // render the output image into an existing <img> element
 const outputImage = document.getElementById('outputImage')
-outputImage.src = URL.createObjectURL(firstOutputImage.blob)
+outputImage.src = URL.createObjectURL(outputImage.blob)
+outputImage.alt = outputImage.name
 ```
 
 
-## Loading directly from html file
+## Importing the library in your project
+
+### With npm
+
+```sh
+npm install --save wasm-imagemagick
+```
+
+**IMPORTANT:  
+
+**Don't forget to copy `magick.wasm` and `magick.js`** files to the folder where your `index.html` is being served:
+
+```sh
+cp node_modules/wasm-imagemagick/dist/magick.wasm .
+cp node_modules/wasm-imagemagick/dist/magick.js .
+```
+
+Then you are ready to import the library in your project like this: 
+
+```ts
+import { execute} from 'wasm-imagemagick'
+```
+
+or like this if you are not using standard modules:
+
+```ts
+const execute = require('wasm-imagemagick').execute
+```
+
+
+### Loading directly from html file
 
 If you are not working in a npm development environment you can still load the library bundle .js file. It supports being imported as JavaScript standard module or as a UMD module. Again, don't forget to copy `magick.js`, `magick.wasm` in the same folder as your html file.:
 
 
-### Importing it as JavaScript standard module: 
+#### Importing it as JavaScript standard module: 
 
 ```html
 <script type="module">
@@ -120,10 +154,10 @@ If you are not working in a npm development environment you can still load the l
 </script>
 ```
 
-[See working example](https://github.com/KnicKnic/WASM-ImageMagick/blob/master/tests/bundles/esm-test.html)
+[Working example source code](./tests/bundles/esm-test.html)
 
 
-### Using the UMD bundle in AMD projects (requirejs)
+#### Using the UMD bundle in AMD projects (requirejs)
 
 ```html
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
@@ -134,10 +168,10 @@ require(['wasm-imagemagick'], function (WasmImagemagick) {
     // ... same snippet as before
 ```
 
-[See working example](https://github.com/KnicKnic/WASM-ImageMagick/blob/master/tests/bundles/umd-test-requirejs.html)
+[Working example source code](./tests/bundles/umd-test-requirejs.html)
 
 
-### Using the UMD bundle without libraries
+#### Using the UMD bundle without libraries
 
 ```html
 <script src="../../dist/bundles/wasm-imagemagick.umd-es5.js"></script>
@@ -146,12 +180,8 @@ require(['wasm-imagemagick'], function (WasmImagemagick) {
     // ... same snippet as before
 ```
 
-[See working example](https://github.com/KnicKnic/WASM-ImageMagick/blob/master/tests/bundles/umd-test-nolibrary.html)
+[Working example source code](./tests/bundles/umd-test-nolibrary.html)
 
-
-## API reference documentation
-
-[API Reference Documentation](./apidocs)
 
 
 ## Build instructions
@@ -176,6 +206,12 @@ Note: `npm run build` will perform all the previous commands plus compiling the 
 
 ## Run tests
 
-`npm test` will run some tests with nodejs located at `./tests/rotate`.
+`npm test` will run all the tests.
 
-`npm run test-browser` will run spec in a headless chrome browser. This tests are located at `./spec/`. `npm run test-browser-server` will serve the test so you can debug them with a browser. 
+`npm run test-browser` will run spec in a headless chrome browser. These tests are located at `./spec/`. 
+
+`npm run test-browser-server` will serve the test so you can debug them with a browser. 
+
+`npm run test-browser-start` will run the server and start watching for file changes, recompile and restart the server for agile development.
+
+`npm test-node` will run some tests with nodejs located at `./tests/rotate`.

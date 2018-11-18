@@ -7,7 +7,7 @@ import { asExecuteConfig } from './execute'
  */
 export interface ExecutionContext {
   /**
-   * This behaves almost the same as [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute).
+   * This behaves almost the same as [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute).
    */
   execute(configOrCommands: ExecuteConfig | ExecuteCommand | string): Promise<ExecuteResult>
 

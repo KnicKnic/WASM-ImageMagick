@@ -13,7 +13,7 @@ export interface MagickOutputFile extends MagickFile {
 }
 
 /**
- * Represents input files that need to be provided to {@link call} or [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute).
+ * Represents input files that need to be provided to {@link call} or [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute).
  * 
  * Can be builded using {@link buildInputFile}
  */
@@ -30,7 +30,7 @@ export async function Call(inputFiles: MagickInputFile[], command: string[]): Pr
 }
 
 /**
- * The result of calling {@link call}. Also the base class of results of calling [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute).
+ * The result of calling {@link call}. Also the base class of results of calling [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute).
  */
 export interface CallResult {
   /**
@@ -52,7 +52,7 @@ export interface CallResult {
 }
 
 /**
- * Low level execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) 
+ * Low level execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute) 
  * ends up calling this one. It accept only one command and only in the form of array of strings.
  */
 export function call(inputFiles: MagickInputFile[], command: string[]): Promise<CallResult> {
