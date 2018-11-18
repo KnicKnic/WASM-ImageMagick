@@ -15,6 +15,20 @@ export const commandExamples: Example[] = [
     description: `runs identify program to print to stdout image info`,
     command: `identify rose:`.trim(),
   },
+
+
+{
+  name: '-print all image info',
+  description: `prints all properties artifacts and options of the image using -print and formatting the output`,
+  command: `
+convert $$IMAGE_0 \\
+  -print '\\n__Properties__\\n\\n%[*]\\nsesba\\n\\nsa\\n' \\
+  -print '\\n__Artifacts__\\n\\n%[artifact:*]' \\
+  -print '\\n__Options__\\n\\n%[option:*]\\n' \\
+info:
+`.trim(),
+},
+
   
 
   {

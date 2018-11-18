@@ -52,7 +52,8 @@ export interface CallResult {
 }
 
 /**
- * Low level execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) ends up calling this one. It accept only one command and only in the form of array of strings.
+ * Low level execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs#execute) 
+ * ends up calling this one. It accept only one command and only in the form of array of strings.
  */
 export function call(inputFiles: MagickInputFile[], command: string[]): Promise<CallResult> {
   const request = {

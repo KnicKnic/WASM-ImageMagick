@@ -212,7 +212,15 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   protected async execute() {
-    const result = await this.props.context.execute(this.state.commandString)
+    // replace the $$IMAGE_N with the n-image in this.state.files
+    const cmd = (JSON.parse(this.state.commandArray) as string[][])
+      .map(c=>c.map(arg=>arg.startsWith('$$IMAGE_') ? 
+        (this.state.files[parseInt(arg.substring('$$IMAGE_'.length, arg.length), 10)]||{name: 'rose:'}).name : 
+        arg))
+        
+        const result = await this.props.context.execute(cmd)
+        
+        console.log(cmd, result);
     this.state.outputFiles = result.outputFiles
     this.state.stderr = result.stderr.join('\n')
     this.state.stdout = result.stdout.join('\n')

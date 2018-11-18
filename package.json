@@ -11,8 +11,9 @@
     "bundle": "npx tsc --project tsconfig-esm5.json && npx tsc --project tsconfig-esm6.json && npx tsc --project tsconfig-esm2018.json && mkdir -p dist/bundles && npx rollup -c rollup.config.js && npx rollup -c rollup.config.js --environment NODE_ENV:production",
     "build": "npm run build-wasm && npm run build-ts",
     "prepare": "npm run build && npm run copy && npm run magickApiJs",
-    "copy": "cp magick.js magick.wasm dist && cp magick.js magick.wasm spec/assets && cp -r spec/assets dist",
+    "copy": "npm run magickJs && mkdir -p dist && cp magick.js magick.wasm dist && cp magick.js magick.wasm spec/assets && cp -r spec/assets dist",
     "magickApiJs": "cp dist/bundles/wasm-imagemagick.esm-es6.js magickApi.js",
+    "magickJs": "rm -rf magick.js && cp webworker.js magick.js && cat ImageMagick/utilities/magick.js >> magick.js",
     "clean": "sh clean.sh",
     "lint": "tslint \"src/**/*.ts\" \"spec/**/*.ts\"",
     "lint-and-fix": "tslint \"src/**/*.ts\" \"spec/**/*.ts\" --fix",
@@ -26,7 +27,6 @@
     "test-browser-watch-all": "concurrently 'npm run test-browser-watch-build' 'npm run test-browser-watch-server' ",
     "test-browser-watch-build": "onchange -i -v 'src/**/*' 'spec/**/*' -- npm run test-browser-build",
     "test-browser-watch-server": "onchange  -k -v 'dist/bundle.js' -- gulp --gulpfile spec/gulpfile.js jasmine-server",
-
     "apidocs": "typedoc --options typedoc.js --theme markdown"
   },
   "repository": {

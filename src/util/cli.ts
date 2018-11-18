@@ -2,6 +2,17 @@ import { Command } from '..'
 import { ExecuteCommand } from '../execute'
 import { flat } from './misc'
 
+// TODO: store variables from text file output and reuse them. example: 
+// `
+// color=$(convert filename.png -format "%[pixel:p{0,0}]" info:foo.txt)
+// convert filename.png -alpha off -bordercolor $color -border 1 \
+//     \( +clone -fuzz 30% -fill none -floodfill +0+0 $color \
+//        -alpha extract -geometry 200% -blur 0x0.5 \
+//        -morphology erode square:1 -geometry 50% \) \
+//     -compose CopyOpacity -composite -shave 1 outputfilename.png
+// `
+
+
 /**
  * Generates a valid command line command from given `string[]` command. Works with a single command.
  */
