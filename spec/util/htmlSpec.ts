@@ -10,7 +10,6 @@ export default describe('util/html', () => {
       expect(el.src).toBeFalsy()
       await loadImageElement(img1, el)
       expect(el.src).toBeTruthy()
-
       let img2 = await buildInputFile(el.src, 'image2.png')
       expect(await compare(img1, img2)).toBe(true)
 

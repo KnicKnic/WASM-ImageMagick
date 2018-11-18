@@ -60,7 +60,7 @@ class ImageHomeImpl implements ImageHome {
   register(file: MagickFile, name: string = file.name): MagickInputFilePromise {
     const promise = asInputFile(file) as MagickInputFilePromise
     this.images[name] = promise
-    this.images[name].catch(() => { }).then(() => {
+    this.images[name].then(() => {
       promise.resolved = true
     })
     return promise
