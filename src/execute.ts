@@ -58,15 +58,18 @@ export interface ExecuteResultOne extends CallResult {
  */
 export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand | MagickInputFile[], execCommand?: ExecuteCommand): Promise<ExecuteResultOne> {
   const config = asExecuteConfig(configOrCommand, execCommand)
+
+  config.inputFiles = config.inputFiles || []
+  const command = asCommand(config.commands)[0]
   let result: CallResult = {
     stderr: [],
     stdout: [],
     outputFiles: [],
     exitCode: 1,
+    command: command.map(c=>c+''), 
+    inputFiles: config.inputFiles
   }
   try {
-    config.inputFiles = config.inputFiles || []
-    const command = asCommand(config.commands)[0]
     result = await call(config.inputFiles, command.map(c => c + ''))
     if (result.exitCode) {
       return { ...result, errors: ['exit code: ' + result.exitCode + ' stderr: ' + result.stderr.join('\n')] }
@@ -118,7 +121,9 @@ export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig 
 
 
 export interface ExecuteResult extends ExecuteResultOne {
-  results: ExecuteResultOne[]
+  results: ExecuteResultOne[],
+  /** the original commands used in the execute() call */
+  commands: ExecuteCommand[],
   // breakOnError?: boolean
 }
 
@@ -164,6 +169,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}
   const allInputFiles: { [name: string]: MagickInputFile } = {}
+  // const allCommands = []
   config.inputFiles.forEach(f => {
     allInputFiles[f.name] = f
   })
@@ -177,6 +183,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       commands: [c],
     }
     const result = await executeOne(thisConfig)
+    // allCommands.push(result.command)
     results.push(result)
     allErrors = allErrors.concat(result.errors || [])
     allStdout = allStdout.concat(result.stdout || [])
@@ -197,5 +204,8 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     stdout: allStdout,
     stderr: allStderr,
     exitCode: resultWithError ? resultWithError.exitCode : 0,
+    command: [],
+    commands, 
+    inputFiles:  config.inputFiles
   }
 }

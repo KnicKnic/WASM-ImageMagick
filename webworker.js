@@ -12,7 +12,7 @@ if (typeof Module == 'undefined') {
 
     print: text => { 
       stdout.push(text) 
-      console.log(text)      
+      // console.log(text)      
     },
     printErr: text => { 
       stderr.push(text)

@@ -49,6 +49,12 @@ export interface CallResult {
    * Exit code of the command executed. If 0 the command executed successfully, otherwise an error occurred and `stderr` could have some information about what was wrong
    */
   exitCode: number
+
+  /** the command used for this result */
+  command: string[],
+  
+  /** the input files used for this result */
+  inputFiles: MagickInputFile[]
 }
 
 /**
@@ -61,7 +67,9 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
     args: command,
     requestNumber: magickWorkerPromisesKey,
   }
-  const promise = CreatePromiseEvent()
+  const promise = CreatePromiseEvent();
+  (promise as any).command = command;
+  (promise as any).inputFiles = inputFiles
   magickWorkerPromises[magickWorkerPromisesKey] = promise
 
   const t0 = performance.now()
@@ -102,6 +110,8 @@ magickWorker.onmessage = e => {
     stdout: response.stdout,
     stderr: response.stderr,
     exitCode: response.exitCode || 0,
+    command: (promise as any).command,
+    inputFiles: (promise as any).inputFiles,
   }
   promise.resolve(result)
 }

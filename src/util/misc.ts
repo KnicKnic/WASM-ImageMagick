@@ -22,3 +22,12 @@ export function isArrayOfArrays(a: any): a is any[][] {
 export function isArrayOfArrayOfStrings(a: any): a is any[][] {
   return isArrayOfArrays(a) && (a[0][0].length==0||typeof a[0][0] === 'string')
 }
+export function combinations<T>(arr: T[], fn: (a: T, b: T) => Promise<any>) : Promise<any> {
+  const promises = []
+  arr.forEach(f1 => {
+    arr.
+      filter((f2, i, arr) => i > arr.indexOf(f1))
+      .forEach(f2 => promises.push(fn(f1, f2)))
+  })
+  return Promise.all(promises)
+}
