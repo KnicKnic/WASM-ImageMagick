@@ -28,7 +28,8 @@
     "test-browser-watch-all": "concurrently 'npm run test-browser-watch-build' 'npm run test-browser-watch-server' ",
     "test-browser-watch-build": "onchange -i -v 'src/**/*' 'spec/**/*' -- npm run test-browser-build",
     "test-browser-watch-server": "onchange  -k -v 'dist/bundle.js' -- gulp --gulpfile spec/gulpfile.js jasmine-server",
-    "apidocs": "typedoc --options typedoc.js --theme markdown"
+    "apidocs": "typedoc --options typedoc.js --theme markdown",
+    "doc": "doctoc && npm run apidocs"
   },
   "repository": {
     "type": "git",
@@ -59,7 +60,6 @@
     "doctoc": "^1.3.1",
     "gulp": "^4.0.0",
     "gulp-jasmine-browser": "^4.0.2",
-    "husky": "^1.1.4",
     "jasmine": "^3.3.0",
     "onchange": "^5.1.0",
     "puppeteer": "^0.13.0",

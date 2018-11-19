@@ -1,6 +1,28 @@
 # Web assembly ImageMagick [![Build Status](https://dev.azure.com/oneeyedelf1/wasm-imagemagick/_apis/build/status/KnicKnic.WASM-ImageMagick)](https://dev.azure.com/oneeyedelf1/wasm-imagemagick/_build/latest?definitionId=1)
 This project is not affiliated with [ImageMagick](https://www.imagemagick.org) , but is merely recompiling the code to be [WebAssembly](https://webassembly.org/). I did this because I want to bring the power of ImageMagick to the browser.
 
+**Table of Contents**
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+- [Demos and examples](#demos-and-examples)
+- [Status](#status)
+  - [Image formats supported](#image-formats-supported)
+  - [Features **not** supported](#features-not-supported)
+- [API](#api)
+  - [High level API and utilities](#high-level-api-and-utilities)
+  - [Accessing stdout, stderr, exitCode](#accessing-stdout-stderr-exitcode)
+  - [low-level example](#low-level-example)
+- [Importing the library in your project](#importing-the-library-in-your-project)
+  - [With npm](#with-npm)
+  - [Loading directly from html file](#loading-directly-from-html-file)
+    - [Importing it as JavaScript standard module:](#importing-it-as-javascript-standard-module)
+    - [Using the UMD bundle in AMD projects (requirejs)](#using-the-umd-bundle-in-amd-projects-requirejs)
+    - [Using the UMD bundle without libraries](#using-the-umd-bundle-without-libraries)
+- [Build instructions](#build-instructions)
+- [Run tests](#run-tests)
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 ## Demos and examples
 
@@ -42,7 +64,9 @@ See a list of known supported formats in this [demo](https://cancerberosgx.githu
 
 ## API
 
-[API Reference Documentation](./apidocs)
+### Reference API Documentation
+
+[Reference API Documentation](./apidocs)
 
 
 ### High level API and utilities

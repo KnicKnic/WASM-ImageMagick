@@ -29,7 +29,7 @@ Can be builded using [buildInputFile](../#buildinputfile)
 
 **● content**: *`Uint8Array`*
 
-*Defined in [magickApi.ts:21](https://github.com/KnicKnic/WASM-ImageMagick/blob/866c245/src/magickApi.ts#L21)*
+*Defined in [magickApi.ts:21](https://github.com/KnicKnic/WASM-ImageMagick/blob/a45b8ff/src/magickApi.ts#L21)*
 
 ___
 <a id="name"></a>
@@ -40,7 +40,7 @@ ___
 
 *Inherited from [MagickFile](magickfile.md).[name](magickfile.md#name)*
 
-*Defined in [magickApi.ts:5](https://github.com/KnicKnic/WASM-ImageMagick/blob/866c245/src/magickApi.ts#L5)*
+*Defined in [magickApi.ts:5](https://github.com/KnicKnic/WASM-ImageMagick/blob/a45b8ff/src/magickApi.ts#L5)*
 
 ___
 
