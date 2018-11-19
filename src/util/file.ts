@@ -1,5 +1,5 @@
 import { MagickInputFile, MagickOutputFile, MagickFile } from '..'
-import { execute } from '../execute';
+import { execute } from '../execute'
 
 function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
   return new Promise(resolve => {
@@ -48,10 +48,10 @@ export async function readFileAsText(file: MagickFile): Promise<string> {
 
 export async function isImage(file: MagickFile): Promise<boolean> {
   const {exitCode} = await execute({inputFiles: [await asInputFile(file)], commands: `identify ${file.name}`})
-  return exitCode===0
+  return exitCode === 0
 }
 /**
- * Builds a new {@link MagickInputFile} by fetching the content of given url and optionally naming the file using given name 
+ * Builds a new {@link MagickInputFile} by fetching the content of given url and optionally naming the file using given name
  * or extracting the file name from the url otherwise.
  */
 export async function buildInputFile(url: string, name: string = getFileName(url)): Promise<MagickInputFile> {

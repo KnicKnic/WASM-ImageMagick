@@ -2,7 +2,7 @@ import { MagickInputFile, MagickOutputFile, call, asCommand } from '.'
 import pMap from 'p-map'
 import { CallResult } from './magickApi'
 import { values } from './util/misc'
-import { asInputFile } from './util';
+import { asInputFile } from './util'
 
 export type Command = (string | number)[]
 

@@ -14,7 +14,7 @@ export interface MagickOutputFile extends MagickFile {
 
 /**
  * Represents input files that need to be provided to {@link call} or [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute).
- * 
+ *
  * Can be builded using {@link buildInputFile}
  */
 export interface MagickInputFile extends MagickFile {
@@ -52,7 +52,7 @@ export interface CallResult {
 }
 
 /**
- * Low level execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute) 
+ * Low level execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute)
  * ends up calling this one. It accept only one command and only in the form of array of strings.
  */
 export function call(inputFiles: MagickInputFile[], command: string[]): Promise<CallResult> {

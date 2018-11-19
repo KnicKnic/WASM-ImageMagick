@@ -8,11 +8,11 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
 
  * Image Diff Example (React & TypeScript project): [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z).
 
- * [Playground with several transformation examples and image formats](https://cancerberosgx.github.io/autumn-leaves/#/convertDemo). It also shows the output of transformations made with ImageMaick in the browser to verify wasm-imagemagick output the right thing.  
+ * [Interactive execute context demo](https://cancerberosgx.github.io/demos/WASM-ImageMagick/interactive-execute-context/). Add images, execute commands using different syntaxes, manage and reuse output/input images, and choose commands examples to learn ImageMagick. [Project lives here](./samples/interactive-execute-context)
+
+ * [Playground with several transformation examples and image formats](https://cancerberosgx.github.io/autumn-leaves/#/convertDemo). It also shows the output of transformations made with ImageMagick in the browser to verify wasm-imagemagick output the right thing.  
 
  * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
-
- * [Interactive execute context demo](https://cancerberosgx.github.io/demos/WASM-ImageMagick/interactive-execute-context/). Add images, execute commands using different syntaxes, manage and reuse output/input images, and choose commands examples to learn ImageMagick. 
 
  * Simple example. See [samples/rotate#code](samples/rotate#code). A simple webpage that has image in array and loads magickApi.js to rotate file. Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
 
@@ -37,7 +37,7 @@ See a list of known supported formats in this [demo](https://cancerberosgx.githu
  * [Text](https://www.imagemagick.org/Usage/text/)
  * [Fourier Transforms](https://www.imagemagick.org/Usage/fourier/)
  * Formats not listed above, particularly webp.
-
+ 
 
 
 ## API

@@ -1,4 +1,4 @@
-import { getConfigureFolders } from "../../src";
+import { getConfigureFolders } from '../../src'
 
 // import { trimNoNewLines } from "../../src/util/misc";
 

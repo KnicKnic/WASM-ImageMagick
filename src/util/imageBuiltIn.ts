@@ -24,5 +24,5 @@ export async function getBuiltInImages(): Promise<MagickInputFile[]> {
  */
 export async function getBuiltInImage(name: string): Promise<MagickInputFile> {
   const images = await getBuiltInImages()
-  return images.find(f=>f.name===name)
+  return images.find(f => f.name === name)
 }

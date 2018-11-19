@@ -10,5 +10,4 @@ export default describe('util/misc', () => {
   //   done()
   // })
 
-
 })

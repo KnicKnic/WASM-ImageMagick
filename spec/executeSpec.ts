@@ -134,7 +134,6 @@ export default describe('execute', () => {
       expect(stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
       done()
     })
-    
 
     describe('errors', () => {
 

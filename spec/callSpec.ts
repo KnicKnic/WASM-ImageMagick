@@ -19,7 +19,7 @@ export default describe('call', () => {
     })
 
     it('should preserve empty new lines in stdout', async done => {
-      let result = await call([], ["convert","rose:","-print","\\n\\nfoo\\n\\n\\nbar\\n\\n","info:"])
+      const result = await call([], ['convert', 'rose:', '-print', '\\n\\nfoo\\n\\n\\nbar\\n\\n', 'info:'])
       expect(result.stdout.join('\n')).toContain(`\n\nfoo\n\n\nbar\n\n`)
       done()
     })
@@ -27,12 +27,12 @@ export default describe('call', () => {
     xit('should print las chars in stdout and stderr no matter if it doesnt end with new line', async done => {
       // this is currently broken because of https://github.com/kripken/emscripten/issues/7360
       // this command won't print 'bar' if -print doesn't end with a new line convert rose: -print '\nfoo\nbar' -format '%f' info:
-      
-      let result = await call([], ["convert","rose:","-format", "lorem %f ipsum","info:"])
+
+      let result = await call([], ['convert', 'rose:', '-format', 'lorem %f ipsum', 'info:'])
       expect(result.stdout.join('\n')).toContain(`lorem 46 ipsum`) // fails because of that issue
 
-      // this works: 
-      result = await call([], ["convert","rose:","-format", "lorem %f ipsum\\n","info:"])
+      // this works:
+      result = await call([], ['convert', 'rose:', '-format', 'lorem %f ipsum\\n', 'info:'])
       expect(result.stdout.join('\n')).toContain(`lorem 46 ipsum`) // fails because of that issue
 
       done()

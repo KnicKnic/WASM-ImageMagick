@@ -1,5 +1,5 @@
 import { asInputFile, Call, MagickFile, blobToString, MagickInputFile } from '..'
-import { ExtractInfoResult } from './imageExtractInfoTypes';
+import { ExtractInfoResult } from './imageExtractInfoTypes'
 
 /**
  * Execute `convert $IMG info.json` to extract image metadata. Returns the parsed info.json file contents
@@ -8,7 +8,7 @@ import { ExtractInfoResult } from './imageExtractInfoTypes';
 export async function extractInfo(img: MagickFile|string): Promise<ExtractInfoResult[]> {
 
   // TODO: support several input images - we are already returning an array
-  
+
   let name: string
   let imgs: MagickInputFile[]
   if (typeof img !== 'string') {

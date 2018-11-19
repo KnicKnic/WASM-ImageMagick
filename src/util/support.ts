@@ -1,4 +1,4 @@
-import { execute } from "../";
+import { execute } from '../'
 
 export async function getConfigureFolders(): Promise<string[]> {
   const result = await execute(`convert -debug configure rose: info:`)
@@ -12,8 +12,6 @@ export async function getConfigureFolders(): Promise<string[]> {
   return folders
 
 }
-
-
 
 // has some heuristic information regarding features (not) supported by wasm-imagemagick, for example, image formats
 

@@ -1,4 +1,4 @@
-import { blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, getFileName, asInputFile, 
+import { blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, getFileName, asInputFile,
   asOutputFile, executeAndReturnOutputFile, isImage, readFileAsText, getPixelColor, getBuiltInImages, getBuiltInImage } from '../../src'
 
 export default describe('util/file', () => {

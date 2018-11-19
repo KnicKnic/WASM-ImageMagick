@@ -20,12 +20,12 @@ export interface ImageHome {
    * Get all the files currently available in this context.
    */
   getAll(): Promise<MagickInputFile[]>
-  /** 
+  /**
    * Add ImageMagick built-in images like `rose:`, `logo:`, etc to this execution context so they are present in `getAll()`.
    */
   addBuiltInImages(): Promise<void>
   /**
-   * Remove files by name. 
+   * Remove files by name.
    * @returns the files actually removed.
    */
   remove(names: string[]): MagickInputFile[]
