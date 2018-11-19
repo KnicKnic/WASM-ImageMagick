@@ -3,7 +3,7 @@ import * as React from 'react';
 import { style } from 'typestyle';
 import {
   arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo,
-  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText, getFileNameExtension, knownSupportedWriteOnlyImageFormats
+  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText, getFileNameExtension, knownSupportedWriteOnlyImageFormats, flat, renderCommand
 } from 'wasm-imagemagick';
 import { commandExamples, Example } from './commandExamples';
 import { blobToString } from 'imagemagick-browser';
@@ -28,6 +28,7 @@ export interface AppState {
   exitCode: number
   prettyJSON: boolean
   isImageArray: boolean[]
+  finalCommand: string[][]
 }
 
 export class App extends React.Component<AppProps, AppState> {
@@ -47,7 +48,8 @@ export class App extends React.Component<AppProps, AppState> {
     stderr: '',
     exitCode: 0,
     prettyJSON: false,
-    isImageArray: []
+    isImageArray: [], 
+    finalCommand: [[]]
   }
 
   protected styles = {
@@ -200,7 +202,8 @@ export class App extends React.Component<AppProps, AppState> {
   protected commandStringChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     const commandArray = this.state.prettyJSON ? JSON.stringify(cliToArray(e.target.value), null, 2) : JSON.stringify(cliToArray(e.target.value))
     // TODO: validate
-    this.setState({ ...this.state, commandString: e.target.value, commandArray })
+    this.state  = {...this.state, commandString: e.target.value, commandArray}
+    this.setState({ ...this.state, finalCommand: this.buildFinalCommand() })
   }
 
   protected async addBuiltInImages() {
@@ -211,16 +214,15 @@ export class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  buildFinalCommand() {
+    return renderCommand({commands: JSON.parse(this.state.commandArray) as string[][], files: this.state.files})
+  }
+
   protected async execute() {
-    // replace the $$IMAGE_N with the n-image in this.state.files
-    const cmd = (JSON.parse(this.state.commandArray) as string[][])
-      .map(c=>c.map(arg=>arg.startsWith('$$IMAGE_') ? 
-        (this.state.files[parseInt(arg.substring('$$IMAGE_'.length, arg.length), 10)]||{name: 'rose:'}).name : 
-        arg))
-        
-        const result = await this.props.context.execute(cmd)
-        
-        console.log(cmd, result);
+    this.state.finalCommand = this.buildFinalCommand()
+    const cmd = this.state.finalCommand
+    console.log('Final Command: '+JSON.stringify(cmd));
+    const result = await this.props.context.execute(cmd)
     this.state.outputFiles = result.outputFiles
     this.state.stderr = result.stderr.join('\n')
     this.state.stdout = result.stdout.join('\n')
@@ -237,7 +239,8 @@ export class App extends React.Component<AppProps, AppState> {
     } catch (error) {
       jsonError = error + ''
     }
-    this.setState({ ...this.state, commandString, commandArray, jsonError })
+    this.state = {...this.state, commandString, commandArray, jsonError}
+    this.setState({ ...this.state, finalCommand: this.buildFinalCommand() })
   }
 
   protected async addImagesInputChanged(e: React.ChangeEvent<HTMLInputElement>) {
@@ -255,9 +258,7 @@ export class App extends React.Component<AppProps, AppState> {
     const isImageArray = await pMap(files, isImage)
     const imgSrcs = this.state.showImagesAndInfo ? await pMap(files, (f, i) => buildFileSrc(f, isImageArray[i])) : this.state.imgSrcs
     const filesInfo = this.state.showImagesAndInfo ? await pMap(files, (f, i) => {
-      console.log(getFileNameExtension(f.name));
-      
-      if(isImageArray[i] && knownSupportedWriteOnlyImageFormats.indexOf(getFileNameExtension(f.name))===-1){
+      if (isImageArray[i] && knownSupportedWriteOnlyImageFormats.indexOf(getFileNameExtension(f.name)) === -1) {
         return extractInfo(f)
       }
     }) : this.state.filesInfo
@@ -273,8 +274,9 @@ export class App extends React.Component<AppProps, AppState> {
   protected async selectExampleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const example = commandExamples[e.currentTarget.selectedIndex]
     const command = await this.commandExampleAsCommand(example)
-    const commandString = typeof example.command === 'string' ? example.command : arrayToCli(command)
-    this.setState({ ...this.state, commandArray: JSON.stringify(command), commandString })
+    this.state.commandString = typeof example.command === 'string' ? example.command : arrayToCli(command)
+    this.state.commandArray=JSON.stringify(command)
+    this.setState({ ...this.state,  finalCommand: this.buildFinalCommand() })
   }
 
   protected async commandExampleAsCommand(example: Example): Promise<Command[]> {
@@ -284,8 +286,6 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
 }
-
-
 async function buildFileSrc(file: MagickFile, isImage_?: boolean): Promise<string> {
   if (typeof isImage_ === 'undefined' ? await isImage(file) : isImage_) {
     return await buildImageSrc(file, true)

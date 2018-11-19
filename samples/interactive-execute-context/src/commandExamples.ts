@@ -34,13 +34,13 @@ info:
   {
     name: 'extract pixel color',
     description: `extract pixel color at 0,0 and save it to info.txt file`,
-    command: `convert logo: -format '%[pixel:p{0,0}]' info:info.txt  `.trim(),
+    command: `convert logo: -format '%[pixel:p{0,0}]' info:$$UNIQUE_NAME.txt  `.trim(),
   },
 
   {
     name: 'extract image information',
     description: `extract image information in json format and store it in output file roseinfo.json`,
-    command: `convert rose: roseInfo.json  `.trim(),
+    command: `convert rose: $$UNIQUE_NAME.json  `.trim(),
   },
   
 
@@ -56,9 +56,48 @@ info:
     \( -clone 0 -level 20,100% +level-colors ,#F24 \) \\
     \( -clone 0 -level 30,100% +level-colors ,#F36 \) \\
     \( -clone 0 -level 40,100% +level-colors ,#F46 \) \\
-    -delete 0  -duplicate 1,-2-1 -set delay 1x30 -loop 0 pulsing.gif
+    -delete 0  -duplicate 1,-2-1 -set delay 1x30 -loop 0 $$UNIQUE_NAME.gif
     `.trim(),
   },
+
+  {
+    name: 'warping local region',
+    description: `https://imagemagick.org/Usage/masking/#region_warping`,
+    command: `
+    convert -size 600x70 xc:darkred \\
+    -fill white -draw 'roundrectangle 5,5  595,65 5,5' \\
+    -fill black -draw 'rectangle 5,25 595,31' \\
+    -fill red -draw 'rectangle 5,39 595,45' \\
+    lines.gif
+  convert lines.gif \\
+    -region 90x70+10+0    -swirl  400  \\
+    -region 90x70+100+0   -swirl  400 \\
+    -region 90x70+190+0   -swirl -400 \\
+    -region 120x70+280+0  -implode 1.5 \\
+    -region 100x70+380+0  -implode -7  \\
+    -region 101x70+480+0  -wave 10x50 -crop 0x70+0+10! \\
+    +region lines_regions.gif
+    `.trim(),
+  },
+
+
+  {
+    name: 'remove background color',
+    description: `https://imagemagick.org/Usage/masking/#difference`,
+    command: `
+    convert $$IMAGE_0 \( +clone -fx 'p{0,0}' \) \\
+    -compose Difference  -composite  \\
+    -modulate 100,0  -alpha off  difference.png
+convert difference.png  -threshold 15%  boolean_mask.png
+convert $$IMAGE_0  boolean_mask.png \\
+    -alpha off -compose CopyOpacity -composite \\
+    differenceRemoveBackground.png
+    `.trim(),
+  },
+
+
+
+
 
 
 
@@ -67,21 +106,70 @@ info:
     description: `simple append+ command that joins two images`,
     command: `
 convert -size 100x100 xc:red \\
+  $$ALLIMAGES \\
   \( rose: -rotate -90 \) \\
-  +append output.png
+  +append $$UNIQUE_NAME.png
   `.trim(),
   },
 
   {
     name: 'write pdf',
-    description: `write pdf`,
+    description: `append a couple of images and then all images and output a pdf`,
     command: `
-convert -size 100x100 xc:red \\
+montage \\
+  null: \\
   \( rose: -rotate -90 -resize 66% \) \\
+  null: \\
   \( logo: -rotate -90 -resize 66% \) \\
-  +append output.pdf
+  $$ALLIMAGES \\
+  -page A4 -tile 2x3 -geometry +10+10 -shadow -frame 8   \\
+  $$UNIQUE_NAME.pdf
   `.trim(),
   },
+  
+
+
+  {
+    name: 'Hourglass Distortion Map',
+    description: `https://imagemagick.org/Usage/mapping/#hourglass`,
+    command: `
+convert -size 100x100 xc:  -channel G \\
+    -fx 'sc=.15; (i/w-.5)/(1+sc*cos(j*pi*2/h)-sc)+.5' \\
+    -separate  map_hourglass.png
+
+convert $$IMAGE_0 -alpha set  -virtual-pixel transparent -channel RGBA \\
+    map_hourglass.png  -fx 'p{ v.p{i*v.w/w,j*v.h/h}.g*w, j}' \\
+    distort_hourglass2.png
+
+  `.trim(),
+  },
+
+  
+  {
+    name: 'Spherical Distortion Map',
+    description: `https://imagemagick.org/Usage/mapping/#spherical`,
+    command: `
+convert -size 100x100 xc:  -channel R \\
+    -fx 'yy=(j+.5)/h-.5; (i/w-.5)/(sqrt(1-4*yy^2))+.5' \\
+    -separate  +channel     sphere_lut.png
+convert -size 100x100 xc:black -fill white \\
+    -draw 'circle 49.5,49.5 49.5,0'    sphere_mask.png
+convert sphere_mask.png \\
+    \( +clone -blur 0x20 -shade 110x21.7 -contrast-stretch 0% \\
+       +sigmoidal-contrast 6x50% -fill grey50 -colorize 10%  \) \\
+    -composite sphere_overlay.png
+convert $$IMAGE_0 -resize 100x100!   sphere_lut.png   -fx 'p{ v*w, j }' \\
+    sphere_overlay.png   -compose HardLight  -composite \\
+    sphere_mask.png -alpha off -compose CopyOpacity -composite \\
+    sphere_lena.png
+
+  `.trim(),
+  },
+
+
+
+
+
 
 
   {

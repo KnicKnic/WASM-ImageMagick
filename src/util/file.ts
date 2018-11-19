@@ -1,4 +1,4 @@
-import { MagickInputFile, MagickOutputFile, MagickFile } from '..'
+import { MagickFile, MagickInputFile, MagickOutputFile } from '..'
 import { execute } from '../execute'
 
 function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
@@ -47,7 +47,10 @@ export async function readFileAsText(file: MagickFile): Promise<string> {
 }
 
 export async function isImage(file: MagickFile): Promise<boolean> {
-  const {exitCode} = await execute({inputFiles: [await asInputFile(file)], commands: `identify ${file.name}`})
+  if (getFileNameExtension(file) === 'svg') {
+    return true
+  }
+  const { exitCode } = await execute({ inputFiles: [await asInputFile(file)], commands: `identify ${file.name}` })
   return exitCode === 0
 }
 /**
@@ -115,7 +118,7 @@ export function getFileName(url: string): string {
     }
   }
 }
-export function getFileNameExtension(filePathOrUrl: string) {
-  const s = getFileName(filePathOrUrl)
+export function getFileNameExtension(filePathOrUrlOrFile: string | MagickFile) {
+  const s = getFileName(typeof filePathOrUrlOrFile === 'string' ? filePathOrUrlOrFile : filePathOrUrlOrFile.name)
   return s.substring(s.lastIndexOf('.') + 1, s.length)
 }

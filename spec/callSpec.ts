@@ -31,9 +31,9 @@ export default describe('call', () => {
       let result = await call([], ['convert', 'rose:', '-format', 'lorem %f ipsum', 'info:'])
       expect(result.stdout.join('\n')).toContain(`lorem 46 ipsum`) // fails because of that issue
 
-      // this works:
-      result = await call([], ['convert', 'rose:', '-format', 'lorem %f ipsum\\n', 'info:'])
-      expect(result.stdout.join('\n')).toContain(`lorem 46 ipsum`) // fails because of that issue
+      // // this works:
+      // result = await call([], ["convert", "rose:", "-format", "lorem %f ipsum\\n", "info:"])
+      // expect(result.stdout.join('\n')).toContain(`lorem 46 ipsum`) // fails because of that issue
 
       done()
     })
