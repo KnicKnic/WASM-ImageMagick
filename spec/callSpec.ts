@@ -24,7 +24,7 @@ export default describe('call', () => {
       done()
     })
 
-    xit('should print las chars in stdout and stderr no matter if it doesnt end with new line', async done => {
+    xit('should print last chars in stdout and stderr no matter if it doesn\'t end with new line', async done => {
       // this is currently broken because of https://github.com/kripken/emscripten/issues/7360
       // this command won't print 'bar' if -print doesn't end with a new line convert rose: -print '\nfoo\nbar' -format '%f' info:
 

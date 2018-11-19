@@ -17,7 +17,7 @@ export async function getConfigureFolders(): Promise<string[]> {
 
 // heads up - all images spec/assets/to_rotate.* where converted using gimp unless explicitly saying otherwise
 /**
- * list of image formats that are known to be supported by wasm-imagemagick. See `spec/formatSpec.ts`
+ * list of image formats that are known to be supported by wasm-imagemagick both for read and write. See `spec/formatSpec.ts`
  */
 export const knownSupportedReadWriteImageFormats = [
   'jpg', 'png',
@@ -35,6 +35,18 @@ export const knownSupportedReadWriteImageFormats = [
   'otb', // generated using convert to_rotate.png  to_rotate.otb
 
   'txt', // generated using convert to_rotate.png  to_rotate.txt
+  'psb',
 
   // 'rgb', // fails because  MustSpecifyImageSize `to_rotate.rgb'
 ]
+
+/**
+ * list of image formats that are known to be supported by wasm-imagemagick but only for write. See `spec/formatSpec.ts`
+ */
+export const knownSupportedWriteOnlyImageFormats = [
+  'ps', 'pdf', 
+  'epdf', // generated using convert to_rotate.png  to_rotate.epdf
+  'svg', 
+  'djvu' // converted from png using online tool
+]
+

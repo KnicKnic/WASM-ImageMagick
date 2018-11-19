@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { knownSupportedReadWriteImageFormats } from 'wasm-imagemagick';
+import { knownSupportedReadWriteImageFormats, knownSupportedWriteOnlyImageFormats } from 'wasm-imagemagick';
 import { App } from './app';
  
 
@@ -12,5 +12,5 @@ export function install() {
 }
  
 export function render() {
-  ReactDOM.render(<App formats={knownSupportedReadWriteImageFormats}></App>, document.querySelector('#app'));
+  ReactDOM.render(<App formatsReadWrite={knownSupportedReadWriteImageFormats}formatsWriteOnly={knownSupportedWriteOnlyImageFormats}></App>, document.querySelector('#app'));
 }

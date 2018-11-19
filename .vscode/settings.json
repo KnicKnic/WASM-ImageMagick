@@ -1,0 +1,10 @@
+{
+  "search.exclude": {
+    "**/dist/**": true,
+    "ImageMagick/**": true,
+    "libjpeg/**": true,
+    "libpng/**": true,
+    "libtiff/**": true,
+    "zlib/**": true
+  }
+}

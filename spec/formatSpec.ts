@@ -1,45 +1,37 @@
 import pmap from 'p-map'
-import { buildInputFile, compare, execute, executeOne, extractInfo, knownSupportedReadWriteImageFormats } from '../src'
+import { buildInputFile, compare, executeOne, extractInfo, knownSupportedReadWriteImageFormats, knownSupportedWriteOnlyImageFormats, readFileAsText } from '../src'
 
 export default describe('formats', () => {
 
-  const formats = knownSupportedReadWriteImageFormats
-  const descriptions = {
-    psd: 'Adobe Photoshop bitmap file',
-  }
-
-  describe('compare and assert on info', () => {
+  describe('compare each other and extract', () => {
 
     let jasmineTimeout
+    const images = {}
 
-    beforeAll(() => {
+    beforeAll(async done => {
       jasmineTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
       jasmine.DEFAULT_TIMEOUT_INTERVAL = 40000
+      await pmap(knownSupportedReadWriteImageFormats, async f=>(images[f] = await buildInputFile(`formats/to_rotate.${f}`)))
+      done()
     })
 
     afterAll(() => {
       jasmine.DEFAULT_TIMEOUT_INTERVAL = jasmineTimeout
     })
 
-    it('compare should be true for all combinations', async done => {
-      const compares = []
-      formats.forEach(f1 => {
-        formats.filter(f2 => f2 !== f1).forEach(async f2 => {
-          compares.push([`formats/to_rotate.${f1}`, `formats/to_rotate.${f2}`])
+    knownSupportedReadWriteImageFormats.forEach(f1 => {
+      knownSupportedReadWriteImageFormats.
+        filter((f2, i, arr) => i > arr.indexOf(f1))
+        .forEach(async f2 => {
+          it(`${f1}, ${f2} should be equal`, async done => {
+            expect(await compare(images[f1], images[f2])).toBe(true)
+            done()
+          })
         })
-      })
-      const results = await pmap(compares, async c => {
-        return compare(await buildInputFile(c[0]), await buildInputFile(c[1]))
-      })
-      expect(results.length).toBeGreaterThan(formats.length * 2)
-      results.forEach((r, i) => {
-        expect(r).toBe(true, `compare(${compares[i][0]}, ${compares[i][1]})`)
-      })
-      done()
     })
 
     it('info format should match', async done => {
-
+ 
       const mimeTypes = {
         jpg: 'image/jpeg',
         png: 'image/png',
@@ -54,23 +46,22 @@ export default describe('formats', () => {
         jpg: 'jpeg',
         pnm: 'pgm',
       }
-      const results = await pmap(formats, async f => {
-        return extractInfo(await buildInputFile(`formats/to_rotate.${f}`))
+      const results = await pmap(knownSupportedReadWriteImageFormats, async f => {
+        return extractInfo(images[f])
       })
       results.forEach((result, i) => {
         const image = result[0].image
-        const format = formats[i]
+        const format = knownSupportedReadWriteImageFormats[i]
         expect(imFormatMap[format] || format).toBe(image.format.toLowerCase())
         expect(image.geometry.width).toBe(64)
         expect(image.mimeType).toBe(mimeTypes[format] || undefined)
-        console.log(image)
       })
       done()
     })
 
   })
 
-  describe('particular formats not supported or working', () => {
+  xdescribe('particular formats not supported or working', () => { // both are write only - TODO: delete this
 
     it('svg is not supported', async done => {
       const img = await buildInputFile('react.svg')
@@ -91,5 +82,19 @@ export default describe('formats', () => {
       done()
     })
 
+  })
+
+  describe('formats that write only is supported', () => {
+    knownSupportedWriteOnlyImageFormats.forEach(format => {
+      it(`should be able to write to format ${format}`, async done => {
+        const input = await buildInputFile('fn.png')
+        const { outputFiles, exitCode } = await executeOne({ inputFiles: [input], commands: `convert fn.png fn.${format}` })
+        expect(exitCode).toBe(0)
+        expect(outputFiles[0].name).toBe(`fn.${format}`)
+        // we cannot read the file, but we can at least assert on its size:
+        expect((await readFileAsText(outputFiles[0])).length).not.toBe((await readFileAsText(input)).length)
+        done()
+      })
+    })
   })
 })
