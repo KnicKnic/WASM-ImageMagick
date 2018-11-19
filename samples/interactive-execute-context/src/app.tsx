@@ -3,7 +3,7 @@ import * as React from 'react';
 import { style } from 'typestyle';
 import {
   arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo,
-  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText
+  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText, getFileNameExtension, knownSupportedWriteOnlyImageFormats
 } from 'wasm-imagemagick';
 import { commandExamples, Example } from './commandExamples';
 import { blobToString } from 'imagemagick-browser';
@@ -102,7 +102,7 @@ export class App extends React.Component<AppProps, AppState> {
               <tbody>
                 {this.state.files.map((f, i) =>
                   <tr>
-                    <td>{f.name}</td>
+                    <td><a download={f.name} target="_blank" href={URL.createObjectURL(new Blob([f.content]))}>{f.name}</a></td>
                     <td>
                       <button data-image={f.name} onClick={this.removeImage.bind(this)}>remove</button>
                     </td>
@@ -254,7 +254,13 @@ export class App extends React.Component<AppProps, AppState> {
     const files = await this.props.context.getAllFiles()
     const isImageArray = await pMap(files, isImage)
     const imgSrcs = this.state.showImagesAndInfo ? await pMap(files, (f, i) => buildFileSrc(f, isImageArray[i])) : this.state.imgSrcs
-    const filesInfo = this.state.showImagesAndInfo ? await pMap(files, (f, i) => isImageArray[i] ? extractInfo(f) : undefined) : this.state.filesInfo
+    const filesInfo = this.state.showImagesAndInfo ? await pMap(files, (f, i) => {
+      console.log(getFileNameExtension(f.name));
+      
+      if(isImageArray[i] && knownSupportedWriteOnlyImageFormats.indexOf(getFileNameExtension(f.name))===-1){
+        return extractInfo(f)
+      }
+    }) : this.state.filesInfo
     const outputFileSrcs = await pMap(this.state.outputFiles, (f, i) => buildFileSrc(f))
     this.setState({ ...this.state, files, imgSrcs, outputFileSrcs, filesInfo, isImageArray })
   }

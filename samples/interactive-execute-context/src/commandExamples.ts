@@ -45,6 +45,23 @@ info:
   
 
 
+
+  {
+    name: 'pulsing animation',
+    description: `generates a radial-gradient image, which is then cloned and adjusted to create a red to brighter red-orange pulse. This is then duplicated to create a reversed Patrol Cycle before creating a 30 second, looped `,
+    command: `
+  convert -size 101x101 radial-gradient: \\
+    \( -clone 0 -level 00,100% +level-colors ,#F00 \) \\
+    \( -clone 0 -level 10,100% +level-colors ,#F12 \) \\
+    \( -clone 0 -level 20,100% +level-colors ,#F24 \) \\
+    \( -clone 0 -level 30,100% +level-colors ,#F36 \) \\
+    \( -clone 0 -level 40,100% +level-colors ,#F46 \) \\
+    -delete 0  -duplicate 1,-2-1 -set delay 1x30 -loop 0 pulsing.gif
+    `.trim(),
+  },
+
+
+
   {
     name: 'simple append',
     description: `simple append+ command that joins two images`,
@@ -52,6 +69,17 @@ info:
 convert -size 100x100 xc:red \\
   \( rose: -rotate -90 \) \\
   +append output.png
+  `.trim(),
+  },
+
+  {
+    name: 'write pdf',
+    description: `write pdf`,
+    command: `
+convert -size 100x100 xc:red \\
+  \( rose: -rotate -90 -resize 66% \) \\
+  \( logo: -rotate -90 -resize 66% \) \\
+  +append output.pdf
   `.trim(),
   },
 
