@@ -5,19 +5,13 @@ steps:
 
 - task: NodeTool@0
   inputs:
-    versionSpec: '8.x'
+    versionSpec: '11.x'
 
-- script: |
-   echo "node version `node -v`"
-   echo "npm version `npm -v`" 
-   npm install
-  displayName: npm install
+- script: npm install
+  displayName: install and build
 
-- script: |
-   echo "node version `node -v`"
-   echo "npm version `npm -v`" 
-   npm test
-  displayName: run tests
+- script: npm test
+  displayName: test
 
 - script: cp magick* $(Build.ArtifactStagingDirectory)
   displayName: cp magick files to artifact staging directory
