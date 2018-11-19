@@ -63,26 +63,33 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
   }
   const promise = CreatePromiseEvent()
   magickWorkerPromises[magickWorkerPromisesKey] = promise
+
+  const t0 = performance.now()
+  const id = magickWorkerPromisesKey
+  callListeners.forEach(listener => listener.beforeCall({ inputFiles, command, id }))
+
   magickWorker.postMessage(request)
+
+  promise.then(callResult => callListeners.forEach(listener => listener.afterCall({ inputFiles, command, id, callResult, took: performance.now() - t0 })))
+
   magickWorkerPromisesKey++
-  return promise as Promise<CallResult>
+  return promise
 }
 
-function CreatePromiseEvent() {
+type CallPromise = Promise<CallResult> & { resolve?: (CallResult) => void, reject?: any }
+
+function CreatePromiseEvent(): CallPromise {
   let resolver
-  let rejecter
-  const emptyPromise = new Promise((resolve, reject) => {
+  const promise = new Promise(resolve => {
     resolver = resolve
-    rejecter = reject
-  }) as Promise<{}> & { resolve?: any, reject?: any }
-  emptyPromise.resolve = resolver
-  emptyPromise.reject = rejecter
-  return emptyPromise
+  }) as CallPromise
+  promise.resolve = resolver
+  return promise
 }
 
 const magickWorker = new Worker('magick.js')
 
-const magickWorkerPromises = {}
+const magickWorkerPromises: { [key: string]: CallPromise } = {}
 let magickWorkerPromisesKey = 1
 
 // handle responses as they stream in after being outputFiles by image magick
@@ -90,11 +97,32 @@ magickWorker.onmessage = e => {
   const response = e.data
   const promise = magickWorkerPromises[response.requestNumber]
   delete magickWorkerPromises[response.requestNumber]
-  const result = {
+  const result: CallResult = {
     outputFiles: response.outputFiles,
     stdout: response.stdout,
     stderr: response.stderr,
     exitCode: response.exitCode || 0,
   }
   promise.resolve(result)
+}
+
+// execute event emitter
+
+export interface CallEvent {
+  command: string[]
+  inputFiles: MagickInputFile[]
+  callResult?: CallResult
+  took?: number
+  id: number
+}
+
+export interface CallListener {
+  afterCall?(event: CallEvent): void
+  beforeCall?(event: CallEvent): void
+}
+
+const callListeners: CallListener[] = []
+
+export function addCallListener(l: CallListener) {
+  callListeners.push(l)
 }

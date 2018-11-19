@@ -1,15 +1,13 @@
-import { MagickInputFile, MagickOutputFile, call, asCommand } from '.'
 import pMap from 'p-map'
+import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
 import { CallResult } from './magickApi'
+import { asInputFile, isInputFile } from './util'
 import { values } from './util/misc'
-import { asInputFile } from './util'
 
 export type Command = (string | number)[]
 
 export interface ExecuteConfig {
   inputFiles?: MagickInputFile[]
-  /**
-   */
   commands: ExecuteCommand
 }
 
@@ -55,9 +53,11 @@ export interface ExecuteResultOne extends CallResult {
 
 /**
  * Execute first command in given config.
+ *
+ * @see [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute) for full documentation on accepted signatures
  */
-export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand): Promise<ExecuteResultOne> {
-  const config = asExecuteConfig(configOrCommand)
+export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand | MagickInputFile[], execCommand?: ExecuteCommand): Promise<ExecuteResultOne> {
+  const config = asExecuteConfig(configOrCommand, execCommand)
   let result: CallResult = {
     stderr: [],
     stdout: [],
@@ -67,10 +67,7 @@ export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand
   try {
     config.inputFiles = config.inputFiles || []
     const command = asCommand(config.commands)[0]
-    const t0 = performance.now()
-    executeListeners.forEach(listener => listener.beforeExecute({ command, took: performance.now() - t0, id: t0 }))
     result = await call(config.inputFiles, command.map(c => c + ''))
-    executeListeners.forEach(listener => listener.afterExecute({ command, took: performance.now() - t0, id: t0 }))
     if (result.exitCode) {
       return { ...result, errors: ['exit code: ' + result.exitCode + ' stderr: ' + result.stderr.join('\n')] }
     }
@@ -81,53 +78,44 @@ export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand
   }
 }
 
-export function isExecuteCommand(arg: any): arg is ExecuteConfig {
+export function isExecuteConfig(arg: any): arg is ExecuteConfig {
   return !!arg.commands
 }
 
 /**
  * Transform  `configOrCommand: ExecuteConfig | ExecuteCommand` to a valid ExecuteConfig object
  */
-export function asExecuteConfig(arg: ExecuteConfig | ExecuteCommand): ExecuteConfig {
-  if (isExecuteCommand(arg)) {
-    return arg
+export function asExecuteConfig(configOrCommandOrFiles: ExecuteConfig | ExecuteCommand | MagickInputFile[], command?: ExecuteCommand): ExecuteConfig {
+  if (isExecuteConfig(configOrCommandOrFiles)) {
+    return configOrCommandOrFiles
+  }
+  else {
+    if (Array.isArray(configOrCommandOrFiles) && isInputFile(configOrCommandOrFiles[0])) {
+      if (!command) {
+        throw new Error('No command given')
+      }
+      return {
+        inputFiles: configOrCommandOrFiles as MagickInputFile[],
+        commands: command,
+      }
+    }
   }
   return {
     inputFiles: [],
-    commands: arg,
+    commands: configOrCommandOrFiles as ExecuteCommand,
   }
 }
 
 /**
- * `execute()` shortcut that useful for commands that return only one output file or when only one particular output file is relevant.
- * @param outputFileName optionally user can give the desired output file name
- * @returns If `outputFileName` is given the file with that name, the first output file otherwise or undefined
- * if no file match, or no output files where generated (like in an error).
+ * `execute()` shortcut that return directly the first output file or undefined if none or error occur
  */
-export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig | ExecuteCommand, outputFileName?: string): Promise<MagickOutputFile | undefined> {
-  const config = asExecuteConfig(configOrCommand)
+export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig | ExecuteCommand | MagickInputFile[],
+  command?: ExecuteCommand): Promise<MagickOutputFile | undefined> {
+  const config = asExecuteConfig(configOrCommand, command)
   const result = await execute(config)
-  return outputFileName ? result.outputFiles.find(f => f.name === outputFileName) : (result.outputFiles.length && result.outputFiles[0] || undefined)
+  return result.outputFiles.length && result.outputFiles[0] || undefined
 }
 
-// execute event emitter
-
-export interface ExecuteEvent {
-  command: Command
-  took: number
-  id: number
-}
-
-export interface ExecuteListener {
-  afterExecute?(event: ExecuteEvent): void
-  beforeExecute?(event: ExecuteEvent): void
-}
-
-const executeListeners: ExecuteListener[] = []
-
-export function addExecuteListener(l: ExecuteListener) {
-  executeListeners.push(l)
-}
 
 export interface ExecuteResult extends ExecuteResultOne {
   results: ExecuteResultOne[]
@@ -153,14 +141,26 @@ export interface ExecuteResult extends ExecuteResultOne {
  *   await loadImageElement(outputFiles.find(f => f.name==='image3.jpg'), document.getElementById('outputImage'))
  * }
  * ```
+ * Another varlid signature is passing input files and commands as parameters:
+ *
+ * ```ts
+ * const { outputFiles, exitCode, stderr} = await execute([await buildInputFile('foo.png'], 'convert foo.png foo.jpg')
+ * ```
+ *
+ * Another valid signature is just providing the command when there there is no need for input files:
+ *
+ * ```ts
+ * const { outputFiles, exitCode, stderr} = await execute('identify rose:')
+ * ```
  *
  * See {@link ExecuteCommand} for different command syntax supported.
  *
  * See {@link ExecuteResult} for details on the object returned
  */
 
-export async function execute(configOrCommand: ExecuteConfig | ExecuteCommand): Promise<ExecuteResult> {
-  const config = asExecuteConfig(configOrCommand)
+export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCommand | MagickInputFile[], command?: ExecuteCommand): Promise<ExecuteResult> {
+
+  const config = asExecuteConfig(configOrCommandOrFiles, command)
   config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}
   const allInputFiles: { [name: string]: MagickInputFile } = {}

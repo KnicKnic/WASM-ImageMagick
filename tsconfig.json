@@ -4,14 +4,14 @@
     "sourceMap": true,
     "declaration": true,
     "lib": [
-      "dom", "es2018"
+      "dom",
+      "es2018"
     ],
     "target": "es2018",
-    "module": "commonjs", 
-    "skipLibCheck": true
+    "module": "commonjs"
   },
   "include": [
-    "src", "spec"
+    "src",
+    "spec"
   ]
 }
-

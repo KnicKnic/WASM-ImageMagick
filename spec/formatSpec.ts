@@ -1,5 +1,5 @@
 import pmap from 'p-map'
-import { buildInputFile, compare, executeOne, extractInfo, knownSupportedReadWriteImageFormats, knownSupportedWriteOnlyImageFormats, readFileAsText } from '../src'
+import { buildInputFile, compare, executeOne, extractInfo, knownSupportedReadWriteImageFormats, knownSupportedWriteOnlyImageFormats, readFileAsText, knownSupportedReadOnlyImageFormats, execute, _knownSupportedImageFormatsInFolderForTest } from '../src'
 
 export default describe('formats', () => {
 
@@ -93,6 +93,28 @@ export default describe('formats', () => {
         expect(outputFiles[0].name).toBe(`fn.${format}`)
         // we cannot read the file, but we can at least assert on its size:
         expect((await readFileAsText(outputFiles[0])).length).not.toBe((await readFileAsText(input)).length)
+        done()
+      })
+    })
+  })
+
+  xdescribe('formats that read only is supported', () => {
+    
+    knownSupportedReadOnlyImageFormats.forEach(format => {
+      it(`should be able to read ${format}`, async done => {
+
+        const inputPath = _knownSupportedImageFormatsInFolderForTest.includes(format) ? `formats/${format}/img.${format}` : `formats/to_rotate.${format}`
+
+        const pngPath = _knownSupportedImageFormatsInFolderForTest.includes(format) ? `formats/${format}/img.png` : `formats/to_rotate.png`
+
+        const input = await buildInputFile(inputPath)
+        const png = await buildInputFile(pngPath)
+
+        // expect(await compare(input, png)).toBe(true)
+
+        const {exitCode, stdout} =await execute([input], `convert ${input.name} info:`)
+        expect(exitCode).toBe(0)
+        expect(stdout.join('\n').toLowerCase()).toContain(format)
         done()
       })
     })

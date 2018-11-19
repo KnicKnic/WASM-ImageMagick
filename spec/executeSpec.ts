@@ -1,4 +1,4 @@
-import { buildInputFile, compare, execute, executeAndReturnOutputFile, executeOne, extractInfo } from '../src'
+import { buildInputFile, compare, execute, executeAndReturnOutputFile, executeOne, extractInfo, ExecuteCommand } from '../src'
 import { showImages } from './testUtil'
 
 export default describe('execute', () => {
@@ -129,6 +129,27 @@ export default describe('execute', () => {
       done()
     })
 
+    it('supports passing config properties as parameters', async done => {
+      const img = await buildInputFile('fn.png')
+      const result1 = await execute([img], 'convert fn.png -rotate 70 -resize 70% image2.gif')
+      const out1 = result1.outputFiles[0]
+
+      const result2 = await execute([img], `convert fn.png -rotate 70 out1.png\n convert out1.png -resize 70% out2.gif`)
+      const out2 = result2.outputFiles[1]
+
+      const result3 = await execute([img], [`convert fn.png -rotate 70 out1.png`, 'convert out1.png -resize 70% out2.gif'])
+      const out3 = result3.outputFiles[1]
+
+      const result4 = await execute([img], [["convert","fn.png","-rotate","70","out1.png"],["convert","out1.png","-resize","70%","out2.gif"]])
+      const out4 = result4.outputFiles[1]
+
+      expect(await compare(out1, out2)).toBe(true)
+      expect(await compare(out1, out3)).toBe(true)
+      expect(await compare(out1, out4)).toBe(true)
+
+      done()
+    })
+
     it('can access stdout', async done => {
       const { stdout } = await execute(`identify rose:`)
       expect(stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
@@ -184,19 +205,21 @@ export default describe('execute', () => {
   })
 
   describe('executeAndReturnOutputFile', () => {
-    it('should support using just a command when input files are not necessary', async done => {
-      const out = await executeAndReturnOutputFile('convert rose: -rotate 55 -resize 55% out.png')
-      expect(out.name).toBe('out.png')
-
+    it('should return the first image', async done => {
       const out2 = await executeAndReturnOutputFile(`
       convert rose: -rotate 55 out1.png
       convert out1.png -resize 55% out2.png
       `, 'out2.png')
-      expect(out2.name).toBe('out2.png')
-      expect(await compare(out, out2)).toBe(true)
-
+      expect(out2.name).toBe('out1.png')
       done()
     })
+
+    it('should return undefined in case of error or no output files', async done => {
+      expect( await executeAndReturnOutputFile(`convert rose: info:`)).toBeUndefined()
+      expect( await executeAndReturnOutputFile(`convert nonExitent.png out.png`)).toBeUndefined()
+      done()
+    })
+
   })
 
   xit('event emitter', () => { })

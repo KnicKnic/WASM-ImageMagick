@@ -23,10 +23,10 @@ export function blobToString(blb: Blob): Promise<string> {
   })
 }
 
-export function isInputFile(file: MagickFile): file is MagickInputFile {
+export function isInputFile(file: any): file is MagickInputFile {
   return !!(file as MagickInputFile).content
 }
-export function isOutputFile(file: MagickFile): file is MagickOutputFile {
+export function isOutputFile(file: any): file is MagickOutputFile {
   return !!(file as MagickOutputFile).blob
 }
 

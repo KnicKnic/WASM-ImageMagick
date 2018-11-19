@@ -23,9 +23,7 @@ export const knownSupportedReadWriteImageFormats = [
   'jpg', 'png',
   'psd',
   'tiff', 'xcf', 'gif', 'bmp', 'tga', 'miff', 'ico', 'dcm', 'xpm', 'pcx',
-  //  'pix', // gives error
   'fits',
-  // 'djvu', // read only support
   'ppm',
   'pgm',
   'pfm',
@@ -41,12 +39,22 @@ export const knownSupportedReadWriteImageFormats = [
 ]
 
 /**
- * list of image formats that are known to be supported by wasm-imagemagick but only for write. See `spec/formatSpec.ts`
+ * list of image formats that are known to be supported by wasm-imagemagick but only for write operation. See `spec/formatSpec.ts`
  */
 export const knownSupportedWriteOnlyImageFormats = [
-  'ps', 'pdf', 
+  'ps', 'pdf',
   'epdf', // generated using convert to_rotate.png  to_rotate.epdf
-  'svg', 
-  'djvu' // converted from png using online tool
+  'svg',
+  'djvu', // converted from png using online tool
 ]
 
+/**
+ * list of image formats that are known to be supported by wasm-imagemagick but only for read operation. See `spec/formatSpec.ts`
+ */
+export const knownSupportedReadOnlyImageFormats = [
+  'pix', 'mat'
+]
+
+export const _knownSupportedImageFormatsInFolderForTest = [
+  'mat'
+]
