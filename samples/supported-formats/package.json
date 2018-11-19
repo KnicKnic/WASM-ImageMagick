@@ -4,6 +4,7 @@
   "description": "html page that transform images in different formats (not understandable by the browser), transform each of them to png and show a table with all these transformations.",
   "main": "dist/index.js",
   "scripts": {
+    "all": "npm run clean && npm run build && npm run copy",
     "build": "tsc && npm run bundle",
     "bundle": "browserify dist/index.js -o static/bundle.js",
     "copy": "cp -r ../../spec/assets/formats ../../spec/assets/magick.* src/static/* static",

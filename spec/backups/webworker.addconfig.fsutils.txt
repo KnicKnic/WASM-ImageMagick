@@ -1,0 +1,351 @@
+the following is a webworker version that implement ls, mkdir, readFIle, writeFiles operations and also add colors.xml IM configuration file so IM doesn't complain about that:
+
+
+
+
+// This file helps make the compiled js file be imported as a web worker by the src/magickApi.ts file
+
+const stdout = []
+const stderr = []
+let exitCode = 0
+
+if (typeof Module == 'undefined') {
+  Module = {
+    noInitialRun: true,
+    moduleLoaded: false,
+    messagesToProcess: [],
+    print: text => {
+      // if (text) {
+        stdout.push(text||'')
+        // console.log(text)
+      // }
+    },
+    printErr: text => {
+      // if (text) {
+        stderr.push(text||'')
+        // console.error(text);
+      // }
+    },
+    quit: status => {
+      exitCode = status
+    }
+  }
+
+  // see https://kripken.github.io/emscripten-site/docs/api_reference/module.html
+  Module.onRuntimeInitialized = function () {
+    FS.mkdir('/pictures')
+    FS.currentPath = '/pictures'
+
+    // const configPath = '/home/web_user/.config/ImageMagick'
+    FS.mkdir('/home/web_user/.config')
+    FS.mkdir('/home/web_user/.config/ImageMagick')
+    const colorsXML = `
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE colormap [
+    <!ELEMENT colormap (color)+>
+    <!ELEMENT color (#PCDATA)>
+    <!ATTLIST color name CDATA "0">
+    <!ATTLIST color color CDATA "rgb(0,0,0)">
+    <!ATTLIST color compliance CDATA "SVG">
+    ]>
+    <colormap>
+    </colormap>    
+    `.trim()
+    FS.writeFile('/home/web_user/.config/ImageMagick/colors.xml', colorsXML)
+
+    Module.moduleLoaded = true
+    processFiles()
+  }
+}
+
+processFiles = function () {
+  if (!Module.moduleLoaded) {
+    return
+  }
+
+  // clean up stdout, stderr and exitCode
+  stdout.splice(0, stdout.length)
+  stderr.splice(0, stderr.length)
+  exitCode = undefined
+
+  for (let message of Module.messagesToProcess) {
+
+
+    if (!['readFile', 'writeFiles', 'ls', 'mkdir', 'mkdirp'].includes(message.args[0])) {
+
+      let responseFiles = []
+      try {
+        for (let file of message.files) {
+          FS.writeFile(file.name, file.content)
+        }
+
+        Module.callMain(message.args)
+
+        for (let file of message.files) {
+          // cleanup source files
+          // mogrify then output files have same name, so skip
+          if (message.args[0] !== 'mogrify') {
+            FS.unlink(file.name)
+          }
+        }
+        let dir = FS.open('/pictures')
+        let files = dir.node.contents
+        for (let destFilename in files) {
+          let processed = {}
+          processed.name = destFilename
+          let read = FS.readFile(destFilename)
+          // cleanup read file
+          FS.unlink(destFilename)
+          processed.blob = new Blob([read])
+          responseFiles.push(processed)
+        }
+        message.outputFiles = responseFiles
+        message.stdout = stdout.map(s => s)
+        message.stderr = stderr.map(s => s)
+        message.exitCode = exitCode
+      }
+      catch (ex) {
+
+        message.outputFiles = responseFiles
+        message.stdout = stdout.map(s => s)
+        message.stderr = [ex + '']
+        message.exitCode = 1
+
+      }
+
+    }
+    else if (message.args[0] === 'mkdirp') {
+      // const currentPath = FS.currentPath
+      // FS.currentPath = '/'
+      try {
+        FS.mkdir(message.args[1])
+        message.outputFiles = []
+        // console.log('from worker ls ', message.args[1], dir.node.contents, dir.node);
+        message.stdout = []//Object.keys(dir.node.contents)//.map(f => f + '')
+        message.stderr = []
+        message.exitCode = 0
+
+      } catch (ex) {
+        message.outputFiles = []
+        message.stdout = []
+        message.stderr = [ex + '']
+        message.exitCode = 1
+      }
+      // FS.currentPath = currentPath
+    }
+
+    else if (message.args[0] === 'mkdir') {
+      // const currentPath = FS.currentPath
+      // FS.currentPath = '/'
+      try {
+        FS.mkdir(message.args[1])
+        message.outputFiles = []
+        // console.log('from worker ls ', message.args[1], dir.node.contents, dir.node);
+        message.stdout = []//Object.keys(dir.node.contents)//.map(f => f + '')
+        message.stderr = []
+        message.exitCode = 0
+
+      } catch (ex) {
+        message.outputFiles = []
+        message.stdout = []
+        message.stderr = [ex + '']
+        message.exitCode = 1
+      }
+      // FS.currentPath = currentPath
+    }
+    else if (message.args[0] === 'ls') {
+      // const currentPath = FS.currentPath
+      // FS.currentPath = '/'
+      try {
+        let dir = FS.open(message.args[1])
+        message.outputFiles = []
+        console.log('from worker ls ', message.args[1], dir.node.contents, dir.node);
+        
+        message.stdout = Object.keys(dir.node.contents)//.map(f => f + '')
+        message.stderr = []
+        message.exitCode = 0
+
+      } catch (ex) {
+        message.outputFiles = []
+        message.stdout = []
+        message.stderr = [ex + '']
+        message.exitCode = 1
+      }
+      // FS.currentPath = currentPath
+    }
+    else if (message.args[0] === 'readFile') {
+      // const currentPath = FS.currentPath
+      // FS.currentPath = '/'
+      try {
+        let read = FS.readFile(message.args[1])
+        message.outputFiles = [{ name: message.args[1], blob: new Blob([read]) }]
+        message.stdout = []
+        message.stderr = []
+        message.exitCode = 0
+      }
+      catch (ex) {
+        message.outputFiles = []
+        message.stdout = []
+        message.stderr = [ex + '']
+        message.exitCode = 1
+      }
+      // FS.currentPath = currentPath
+    }
+    else if (message.args[0] === 'writeFiles') {
+      // const currentPath = FS.currentPath
+      // FS.currentPath = '/'
+      try {
+        for (let file of message.files) {
+          FS.writeFile(file.name, file.content)
+        }
+        message.outputFiles = []
+        message.stdout = []
+        message.stderr = []
+        message.exitCode = 0
+      } catch (ex) {
+        message.outputFiles = []
+        message.stdout = []
+        message.stderr = [ex + '']
+        message.exitCode = 1
+      }
+      // FS.currentPath = currentPath
+    }
+
+    postMessage(message)
+    Module.messagesToProcess = []
+  }
+}
+
+onmessage = function (magickRequest) {
+  Module.messagesToProcess.push(magickRequest.data)
+  processFiles()
+}
+
+
+
+
+
+and the spec
+
+import { blobToString, buildInputFile, Call, extractInfo, call, execute, getConfigureFolders, asInputFile, readFileAsText, ExecuteResult } from '../src'
+
+export default xdescribe('experiments and bugs', () => {
+
+
+  xdescribe('fs tools', () => {
+
+    it('ls', async done => {
+      let result = await execute(`ls /home/`)
+      // console.log('ls', result);
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('web_user')
+      done()
+    })
+
+
+    it('readFile, writeFiles', async done => {
+      let result = await execute(`convert rose: info:info.txt`)
+      const file = result.outputFiles[0]
+      file.name = '/home/web_user//info123.txt'
+      result = await execute({ inputFiles: [await asInputFile(file)], commands: `writeFiles` })
+      expect(result.exitCode).toBe(0)
+
+      file.name = '/not/exists/foo.txt'
+      result = await execute({ inputFiles: [await asInputFile(file)], commands: `writeFiles` })
+      expect(result.exitCode).not.toBe(0)
+      // console.log({result});
+
+      result = await execute({ inputFiles: [], commands: `readFile /home/web_user/info123.txt` })
+      expect(await readFileAsText(file)).toBe(await readFileAsText(result.outputFiles[0]))
+      expect(result.exitCode).toBe(0)
+
+      done()
+    })
+
+
+    it('mkdir', async done => {
+
+      let result: ExecuteResult
+
+      result = await execute(`ls /home/web_user`)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).not.toContain('newFolder1')
+
+      result = await execute(`mkdir /home/web_user/newFolder1/andChild`)
+      expect(result.exitCode).not.toBe(0)
+
+      result = await execute(`mkdir /home/web_user/newFolder1`)
+      expect(result.exitCode).toBe(0)
+
+      result = await execute(`ls /home/web_user`)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('newFolder1')
+      done()
+    })
+
+    xit('mkdirp', async done => {
+      let result: ExecuteResult
+      result = await execute(`ls /home/web_user`)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).not.toContain('newFolder2')
+
+      result = await execute(`mkdir /home/web_user/newFolder2/andChild`)
+      // console.log('mkdir', result);
+      expect(result.exitCode).not.toBe(0)
+
+      result = await execute(`ls /home/web_user`)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout).toContain('newFolder2')
+
+      done()
+    })
+
+
+  it('should resolve with stdout when there\'s one', async done => { // TODO: dont work
+
+    let result = await execute({ inputFiles: [await buildInputFile('fn.png')], commands: `convert -debug configure  logo: -format '%[pixel:p{0,0}]' info:` })
+    // console.log(result);
+    expect(result.exitCode).toBe(0)
+    expect(result.stderr.join('\n')).toContain("UnableToOpenConfigureFile `colors.xml")
+
+
+    // const colors = await buildInputFile('colors.xml')
+    // const configFolders = await getConfigureFolders()
+    // colors.name = '/home/web_user/.config/ImageMagick/colors.xml'
+
+    result = await execute(`ls /home/`)
+    // console.log('ls', result);
+    expect(result.stdout).toContain('web_user')
+
+    result = await execute(`ls /home/web_user/.config`)
+    expect(result.exitCode).toBe(0)
+    // console.log('ls', result);
+    // colors.name = `${configFolders[0]}/colors.xml`
+    // console.log(colors.name);
+
+    // result = await execute({ inputFiles: [colors], commands: `writeFiles` })
+    // console.log('writeFiles', result);
+    // expect(result.exitCode).toBe(0)
+
+
+    // result = await execute({ inputFiles: [], commands: `readFile ${colors.name}` })
+    // console.log('readFile', result);
+    // expect(result.exitCode).toBe(0)
+
+    result = await execute({ inputFiles: [await buildInputFile('fn.png')], commands: `convert -debug configure logo: -format '%[pixel:p{0,0}]' info:` })
+    // console.log(result);
+    expect(result.exitCode).toBe(0)
+    expect(result.stderr.join('\n')).not.toContain("UnableToOpenConfigureFile `colors.xml")
+
+    // expect(result.stderr.length).toBe(0)
+    // expect(result.stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
+    // expect(result.stderr.join('\n')).toBeUndefined()
+    done()
+  })
+
+
+
+  })
+
+
+})

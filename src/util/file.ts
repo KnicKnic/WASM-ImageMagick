@@ -1,6 +1,7 @@
 import { MagickInputFile, MagickOutputFile, MagickFile } from '..'
+import { execute } from '../execute'
 
-export function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
+function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
   return new Promise(resolve => {
     const fileReader = new FileReader()
     fileReader.onload = event => {
@@ -22,6 +23,37 @@ export function blobToString(blb: Blob): Promise<string> {
   })
 }
 
+export function isInputFile(file: MagickFile): file is MagickInputFile {
+  return !!(file as MagickInputFile).content
+}
+export function isOutputFile(file: MagickFile): file is MagickOutputFile {
+  return !!(file as MagickOutputFile).blob
+}
+
+function uint8ArrayToString(arr: Uint8Array, charset: string = 'utf-8'): string {
+  return new TextDecoder(charset).decode(arr)
+}
+
+/**
+ * Read files as string. Useful when files contains plain text like in the output file info.txt of `convert logo: -format '%[pixel:p{0,0}]' info:info.txt`
+ */
+export async function readFileAsText(file: MagickFile): Promise<string> {
+  if (isInputFile(file)) {
+    return uint8ArrayToString(file.content)
+  }
+  if (isOutputFile(file)) {
+    return await blobToString(file.blob)
+  }
+}
+
+export async function isImage(file: MagickFile): Promise<boolean> {
+  const {exitCode} = await execute({inputFiles: [await asInputFile(file)], commands: `identify ${file.name}`})
+  return exitCode === 0
+}
+/**
+ * Builds a new {@link MagickInputFile} by fetching the content of given url and optionally naming the file using given name
+ * or extracting the file name from the url otherwise.
+ */
 export async function buildInputFile(url: string, name: string = getFileName(url)): Promise<MagickInputFile> {
   const fetchedSourceImage = await fetch(url)
   const arrayBuffer = await fetchedSourceImage.arrayBuffer()
@@ -29,36 +61,46 @@ export async function buildInputFile(url: string, name: string = getFileName(url
   return { name, content }
 }
 
-export function uint8ArrayToBlob(arr: Uint8Array): Blob {
+function uint8ArrayToBlob(arr: Uint8Array): Blob {
   return new Blob([arr])
 }
 
-export async function outputFileToInputFile(file: MagickOutputFile, name: string = file.name): Promise<MagickInputFile> {
+async function outputFileToInputFile(file: MagickOutputFile, name: string = file.name): Promise<MagickInputFile> {
   return {
     name,
     content: await blobToUint8Array(file.blob),
   }
 }
 
-export function inputFileToOutputFile(file: MagickInputFile, name: string = file.name): MagickOutputFile {
+function inputFileToOutputFile(file: MagickInputFile, name: string = file.name): MagickOutputFile {
   return {
     name,
     blob: uint8ArrayToBlob(file.content),
   }
 }
 
-export async function asInputFile(f: MagickFile): Promise<MagickInputFile> {
-  if ((f as MagickOutputFile).blob) {
-    return await outputFileToInputFile(f as MagickOutputFile)
+export async function asInputFile(f: MagickFile, name: string = f.name): Promise<MagickInputFile> {
+  let inputFile: MagickInputFile
+  if (isOutputFile(f)) {
+    inputFile = await outputFileToInputFile(f)
   }
-  return f as MagickInputFile
+  else {
+    inputFile = f as MagickInputFile
+  }
+  inputFile.name = name
+  return inputFile
 }
 
-export async function asOutputFile(f: MagickFile): Promise<MagickOutputFile> {
-  if ((f as MagickInputFile).content) {
-    return await inputFileToOutputFile(f as MagickInputFile)
+export async function asOutputFile(f: MagickFile, name: string = f.name): Promise<MagickOutputFile> {
+  let outputFile: MagickOutputFile
+  if (isInputFile(f)) {
+    outputFile = inputFileToOutputFile(f)
   }
-  return f as MagickOutputFile
+  else {
+    outputFile = f as MagickOutputFile
+  }
+  outputFile.name = name
+  return outputFile
 }
 
 export function getFileName(url: string): string {
@@ -71,7 +113,6 @@ export function getFileName(url: string): string {
     } catch (error) {
       return url
     }
-    return url
   }
 }
 export function getFileNameExtension(filePathOrUrl: string) {

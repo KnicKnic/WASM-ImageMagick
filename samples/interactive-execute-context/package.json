@@ -1,0 +1,38 @@
+{
+  "name": "interactive-execute-context",
+  "version": "1.0.0",
+  "description": "html page that let the user enter commands and store/show files so they can be reused in later commands. Shows a collection of command examples using different command syntaxes",
+  "main": "dist/index.js",
+  "scripts": {
+    "all": "npm run clean && npm run build && npm run copy",
+    "build": "tsc && npm run bundle",
+    "bundle": "browserify dist/index.js -o static/bundle.js",
+    "copy": "here=`pwd` && cd ../.. && npm run copy && cd $here && cp -r ../../spec/assets/fn.png ../../spec/assets/magick.* src/static/* static",
+    "clean": "rm -rf dist static",
+    "start": "npm run all && npm run watch-all",
+    "server": "http-server static",
+    "watch-all": "concurrently 'npm run watch-build' 'npm run watch-server' ",
+    "watch-build": "onchange -v 'src/**/*' -- npm run build",
+    "watch-server": "onchange -i -k -v 'static/**/*' -- npm run server"
+  },
+  "keywords": [],
+  "author": "sg",
+  "license": "ISC",
+  "dependencies": {
+    "imagemagick-browser": "0.0.3",
+    "p-map": "^2.0.0",
+    "react": "^16.6.1",
+    "react-dom": "^16.6.1",
+    "typestyle": "^2.0.1",
+    "wasm-imagemagick": "file:../.."
+  },
+  "devDependencies": {
+    "http-server": "^0.11.1",
+    "onchange": "^5.1.0",
+    "@types/react": "^16.4.6",
+    "@types/react-dom": "^16.0.6",
+    "browserify": "^16.2.3",
+    "concurrently": "^4.0.1",
+    "typescript": "^3.1.6"
+  }
+}

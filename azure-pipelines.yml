@@ -1,65 +1,22 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
 
-- script: |
-   echo "original node version `node -v`" 
-   echo "original npm version `npm -v`"
-   sudo npm i -g n    
-   sudo n latest
-   echo "installed latest node version `node -v`"
-   echo "installed latest npm version `npm -v`" 
-  displayName: install node latest
+- task: NodeTool@0
+  inputs:
+    versionSpec: '11.x'
 
-- script: |
-   echo "npm install with node version `node -v`"
-   echo "npm install with npm version `npm -v`" 
-   npm install
-  displayName: npm install
-
-# - script: |
-#    cd tests/rotate
-#    docker run -v "$PWD":/code --rm --workdir /code node node  /code/node.js
-#  displayName: test wasm with nodejs
+- script: npm install
+  displayName: install and build
 
 - script: npm test
-  displayName: run tests
-  
-
-- script: npm run test-browser
-  displayName: run tests in browser
-
+  displayName: test
 
 - script: cp magick* $(Build.ArtifactStagingDirectory)
   displayName: cp magick files to artifact staging directory
   
-# # Below doesn't work due to error 
-# # Unhandled: Failed find: ENOENT: no such file or directory, stat '/home/vsts/work/1/s/libpng/compile'
-# Copy Files
-# Copy files from source folder to target folder using match patterns (The match patterns will only match file paths, not folder paths)
-#- task: CopyFiles@2
-#  inputs:
-#    #sourceFolder: # Optional
-#    contents: 'magick*' 
-#    targetFolder: $(Build.ArtifactStagingDirectory)
-#    #cleanTargetFolder: false # Optional
-#    #overWrite: false # Optional
-#    #flattenFolders: false # Optional
-
-# Publish Build Artifacts
-# Publish build artifacts to Azure Artifacts/TFS or a file share
 - task: PublishBuildArtifacts@1
   continueOnError: true
   inputs:
-    #pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
     artifactName: 'magick' 
-    #publishLocation: 'Container' # Options: container, filePath
-    #targetPath: # Required when publishLocation == FilePath
-    #parallel: false # Optional
-    #parallelCount: # Optional

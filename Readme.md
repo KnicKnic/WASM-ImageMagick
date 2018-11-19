@@ -1,8 +1,40 @@
 # Web assembly ImageMagick [![Build Status](https://dev.azure.com/oneeyedelf1/wasm-imagemagick/_apis/build/status/KnicKnic.WASM-ImageMagick)](https://dev.azure.com/oneeyedelf1/wasm-imagemagick/_build/latest?definitionId=1)
 This project is not affiliated with [ImageMagick](https://www.imagemagick.org) , but is merely recompiling the code to be [WebAssembly](https://webassembly.org/). I did this because I want to bring the power of ImageMagick to the browser.
 
+**Table of Contents**
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+- [Demos and examples](#demos-and-examples)
+- [Status](#status)
+  - [Image formats supported](#image-formats-supported)
+  - [Features **not** supported](#features-not-supported)
+- [API](#api)
+  - [High level API and utilities](#high-level-api-and-utilities)
+  - [Accessing stdout, stderr, exitCode](#accessing-stdout-stderr-exitcode)
+  - [low-level example](#low-level-example)
+- [Importing the library in your project](#importing-the-library-in-your-project)
+  - [With npm](#with-npm)
+  - [Loading directly from html file](#loading-directly-from-html-file)
+    - [Importing it as JavaScript standard module:](#importing-it-as-javascript-standard-module)
+    - [Using the UMD bundle in AMD projects (requirejs)](#using-the-umd-bundle-in-amd-projects-requirejs)
+    - [Using the UMD bundle without libraries](#using-the-umd-bundle-without-libraries)
+- [Build instructions](#build-instructions)
+- [Run tests](#run-tests)
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 ## Demos and examples
+
+ * Basic playground (React & TypeScript project): [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59).
+
+ * Image Diff Example (React & TypeScript project): [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z).
+
+ * [Interactive execute context demo](https://cancerberosgx.github.io/demos/WASM-ImageMagick/interactive-execute-context/). Add images, execute commands using different syntaxes, manage and reuse output/input images, and choose commands examples to learn ImageMagick. [Project lives here](./samples/interactive-execute-context)
+
+ * [Playground with several transformation examples and image formats](https://cancerberosgx.github.io/autumn-leaves/#/convertDemo). It also shows the output of transformations made with ImageMagick in the browser to verify wasm-imagemagick output the right thing.  
+
+ * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
 
  * Simple example. See [samples/rotate#code](samples/rotate#code). A simple webpage that has image in array and loads magickApi.js to rotate file. Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
 
@@ -12,73 +44,39 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
  * Used in [Croppy](https://knicknic.github.io/croppy/) to split webcomics from one long vertical strip into many panels.
     * For code see https://github.com/KnicKnic/croppy.
 
- * Basic playground (React & TypeScript project): [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59).
-
- * Image Diff Example (React & TypeScript project): [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z).
-
- * [Playground with several transformation examples and image formats](https://cancerberosgx.github.io/autumn-leaves/#/convertDemo). It also shows the output of transformations made with ImageMaick in the browser to verify wasm-imagemagick output the right thing.  
-
- * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
 
 
 ## Status
 
 ### Image formats supported
 
-Supports PNG, TIFF, JPEG, + Native ImageMagick such as BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/)
+Supports PNG, TIFF, JPEG, BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/), and more! 
+
+See a list of known supported formats in this [demo](https://cancerberosgx.github.io/demos/WASM-ImageMagick/supported-formats/)
 
 ### Features **not** supported 
 
  * [Text](https://www.imagemagick.org/Usage/text/)
  * [Fourier Transforms](https://www.imagemagick.org/Usage/fourier/)
+ * Formats not listed above, particularly webp.
+ 
 
 
-## Usage with npm
+## API
 
-```sh
-npm install --save wasm-imagemagick
-```
+### Reference API Documentation
 
-Use the low-level `Call()` API:
+[Reference API Documentation](./apidocs)
 
-```js
-import { Call } from 'wasm-imagemagick'
-
-// fetch the input image and get its content bytes
-const fetchedSourceImage = await fetch("rotate.png")
-const sourceBytes = new Uint8Array(await fetchedSourceImage.arrayBuffer());
-
-// calling ImageMagick with one source image, and command to rotate & resize image
-const inputFiles = [{ 'name': 'srcFile.png', 'content': sourceBytes }]
-const command = ["convert", "srcFile.png", '-rotate', '90', '-resize', '200%', 'out.png']
-const processedFiles = await Call(inputFiles, command)
-
-// response can be multiple files (example split) here we know we just have one
-const firstOutputImage = processedFiles[0]
-
-// create a html image element to show the output image:
-const outputImage = document.getElementById('rotatedImage')
-outputImage.src = URL.createObjectURL(firstOutputImage.blob)
-console.log('created image ' + firstOutputImage.name)
-```
-
-And **don't forget to copy `magick.wasm` and `magick.js`** files to the folder where index.html is being served:
-
-```sh
-cp node_modules/wasm-imagemagick/dist/magick.wasm .
-cp node_modules/wasm-imagemagick/dist/magick.js .
-```
-
-You can then use browserify, tsc, webpack, rollup, etc to build a bundle.js file from previous example.
 
 ### High level API and utilities
 
-`wasm-imagemagick` comes with some easy to use APIs for creating image files from urls, executing multiple commands reusing output imges and nicer command syntax, and utilities to handle html images, image comparission, metadata extraction,  etc. The following example is equivalent to the previous using these APIs: 
+`wasm-imagemagick` comes with some easy to use APIs for creating image files from urls, executing multiple commands reusing output images and nicer command syntax, and utilities to handle files, html images, input elements, image comparison, metadata extraction, etc. Refer to [API Reference Documentation](./apidocs) for details.
 
 ```ts
 import { buildInputFile, execute, loadImageElement } from 'wasm-imagemagick'
- 
-const {outputFiles} = await execute({
+
+const { outputFiles, exitCode} = await execute({
   inputFiles: [await buildInputFile('http://some-cdn.com/foo/fn.png', 'image1.png')],
   commands: [
     'convert image1.png -rotate 70 image2.gif',
@@ -86,37 +84,128 @@ const {outputFiles} = await execute({
     'convert image2.gif -scale 23% image3.jpg',
   ],
 })
-await loadImageElement(outputFiles[0], document.getElementById('transformedImage'))
+if(exitCode !== 0)
+    await loadImageElement(outputFiles[0], document.getElementById('outputImage'))
 ```
 
-## Using it directly from the HTML file
+### Accessing stdout, stderr, exitCode
 
-If you are not working in a npm development environment you can still load the library with the following code by placing these three files next to your index.html: `magick.js`, `magick.wasm` and `magickApi.js` : 
+This other example executes `identify` command to extract information about an image. As you can see, we access `stdout` from the execution result and check for errors using `exitCode` and `stderr`: 
+
+```ts
+import { buildInputFile, execute } from 'wasm-imagemagick'
+
+const { stdout, stderr, exitCode } = await execute({
+    inputFiles: [await buildInputFile('foo.gif')], 
+    commands: `identify foo.gif`
+})
+if(exitCode === 0) 
+    console.log('foo.gif identify output: ' + stdout.join('\n'))
+else 
+    console.error('foo.gif identify command failed: ' + stderr.join('\n'))
+```
+
+### low-level example
+
+As demonstration purposes, the following example doesn't use any helper provided by the library, only the low level `call()` function which only accept one command, in array syntax only:
 
 ```js
+import { call } from 'wasm-imagemagick'
+
+// build an input file by fetching its content
+const fetchedSourceImage = await fetch("assets/rotate.png")
+const content = new Uint8Array(await fetchedSourceImage.arrayBuffer());
+const image = { name: 'srcFile.png', content }
+
+const command = ["convert", "srcFile.png", '-rotate', '90', '-resize', '200%', 'out.png']
+const result = await call([image], command)
+
+// is there any errors ?
+if(result.exitCode !== 0)
+    return alert('There was an error: ' + result.stderr.join('\n'))
+
+// response can be multiple files (example split) here we know we just have one
+const outputImage = result.processedFiles[0]
+
+// render the output image into an existing <img> element
+const outputImage = document.getElementById('outputImage')
+outputImage.src = URL.createObjectURL(outputImage.blob)
+outputImage.alt = outputImage.name
+```
+
+
+## Importing the library in your project
+
+### With npm
+
+```sh
+npm install --save wasm-imagemagick
+```
+
+**IMPORTANT:  
+
+**Don't forget to copy `magick.wasm` and `magick.js`** files to the folder where your `index.html` is being served:
+
+```sh
+cp node_modules/wasm-imagemagick/dist/magick.wasm .
+cp node_modules/wasm-imagemagick/dist/magick.js .
+```
+
+Then you are ready to import the library in your project like this: 
+
+```ts
+import { execute} from 'wasm-imagemagick'
+```
+
+or like this if you are not using standard modules:
+
+```ts
+const execute = require('wasm-imagemagick').execute
+```
+
+
+### Loading directly from html file
+
+If you are not working in a npm development environment you can still load the library bundle .js file. It supports being imported as JavaScript standard module or as a UMD module. Again, don't forget to copy `magick.js`, `magick.wasm` in the same folder as your html file.:
+
+
+#### Importing it as JavaScript standard module: 
+
+```html
 <script type="module">
-import * as Magick from './magickApi.js'
-// ... same snippet as before
+    import { execute, loadImageElement, buildInputFile } from '../../dist/bundles/wasm-imagemagick.esm-es2018.js'
+    // ... same snippet as before
 </script>
 ```
 
-### Usage Details
+[Working example source code](./tests/bundles/esm-test.html)
 
-1. import magickApi.js in a javascript module
-1. call "Call" in the module
-    1. Pass in 2 parameters, 
-        1. an array of objects 
-            1. name:"filename" 
-            1. blob: new Uint8Array(contents)
-        1. array of magick cmdline args
-    1. example: `Call([{name: "filenamestring", blob: new Uint8Array(imageContents)}], ["mogrify", "-thumbnail", "10%", "*"])`
-1. get promise 
-    1. on Success an array of objects
-        1. name: "filename" 
-        1. blob: new Blob(contents)
-    1. on error a string
 
-For working sample code see [samples/rotate](samples/rotate)
+#### Using the UMD bundle in AMD projects (requirejs)
+
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script src="../../dist/bundles/wasm-imagemagick.umd-es5.js"></script>
+<script>
+require(['wasm-imagemagick'], function (WasmImagemagick) {
+    const { execute, loadImageElement, buildInputFile } = WasmImagemagick
+    // ... same snippet as before
+```
+
+[Working example source code](./tests/bundles/umd-test-requirejs.html)
+
+
+#### Using the UMD bundle without libraries
+
+```html
+<script src="../../dist/bundles/wasm-imagemagick.umd-es5.js"></script>
+<script>
+    const { execute, loadImageElement, buildInputFile } = window['wasm-imagemagick']
+    // ... same snippet as before
+```
+
+[Working example source code](./tests/bundles/umd-test-nolibrary.html)
+
 
 
 ## Build instructions
@@ -141,6 +230,12 @@ Note: `npm run build` will perform all the previous commands plus compiling the 
 
 ## Run tests
 
-`npm test` will run some tests with nodejs located at `./tests/rotate`.
+`npm test` will run all the tests.
 
-`npm run test-browser` will run spec in a headless chrome browser. This tests are located at `./spec/`.
+`npm run test-browser` will run spec in a headless chrome browser. These tests are located at `./spec/`. 
+
+`npm run test-browser-server` will serve the test so you can debug them with a browser. 
+
+`npm run test-browser-start` will run the server and start watching for file changes, recompile and restart the server for agile development.
+
+`npm test-node` will run some tests with nodejs located at `./tests/rotate`.

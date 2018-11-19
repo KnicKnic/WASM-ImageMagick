@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es5",
+    "rootDir": "src",
+    "lib": [
+      "dom",
+      "es2015"
+    ],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "stripInternal": true,
+    "outDir": "dist/esm5",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "importHelpers": true,
+  },
+  "exclude": [
+    "spec", "samples", "scripts"
+  ]
+}

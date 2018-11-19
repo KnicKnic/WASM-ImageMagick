@@ -20,4 +20,18 @@ export default describe('imageHome', () => {
     expect(all.find(f => f.name === 'holocaust.jpg')).toBeTruthy()
     done()
   })
+
+  it('should addBuiltInImages()', async done => {
+
+    const imageHome = createImageHome()
+    let all = await imageHome.getAll()
+    expect(all.find(i => i.name === 'rose:')).toBeUndefined()
+    // const builtIn = await context.addBuiltInImages()
+    // expect(builtIn.find(i => i.name === 'rose:')).toBeDefined()
+    await imageHome.addBuiltInImages()
+    all = await imageHome.getAll()// .getAllFiles()
+    expect(all.find(i => i.name === 'rose:')).toBeDefined()
+    done()
+  })
+
 })

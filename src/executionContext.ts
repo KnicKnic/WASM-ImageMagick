@@ -1,55 +1,90 @@
-import { ImageHome } from '.'
-import { ExecuteConfig, ExecuteResult, execute, ExecuteCommand } from './execute'
-import { createImageHome } from './imageHome'
-import { MagickInputFile, MagickFile } from './magickApi'
-import fileSpec from '../spec/util/fileSpec'
+import { createImageHome, execute, ExecuteCommand, ExecuteConfig, ExecuteResult, ImageHome, MagickFile, MagickInputFile } from '.'
+import { asExecuteConfig } from './execute'
 
 /**
- * Allow multiple execute() calls remembering previus execute() generated output files and previous given input files that can be used as input files in next calls.
+ * Allow multiple execute() calls remembering previous execute() generated output files and previous given input files that
+ * can be used as input files in next calls.
  */
 export interface ExecutionContext {
-  execute(configOrCommands: ExecuteConfig|ExecuteCommand|string): Promise<ExecuteResult>
-  addFiles(files: MagickFile[]): void
-  getAllFiles(): Promise<MagickInputFile[]>
-}
+  /**
+   * This behaves almost the same as [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute).
+   */
+  execute(configOrCommands: ExecuteConfig | ExecuteCommand | string): Promise<ExecuteResult>
 
-export function newExecutionContext(inheritFrom?: ExecutionContext): ExecutionContext {
-  return ExecutionContextImpl.create(inheritFrom)
+  /**
+   * Programmatically add new files so they are available if following `execute()` calls.
+   */
+  addFiles(files: MagickFile[]): void
+
+  /**
+   * Get all the files currently available in this context.
+   */
+  getAllFiles(): Promise<MagickInputFile[]>
+
+  /**
+   * Add ImageMagick built-in images like `rose:`, `logo:`, etc to this execution context so they are present in `getAllFiles()`.
+   */
+  addBuiltInImages(): Promise<void>
+
+  /**
+   * Get a file by name or undefined if none.
+   */
+  getFile(name: string): Promise<MagickInputFile|undefined>
+
+  /**
+   * Remove files by name.
+   * @returns the files actually removed.
+   */
+  removeFiles(names: string[]): MagickInputFile[]
 }
 
 class ExecutionContextImpl implements ExecutionContext {
+
   constructor(private imageHome: ImageHome = createImageHome()) {
   }
-  async execute(configOrCommands: ExecuteConfig|ExecuteCommand|string): Promise<ExecuteResult> {
-    const config = asConfig(configOrCommands)
+
+  async execute(configOrCommands: ExecuteConfig | ExecuteCommand | string): Promise<ExecuteResult> {
+    const config = asExecuteConfig(configOrCommands)
     config.inputFiles.forEach(f => {
       this.imageHome.register(f)
     })
     const inputFiles = await this.imageHome.getAll()
-    const result = await execute({...config, inputFiles})
+    const result = await execute({ ...config, inputFiles })
     result.outputFiles.forEach(f => {
       this.imageHome.register(f)
     })
     return result
   }
+
   addFiles(files: MagickFile[]) {
     files.forEach(f => this.imageHome.register(f))
   }
+
   async getAllFiles(): Promise<MagickInputFile[]> {
-    return this.imageHome.getAll()
+    return await this.imageHome.getAll()
   }
+
+  async getFile(name: string): Promise<MagickInputFile> {
+    return await this.imageHome.get(name)
+  }
+
+  async addBuiltInImages() {
+    return this.imageHome.addBuiltInImages()
+  }
+
+  removeFiles(names: string[]): MagickInputFile[] {
+    return this.imageHome.remove(names)
+  }
+
   static create(inheritFrom?: ExecutionContext) {
     if (inheritFrom && !(inheritFrom as ExecutionContextImpl).imageHome) {
-      throw new Error('Dont know how to inherith from other ExecutionContext implementation than this one')
+      throw new Error('Dont know how to inherit from other ExecutionContext implementation than this one')
     }
     return new ExecutionContextImpl(inheritFrom && (inheritFrom as ExecutionContextImpl).imageHome)
   }
+
 }
 
-function asConfig(configOrCommands: ExecuteConfig|ExecuteCommand|string): ExecuteConfig {
-  if (typeof configOrCommands === 'string') {
-    return {inputFiles: [], commands: [configOrCommands]}
-  }
-  return (configOrCommands as ExecuteConfig).inputFiles ? (configOrCommands as ExecuteConfig) :
-  ({commands: configOrCommands as ExecuteCommand, inputFiles: ([] as MagickInputFile[])} as ExecuteConfig)
+export function newExecutionContext(inheritFrom?: ExecutionContext): ExecutionContext {
+  return ExecutionContextImpl.create(inheritFrom)
 }
