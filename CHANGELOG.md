@@ -11,7 +11,7 @@
  * source code ported to TypeScript
  * Types for input files, output files
 
-## 1.2.0 (not published yet)
+## 1.2.0 published yet
 
  * src/util with utilities for 
    * working with magick files, 
