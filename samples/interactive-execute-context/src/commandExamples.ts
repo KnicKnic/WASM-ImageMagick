@@ -17,19 +17,19 @@ export const commandExamples: Example[] = [
   },
 
 
-{
-  name: '-print all image info',
-  description: `prints all properties artifacts and options of the image using -print and formatting the output`,
-  command: `
+  {
+    name: '-print all image info',
+    description: `prints all properties artifacts and options of the image using -print and formatting the output`,
+    command: `
 convert $$IMAGE_0 \\
   -print '\\n__Properties__\\n\\n%[*]\\nsesba\\n\\nsa\\n' \\
   -print '\\n__Artifacts__\\n\\n%[artifact:*]' \\
   -print '\\n__Options__\\n\\n%[option:*]\\n' \\
 info:
 `.trim(),
-},
+  },
 
-  
+
 
   {
     name: 'extract pixel color',
@@ -42,7 +42,7 @@ info:
     description: `extract image information in json format and store it in output file roseinfo.json`,
     command: `convert rose: $$UNIQUE_NAME.json  `.trim(),
   },
-  
+
 
 
 
@@ -126,7 +126,7 @@ montage \\
   $$UNIQUE_NAME.pdf
   `.trim(),
   },
-  
+
 
 
   {
@@ -144,7 +144,7 @@ convert $$IMAGE_0 -alpha set  -virtual-pixel transparent -channel RGBA \\
   `.trim(),
   },
 
-  
+
   {
     name: 'Spherical Distortion Map',
     description: `https://imagemagick.org/Usage/mapping/#spherical`,
@@ -267,18 +267,18 @@ convert -size 100x100 xc: +noise Random -separate \\
 `.trim(),
   },
 
-  {
-    name: 'radial flare',
-    description: `the width of the initial image before polar distorting, basically sets the number of rays that will be produced`,
-    command: `
-    convert -size 100x1 xc: +noise Random -channel G -separate +channel \\
-    -scale 100x100!                                +write flare_1a.png \\
-    \( -size 100x100 gradient:gray(100%) -sigmoidal-contrast 10x50% \) \\
-    -colorspace sRGB -compose hardlight -composite  +write flare_1b.png \\
-    -virtual-pixel HorizontalTileEdge -distort Polar -1 \\
-    flare_1_final.png
-`.trim(),
-  },
+//   {
+//     name: 'radial flare',
+//     description: `the width of the initial image before polar distorting, basically sets the number of rays that will be produced`,
+//     command: `
+//     convert -size 100x1 xc: +noise Random -channel G -separate +channel \\
+//     -scale 100x100!                                +write flare_1a.png \\
+//     \( -size 100x100 gradient:gray(100%) -sigmoidal-contrast 10x50% \) \\
+//     -colorspace sRGB -compose hardlight -composite  +write flare_1b.png \\
+//     -virtual-pixel HorizontalTileEdge -distort Polar -1 \\
+//     flare_1_final.png
+// `.trim(),
+//   },
 
 
   {
@@ -318,8 +318,8 @@ sampleCommandTemplates.forEach(template => {
       const img = inputFiles[0]
       const info = await extractInfo(img)
       const context = { ...template.defaultTemplateContext, imageWidth: info[0].image.geometry.width, imageHeight: info[0].image.geometry.height }
-      const command = template.template(context)[0].map(s => s === '$INPUT' ? img.name : s === '$OUTPUT' ? `output${selectExampleCounter++}.png` : s)
-      return command
+      const result = template.template(context)
+      return result.map(r => r.map(s => s === '$INPUT' ? img.name : s === '$OUTPUT' ? `output${selectExampleCounter++}.png` : s))
     },
   }
   commandExamples.push(example)
