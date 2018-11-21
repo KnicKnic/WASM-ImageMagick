@@ -606,7 +606,7 @@ stars_colored.gif
   {
     name: 'stars animation',
     description: `By combining the above with a plasma glitter animation you can make set of stars that look like christmas decorations.`,
-    tags: [ExampleTag.animation]
+    tags: [ExampleTag.animation],
     command: `
 convert -size 200x200 xc: +noise Random -separate \\
   null: \\
@@ -655,7 +655,7 @@ convert -size 200x200 xc: +noise Random -separate \\
 //     \( -size 1x50 xc:gray(0) \\
 //        -size 1x1 xc:gray(50%) \\
 //        -size 1x49 xc:gray(0) \\
-//        -append -blur 0x2 -scale 100x100! \) \\
+//        -append -blur 0x2 -scale 100x100! \) \\ 
 //     -scene 10 +write flare_2%x.png \\
 //     -background gray(0) -compose screen -flatten +write flare_2f.png \\
 //     -virtual-pixel HorizontalTileEdge -distort Polar -1 \\

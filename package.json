@@ -55,6 +55,7 @@
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
     "@types/jasmine": "^2.8.11",
+    "@types/minimatch": "^3.0.3",
     "@types/node": "^10.12.3",
     "@types/shelljs": "^0.8.0",
     "browserify": "^16.2.3",
@@ -84,7 +85,7 @@
     "webpack-config-utils": "^2.3.1"
   },
   "dependencies": {
-    "p-map": "^2.0.0",
-    "shell-parse": "0.0.2"
+    "minimatch": "^3.0.4",
+    "p-map": "^2.0.0"
   }
 }

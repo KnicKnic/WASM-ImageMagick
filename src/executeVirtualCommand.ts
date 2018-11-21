@@ -2,6 +2,7 @@ import pMap from 'p-map'
 import { execute, ExecuteResult } from './execute'
 import { MagickInputFile, MagickOutputFile } from './magickApi'
 import { asInputFile, asOutputFile, buildInputFile, readFileAsText, unquote, values } from './util'
+import * as Minimatch from 'minimatch';
 
 // TODO: variable declaration
 
@@ -37,11 +38,14 @@ registerVirtualCommand({
     return c.command[0] === 'ls'
   },
   async execute(c: VirtualCommandContext): Promise<ExecuteResult> {
-    const file = c.files[c.command[1]]
+    const target = unquote(c.command[1])
+    const stdout = Object.keys(c.files).filter(f => Minimatch(f, target))
     const result: ExecuteResult = {
-      stderr: file ? [] : [`${c.command[1]} file not found`],
-      stdout: file ? [file.name] : [],
-      exitCode: file ? 0 : 1, outputFiles: [], command: c.command, commands: [c.command], inputFiles: values(c.files), results: [],
+      stderr: target.includes('*') ? [] : stdout.length ? [] : [target + ' not found.'],
+      stdout,
+      exitCode: target.includes('*') ? 0 : stdout.length > 0 ? 0 : 1, outputFiles: [],
+      command: c.command, commands: [c.command],
+      inputFiles: values(c.files), results: [],
     }
     result.results = [result]
     return result
@@ -54,12 +58,13 @@ registerVirtualCommand({
     return c.command[0] === 'cat'
   },
   async execute(c: VirtualCommandContext): Promise<ExecuteResult> {
-    const file = c.files[c.command[1]]
+    const target = unquote(c.command[1])
+    const stdout = await pMap(Object.keys(c.files).filter(f => Minimatch(f, target)), f => readFileAsText(c.files[f]))
     const result: ExecuteResult = {
-      stderr: file ? [] : [`${c.command[1]} file not found`],
+      stderr: target.includes('*') ? [] : stdout.length ? [] : [target + ' not found.'],
       results: [], commands: [c.command],
-      stdout: file ? [await readFileAsText(file)] : [],
-      exitCode: file ? 0 : 1,
+      stdout,
+      exitCode: target.includes('*') ? 0 : stdout.length > 0 ? 0 : 1,
       outputFiles: [], command: c.command, inputFiles: values(c.files),
     }
     result.results = [result]
@@ -76,6 +81,10 @@ registerVirtualCommand({
     const { fixedCommand, substitution } = resolveCommandSubstitution(c.command)
     const files = values(c.files)
     const result = await execute({ inputFiles: files, commands: [substitution.command] })
+    if(result.stdout.length){
+
+      result.stdout[result.stdout.length-1] = result.stdout[result.stdout.length-1]+substitution.rest
+    }
     fixedCommand.splice(substitution.index, 0, result.stdout.join('\n'))
     const result2 = await execute({ inputFiles: files.concat(await pMap(result.outputFiles, f => asInputFile(f))), commands: [fixedCommand] })
     return {
@@ -86,15 +95,21 @@ registerVirtualCommand({
   },
 })
 
-function resolveCommandSubstitution(command: string[]): { fixedCommand: string[], substitution: { index: number, command: string[] } } {
+function resolveCommandSubstitution(command: string[]): { fixedCommand: string[], substitution: { index: number, command: string[], rest: string } } {
   const indexes = command.map((c, i) => c.startsWith('`') || c.endsWith('`') ? i : undefined).filter(c => typeof c !== 'undefined')
   if (!indexes.length) {
     return { fixedCommand: command, substitution: undefined }
   }
-  const substitution = command.slice(indexes[0], indexes[1] + 1).map(c => c.startsWith('`') ? c.substring(1, c.length) : c.endsWith('`') ? c.substring(0, c.length - 1) : c)
+  if(indexes.length===1){
+    indexes.push(indexes[0])
+  }
+  let rest = ''
+  let substitution = command.slice(indexes[0], indexes[1] + 1).map(c =>  (c.startsWith('`') && c.endsWith('`')) ? c.substring(1, c.length-1) :  (c.lastIndexOf('`')===0) ? c.substring(1, c.length) :( c.indexOf('`')===c.length-1)? c.substring(0, c.length - 1) : c.includes('`') ? (rest = c.substring(c.lastIndexOf('`'), c.length), c.substring(0,c.lastIndexOf('`'))) : c)
+  substitution = substitution.map(c=>c.replace(/`/g, ''))
+  rest = rest.replace(/`/g, '')
   const fixedCommand = command.map(s => s)
   fixedCommand.splice(indexes[0], indexes[1] + 1 - indexes[0])
-  return { fixedCommand, substitution: { index: indexes[0], command: substitution } }
+  return { fixedCommand, substitution: { index: indexes[0], command: substitution, rest } }
 }
 
 registerVirtualCommand({
@@ -116,6 +131,26 @@ registerVirtualCommand({
       command: c.command,
       exitCode: 0,
       stderr, stdout: outputFiles.length ? [unquote(outputFiles[0].name)] : [],
+      inputFiles: values(c.files), results: [],
+    }
+    return { ...result, results: [result] }
+
+  },
+})
+
+let uniqueNameCounter = 0
+registerVirtualCommand({
+  name: 'uniqueName',
+  predicate(c: VirtualCommandContext): boolean {
+    return c.command[0] === 'uniqueName'
+  },
+  async execute(c: VirtualCommandContext): Promise<ExecuteResult> {
+    const result: ExecuteResult = {
+      outputFiles: [],
+      commands: [c.command],
+      command: c.command,
+      exitCode: 0,
+      stderr: [], stdout: ['unique_' + (uniqueNameCounter++)],
       inputFiles: values(c.files), results: [],
     }
     return { ...result, results: [result] }
