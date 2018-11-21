@@ -2,7 +2,7 @@ import {
   blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, getFileName, asInputFile,
   asOutputFile, executeAndReturnOutputFile, isImage, readFileAsText, getPixelColor, getBuiltInImages, getBuiltInImage
 } from '../../src'
-import { showImages } from '../testUtil';
+import { showImages, absolutize } from '../testUtil';
 
 export default describe('util/file', () => {
 
@@ -30,12 +30,11 @@ export default describe('util/file', () => {
     })
 
     it('should work with absolute url and query params', async done => {
-      await test(`${window.location.protocol}//${window.location.host}/fn.png`)
-      await test(`${window.location.protocol}//${window.location.host}/fn.png?foo=999&shshs=hshshs`)
-      await test(`${window.location.protocol}//${window.location.host}/hello/../fn.png?foo=999&shshs=hshshs`)
+      await test(absolutize(`fn.png`))
+      await test(absolutize(`fn.png?foo=999&shshs=hshshs`))
+      await test(absolutize(`hello/../fn.png?foo=999&shshs=hshshs`))
       done()
     })
-
     it('error', async done => {
       buildInputFile('dontexists.png').then(()=>{expect('resolved').toBe('rejected'); done()}).catch(()=>{expect('rejected').toBe('rejected'); done()})
     })

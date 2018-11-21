@@ -24,3 +24,7 @@ export async function showDownloadLink(images: MagickFile[]): Promise<void> {
     return Promise.resolve()
   }, {concurrency: 1})
 }
+
+export function absolutize(s){
+  return `${window.location.protocol}//${window.location.host}/${s}`
+}

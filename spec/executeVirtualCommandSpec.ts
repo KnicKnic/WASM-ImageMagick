@@ -1,5 +1,5 @@
 import { buildInputFile, compare, execute, executeAndReturnOutputFile, executeOne, extractInfo, ExecuteCommand } from '../src'
-import { showImages } from './testUtil'
+import { showImages, absolutize } from './testUtil'
 
 export default describe('executeVirtualCommand', () => {
 
@@ -97,7 +97,7 @@ export default describe('executeVirtualCommand', () => {
     })
     it('buildInputFile from absolute url and custom name', async done => {
       const result = await execute(`
-         convert \`buildInputFile 'http://localhost:8888/fn.png' custom.png\` -rotate 22 out.gif
+         convert \`buildInputFile '${absolutize('fn.png')}' custom.png\` -rotate 22 out.gif
     `)
       expect(result.outputFiles[0].name).toBe('custom.png')
       expect(result.exitCode).toBe(0)
