@@ -225,7 +225,17 @@ docker run --rm -it --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools
 
 Produces `magick.js` & `magick.wasm` in the current folder.
 
-Note: `npm run build` will perform all the previous commands plus compiling the TypeScript project.
+Note: `npm install` or `npm run build` will perform all the previous commands plus compiling the TypeScript project.
+
+### Building using a local emscripten installation
+
+If you have emscripten installed locally and want to build the project using it, you can still do it with the command: 
+
+```sh
+export BUILD_WASM_LOCAL=-local && npm run build
+```
+
+Although this could be useful for testing, it's recommended to use docker to build the library.
 
 
 ## Run tests

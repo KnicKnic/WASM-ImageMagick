@@ -3,8 +3,8 @@
 The idea is that the user can put placeholders or wildcards in its execute commands to refer to existing images, to create unique names, etc.
 Done: refer to exiting images by index, refer to all images, create unique names
 TODO/ ideas :
- * if user / transformation defines some parameters then command able to access its values (user given). Imagine a command for extract pixel color that user gives x, y could be: 
- * 
+ * if user / transformation defines some parameters then command able to access its values (user given). Imagine a command for extract pixel color that user gives x, y could be:
+ *
  * be able to declare variables: imagine: commands: `
  * convert $$IMAGE_0 -format '%[pixel:p{$$USER_x, $$USER_y}]' info:$$UNIQUE_NAME.txt
 $$SET_VAR_backgroundColor=\`
@@ -13,10 +13,9 @@ $$SET_VAR_backgroundColor=\`
     `
   ]
 */
-import { MagickFile, MagickInputFile } from "../magickApi";
-import { isImage } from "./util/file";
-import { ExecuteConfig } from "./execute";
-
+import { MagickFile } from './magickApi'
+import { ExecuteConfig } from './execute'
+import { isImage } from './util/file'
 
 export interface CommandContext {
   commands: string[][],
@@ -36,7 +35,7 @@ export const defaultPlaceholders: CommandContextPlaceholders = {
   allImages: '$$ALLIMAGES',
   imageWidth: '$$IMAGE_WIDTH',
   imageHeight: '$$IMAGE_HEIGHT',
-  uniqueName: '$$UNIQUE_NAME'
+  uniqueName: '$$UNIQUE_NAME',
 }
 export function renderCommand(config: CommandContext): string[][] {
   const { commands, files, placeholders = defaultPlaceholders, defaultImage = files[0] } = config
@@ -53,10 +52,10 @@ export function renderCommand(config: CommandContext): string[][] {
         return getUniqueName(config, arg)
       }
       return arg
-    })
+    }),
   )
 
-  // add placeholders.allImageNames 
+  // add placeholders.allImageNames
   const allImageNames = files.map(f => isImage(f) ? f.name : false).filter(a => a) as string[]
   cmd.forEach(c => {
     const allIndexes = c.map((arg, i) => arg === allImages ? i : undefined).filter(arg => typeof arg !== 'undefined')
@@ -76,7 +75,7 @@ export async function  renderExecuteConfig(config: ExecuteContext): Promise<Exec
   return {...config}
 }
 
-export 
+export
 let counter = 0
 function getUniqueName(c: CommandContext, arg: string): string {
   const { commands, files, placeholders = defaultPlaceholders, defaultImage = files[0] } = c

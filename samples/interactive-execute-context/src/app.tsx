@@ -140,6 +140,10 @@ export class App extends React.Component<AppProps, AppState> {
             <label>Pretty JSON ? <input type='checkbox' onChange={this.prettyJSONChange.bind(this)}></input></label>
           </div>
           <div>
+            Final Command: 
+            <textarea className={this.styles.textarea} disabled={true} value={JSON.stringify(this.state.finalCommand)}></textarea>
+          </div>
+          <div>
             Or select one example
             <select disabled={this.state.files.length === 0} onChange={this.selectExampleChange.bind(this)}>
               {commandExamples.map(t =>

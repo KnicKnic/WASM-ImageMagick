@@ -67,7 +67,7 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
     args: command,
     requestNumber: magickWorkerPromisesKey,
   }
-  const promise = CreatePromiseEvent();
+  const promise = createCallPromise();
   (promise as any).command = command;
   (promise as any).inputFiles = inputFiles
   magickWorkerPromises[magickWorkerPromisesKey] = promise
@@ -86,7 +86,7 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
 
 type CallPromise = Promise<CallResult> & { resolve?: (CallResult) => void, reject?: any }
 
-function CreatePromiseEvent(): CallPromise {
+function createCallPromise(): CallPromise {
   let resolver
   const promise = new Promise(resolve => {
     resolver = resolve
@@ -95,7 +95,7 @@ function CreatePromiseEvent(): CallPromise {
   return promise
 }
 
-const magickWorker = new Worker('magick.js')
+const magickWorker = new Worker(typeof (window as any).WASMImageMagickWorkerPath === 'undefined' ? 'magick.js': (window as any).WASMImageMagickWorkerPath)
 
 const magickWorkerPromises: { [key: string]: CallPromise } = {}
 let magickWorkerPromisesKey = 1
