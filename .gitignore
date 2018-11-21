@@ -10,3 +10,4 @@ node_modules
 *.tgz
 /magickApi.js
 /buildLocal.sh
+llvm-lto3

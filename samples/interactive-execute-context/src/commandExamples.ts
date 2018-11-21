@@ -5,17 +5,23 @@ export interface Example {
   name: string
   description: string
   command: ExecuteCommand | ((images: MagickInputFile[]) => Promise<ExecuteCommand>)
+  tags?: ExampleTag[]
+}
+export enum ExampleTag {
+  animation,
+  info,
+  drawing,
+  gradient,
+  morph
 }
 
 export const commandExamples: Example[] = [
-
 
   {
     name: 'identify simple',
     description: `runs identify program to print to stdout image info`,
     command: `identify rose:`.trim(),
   },
-
 
   {
     name: '-print all image info',
@@ -29,7 +35,34 @@ info:
 `.trim(),
   },
 
-
+  {
+    name: 'animate_granularity',
+    description: `https://imagemagick.org/Usage/canvas/#granularity`,
+    command: `
+# Generate initial random image (also  granularity=0 image
+convert -size 150x150 xc: +noise random \\
+  # Ensure final image is 'tilable' makes results better too..
+  -virtual-pixel tile \\
+  # to speed things up - lets limit operaqtions to just the 'G' channel.
+  -channel G \\
+  # generate a sequence of images with varying granularity
+  \( -clone 0 -blur 0x0.5 \) \( -clone 0 -blur 0x0.65 \) \( -clone 0 -blur 0x0.845 \) \( -clone 0 -blur 0x1.0985 \) \( -clone 0 -blur 0x1.42805 \) \( -clone 0 -blur 0x1.85647 \) \( -clone 0 -blur 0x2.41341 \) \( -clone 0 -blur 0x3.13743 \) \( -clone 0 -blur 0x4.07866 \) \( -clone 0 -blur 0x5.30226 \) \( -clone 0 -blur 0x6.89294 \) \( -clone 0 -blur 0x8.96082 \) \( -clone 0 -blur 0x11.6491 \) \( -clone 0 -blur 0x15.1438 \) \( -clone 0 -blur 0x19.6869 \) \( -clone 0 -blur 0x25.593 \) \\
+  # normalize and separate a grayscale imag
+  -normalize -separate +channel \\
+  # separate black and white granules in equal divisions of black,gray,white
+  -ordered-dither threshold,3 \\
+  # Set intermedite frame animation delay and infinite loop cycle
+  -set delay 12 \\
+  # give a longer pause for the first image
+  \( -clone 0 -set delay 50 \) -swap 0 +delete \\
+  # give a longer pause for the last image
+  \( +clone -set delay 50 \) +swap +delete \\
+  # make it a patrol cycle (see Animation Modifications)
+  \( -clone -2-1 \) \\
+  # final image save
+  -loop 0 animated_granularity.gif
+`.trim(),
+  },
 
   {
     name: 'extract pixel color',
@@ -42,9 +75,6 @@ info:
     description: `extract image information in json format and store it in output file roseinfo.json`,
     command: `convert rose: $$UNIQUE_NAME.json  `.trim(),
   },
-
-
-
 
   {
     name: 'pulsing animation',
@@ -80,7 +110,6 @@ info:
     `.trim(),
   },
 
-
   {
     name: 'remove background color',
     description: `https://imagemagick.org/Usage/masking/#difference`,
@@ -94,12 +123,6 @@ convert $$IMAGE_0  boolean_mask.png \\
     differenceRemoveBackground.png
     `.trim(),
   },
-
-
-
-
-
-
 
   {
     name: 'simple append',
@@ -127,6 +150,284 @@ montage \\
   `.trim(),
   },
 
+  {
+    name: 'montage polaroid',
+    description: `https://www.imagemagick.org/Usage/montage/#overlap`,
+    command: `
+montage -size 400x400 null: $$ALLIMAGES null: \\
+  -auto-orient  -thumbnail 200x200 \\
+  -bordercolor Lavender -background black +polaroid -resize 30% \\
+  -gravity center -background none -extent 80x80 \\
+  -background SkyBlue -geometry -10+2  -tile x1  polaroid_overlap.jpg
+  `.trim(),
+  },
+  
+  {
+    name: 'drawing tests 2',
+    description: `https://www.imagemagick.org/Usage/scripts/generate_test`,
+    tags: [ExampleTag.drawing],
+    command: `
+convert -size 100x150 gradient: -rotate 90 \\
+  -sigmoidal-contrast 7x50% test_gradient.png
+
+# Create a semi-transparent rectangle of the gradient and flop it left-right
+convert -size 150x100 xc:black \\
+  -draw 'fill grey50  rectangle  8,8  142,92' +matte \\
+  test_gradient.png +swap -compose CopyOpacity -composite \\
+  -flop test_bgnd.png
+
+# Draw two overlaping circles and fill then with same (non-flopped) gradient.
+convert -size 150x100 xc:black \\
+  -draw 'fill white circle    40,50  40,12' \\
+  -draw 'fill white circle   110,50 110,12' +matte \\
+  test_gradient.png +swap -compose CopyOpacity -composite \\
+  test_fgnd.png
+
+# Create a rainbow gradient
+convert -size 12x100 xc:Lime -colorspace HSB \\
+    gradient:gray66 -compose CopyRed -composite \\
+    -colorspace sRGB -rotate 90  -compose Over \\
+    -bordercolor black -border 0x1 test_hue.png
+
+# Overlay the images and add some extra colors to result.
+convert test_bgnd.png  test_fgnd.png  -composite \\
+    -draw 'fill red   circle    25,80  25,98' \\
+    -draw 'fill green circle    75,80  75,98' \\
+    -draw 'fill blue  circle   125,80 125,98' \\
+    test_hue.png -geometry +25+80 -composite \\
+    test.png
+
+convert test.png \\
+    \( -size 150x100 tile:pattern:hexagons \\
+       +clone +swap -compose overlay -composite \) \\
+    -compose SrcIn -composite  tint_overlay_pattern.png
+         `.trim(),
+  },
+
+
+  {
+    name: 'morph resize',
+    description: `https://www.imagemagick.org/Usage/anim_mods/#morph_resize`,
+    tags: [ExampleTag.morph],
+    command: `
+    convert rose: $$IMAGE_0 -morph 10 \\
+    -layers TrimBounds -set dispose previous -coalesce \\
+    -background black -alpha remove \\
+    -set delay '%[fx:(t>0&&t<n-1)?10:60]' \\
+    -duplicate 1,-2-1  -loop 0  morph_resize.gif
+    
+         `.trim(),
+  },
+  {
+    name: 'morph color',
+    description: `https://www.imagemagick.org/Usage/anim_mods/#morph_color`,
+    tags: [ExampleTag.morph],
+    command: `
+    convert rose: $$IMAGE_0  -morph 5 \\
+    -set delay '%[fx:(t>0&&t<n-1)?10:240]' \\
+    -duplicate 1,-2-1    rose_flip_anim.gif
+    
+         `.trim(),
+  },
+
+  {
+    name: 'morph tile',
+    description: `https://www.imagemagick.org/Usage/anim_mods/#morph_color`,
+    tags: [ExampleTag.morph],
+    command: `
+ convert rose: $$IMAGE_0 \\
+    \( -clone 0 -crop 3x0 \) \\
+    -set delay 10 -loop 0  wipe.gif
+
+    convert -size 100x60 -delay 100 \\
+    gradient:green-yellow gradient:blue-purple \\
+    gradient:orange-white gradient:red-black \\
+    -write mpr:stack -delete 0--1 \\
+    \\
+    mpr:stack'[0]' \( mpr:stack'[1]' -set delay 5 -crop 4x0 \) \\
+    mpr:stack'[1]' \( mpr:stack'[2]' -set delay 5 -crop 0x4 \) \\
+    mpr:stack'[2]' \( mpr:stack'[3]' -set delay 5 -crop 4x0 -reverse \) \\
+    mpr:stack'[3]' \( mpr:stack'[0]' -set delay 5 -crop 0x4 -reverse \) \\
+    -loop 0 wipe_all.gif
+    
+         `.trim(),
+  },
+  {
+    name: 'glitter_tiles tile',
+    description: `https://www.imagemagick.org/Usage/anim_mods/#glitter_tiles`,
+    tags: [ExampleTag.morph],
+    command: `
+    convert -size 600x600 xc: +noise Random -separate \\
+    null: \( xc: +noise Random -separate -threshold 30% -negate \) \\
+        -compose CopyOpacity -layers composite \\
+    -set dispose background -set delay 20 -loop 0   glitter_overlay.gif
+  
+    convert glitter_overlay.gif \\
+    -compose Screen -bordercolor blue -border 0x0  glitter_plasma.gif
+  
+            convert glitter_plasma.gif -virtual-pixel tile \\
+            -set option:distort:viewport 680x680 -distort SRT 0 \\
+            glitter_plasma_tiled.gif
+  
+            convert logo: -matte -fuzz 33% -transparent blue logo_holed.gif
+            
+            convert logo_holed.gif null: glitter_plasma_tiled.gif \\
+            -compose DstOver -layers composite \\
+            -loop 0 -layers Optimize logo_glittered.gif
+    
+         `.trim(),
+  },
+
+
+    {
+    name: 'animated distorts',
+    description: `https://www.imagemagick.org/Usage/anim_mods/#distort`,
+    tags: [ExampleTag.morph],
+    command: `
+
+    convert $$IMAGE_0  -duplicate 29  -virtual-pixel tile \\
+    -distort SRT '0,0 1, 0, %[fx:w*t/n],%[fx:h*t/n]' \\
+    -set delay 10 -loop 0     rose_diagonal_roll.gif
+
+  convert $$IMAGE_0  -duplicate 29  -virtual-pixel Gray \\
+    -distort SRT '%[fx:360*t/n]' \\
+    -set delay '%[fx:t==0?240:10]' -loop 0     rose_rotate.gif
+  
+    
+         `.trim(),
+  },
+
+
+  {
+    name: 'gradient_complex_hues',
+    description: `https://www.imagemagick.org/Usage/canvas/#gradient_complex_hues`,
+    tags: [ExampleTag.drawing, ExampleTag.gradient],
+    command: `
+  convert -size 100x100 xc: +size xc:red xc:blue xc:lime -colorspace HSB \\
+  -fx 'ar=1/max(1,  (i-50)*(i-50)+(j-10)*(j-10)  ); br=1/max(1,  (i-10)*(i-10)+(j-70)*(j-70)  );  cr=1/max(1,  (i-90)*(i-90)+(j-90)*(j-90)  );  ( u[1]*ar + u[2]*br + u[3]*cr )/( ar+br+cr )' \\
+  -colorspace sRGB   gradient_shepards_HSB.gif
+
+    convert -size 100x100 xc: +size xc:red xc:blue xc:lime \\
+    -colorspace HSB -channel R \\
+    -fx 'aa=u[1]*2*pi; ba=u[2]*2*pi; ca=u[3]*2*pi; ar=1/max(1, hypot(i-50,j-10) ); br=1/max(1, hypot(i-10,j-70) ); cr=1/max(1, hypot(i-90,j-90) );nr=ar+br+cr;   mod(atan2( ( sin(aa)*ar + sin(ba)*br + sin(ca)*cr )/nr,  ( cos(aa)*ar + cos(ba)*br + cos(ca)*cr )/nr )/(2*pi)+1, 1)' \\
+    -separate -background white -combine +channel \\
+    -set colorspace HSB -colorspace sRGB  gradient_circular_mean_hue.gif
+
+    convert -size 100x100 xc: -colorspace RGB \\
+    -sparse-color  Inverse '50,10 red  10,70 blue  90,90 lime' \\
+     -colorspace sRGB gradient_inverse_RGB.png
+
+  convert gradient_inverse_RGB.png -colorspace HSB \\
+    -channel GB -evaluate set 100% +channel \\
+    -colorspace sRGB gradient_inverse_RGB_Hue.gif
+         `.trim(),
+  },
+
+  
+  {
+    name: 'gradient baricentric',
+    description: `https://www.imagemagick.org/Usage/canvas/#barycentric`,
+    tags: [ExampleTag.drawing, ExampleTag.gradient],
+    command: `
+    convert -size 100x100 xc: -colorspace RGB \\
+    -sparse-color  Barycentric '30,10 red   10,80 blue   90,90 lime' \\
+    -colorspace sRGB  -fill white -stroke black \\
+    -draw 'circle 30,10 30,12  circle 10,80 10,82  circle 90,90 90,92' \\
+    sparse_barycentric1.png
+
+    convert -size 100x100 xc: -colorspace RGB \\
+    -sparse-color Barycentric '30,10 red   10,80 blue   90,90 lime' \\
+    -colorspace sRGB  -fill white -stroke black \\
+    \( -size 100x100 xc:black -draw 'polygon 30,10  10,80  90,90' \) \\
+    +matte -compose CopyOpacity -composite \\
+    -draw 'circle 30,10 30,12  circle 10,80 10,82  circle 90,90 90,92' \\
+    sparse_bary_triangle2.png
+
+    convert -size 100x100 xc:none -draw 'polygon 30,10  10,80  90,90' \\
+    -colorspace RGB \\
+    -sparse-color Barycentric '30,10 red   10,80 blue   90,90 lime' \\
+    -colorspace sRGB   sparse_bary_triangle_3.png
+         `.trim(),
+  },
+
+
+
+  {
+    name: 'gradient shepards_power',
+    description: `https://www.imagemagick.org/Usage/canvas/#shepards_power`,
+    tags: [ExampleTag.drawing, ExampleTag.gradient],
+    command: `
+
+    convert -size 100x100 xc: -colorspace RGB -define shepards:power=0.5 \\
+    -sparse-color Shepards '30,10 red  10,80 blue  70,60 lime  80,20 yellow' \\
+    -colorspace sRGB -fill white -stroke black \\
+    -draw 'circle 30,10 30,12  circle 10,80 10,82' \\
+    -draw 'circle 70,60 70,62  circle 80,20 80,22' \\
+    sparse_shepards_pow0.5.png
+ convert -size 100x100 xc: -colorspace RGB -define shepards:power=1 \\
+    -sparse-color Shepards '30,10 red  10,80 blue  70,60 lime  80,20 yellow' \\
+    -colorspace sRGB -fill white -stroke black \\
+    -draw 'circle 30,10 30,12  circle 10,80 10,82' \\
+    -draw 'circle 70,60 70,62  circle 80,20 80,22' \\
+    sparse_shepards_pow1.png
+ convert -size 100x100 xc: -colorspace RGB -define shepards:power=2 \\
+    -sparse-color Shepards '30,10 red  10,80 blue  70,60 lime  80,20 yellow' \\
+    -colorspace sRGB -fill white -stroke black \\
+    -draw 'circle 30,10 30,12  circle 10,80 10,82' \\
+    -draw 'circle 70,60 70,62  circle 80,20 80,22' \\
+    sparse_shepards_pow2.png
+ convert -size 100x100 xc: -colorspace RGB -define shepards:power=3 \\
+    -sparse-color Shepards '30,10 red  10,80 blue  70,60 lime  80,20 yellow' \\
+    -colorspace sRGB -fill white -stroke black \\
+    -draw 'circle 30,10 30,12  circle 10,80 10,82' \\
+    -draw 'circle 70,60 70,62  circle 80,20 80,22' \\
+    sparse_shepards_pow3.png
+convert -size 100x100 xc: -colorspace RGB -define shepards:power=8 \\
+    -sparse-color Shepards '30,10 red  10,80 blue  70,60 lime  80,20 yellow' \\
+    -colorspace sRGB -fill white -stroke black \\
+    -draw 'circle 30,10 30,12  circle 10,80 10,82' \\
+    -draw 'circle 70,60 70,62  circle 80,20 80,22' \\
+    sparse_shepards_pow8.png
+         `.trim(),
+  },
+
+  {
+    name: 'histogram',
+    description: ``,
+    tags: [ExampleTag.info],
+    command: `
+    convert $$IMAGE_0 histogram:histogram.gi
+
+         `.trim(),
+  },
+  
+  {
+    name: 'gradient sparse_fill',
+    description: `https://www.imagemagick.org/Usage/canvas/#sparse_fill`,
+    tags: [ExampleTag.drawing, ExampleTag.gradient],
+    command: `
+    convert -size 100x100 xc:none +antialias -fill none -strokewidth 0.5 \\
+    -stroke Gold        -draw 'path "M 20,70  A 1,1 0 0,1 80,50"' \\
+    -stroke DodgerBlue  -draw 'line 30,10  50,80' \\
+    -stroke Red         -draw 'circle 80,60  82,60' \\
+    sparse_source.gif
+
+    convert sparse_source.gif \\
+    \( +clone -resize 50% \) \\
+    \( +clone -resize 50% \) \\
+    \( +clone -resize 50% \) \\
+    \( +clone -resize 50% \) \\
+    \( +clone -resize 50% \) \\
+    \( +clone -resize 50% \) \\
+    \( +clone -resize 50% \) \\
+    -layers RemoveDups -filter Gaussian -resize 100x100! -reverse \\
+    -background None -flatten -alpha off    sparse_blur_pyramid.png
+
+         `.trim(),
+  },
+
+  
+
 
 
   {
@@ -143,7 +444,6 @@ convert $$IMAGE_0 -alpha set  -virtual-pixel transparent -channel RGBA \\
 
   `.trim(),
   },
-
 
   {
     name: 'Spherical Distortion Map',
@@ -166,12 +466,6 @@ convert $$IMAGE_0 -resize 100x100!   sphere_lut.png   -fx 'p{ v*w, j }' \\
   `.trim(),
   },
 
-
-
-
-
-
-
   {
     name: 'stars spiral and inwards',
     description: `By Polar Distorting the image we can make the comets flying or spiraling into a point!`,
@@ -193,7 +487,7 @@ convert -size 250x100 xc: +noise Random -channel R -threshold .4% \\
 
   {
     name: 'falling stars',
-    description: `use "-motion-blur" to create a field of falling stars`,
+    description: `use '-motion-blur' to create a field of falling stars`,
     command: `
 convert -size 100x100 xc: +noise Random -channel R -threshold .4% \\
     -negate -channel RG -separate +channel \\
@@ -223,7 +517,7 @@ convert -size 100x100 xc: +noise Random -channel R -threshold 1% \\
 `.trim(),
   },
 
-  // commented - not working : 
+  // commented - not working :
   {
     name: 'star bursts',
     description: `Here we motion blur the stars in six directions (in pairs) then merge them together to create a field of 'star bursts', such as you get in a glass lens.`,
@@ -280,7 +574,6 @@ convert -size 100x100 xc: +noise Random -separate \\
 // `.trim(),
 //   },
 
-
   {
     name: 'radial flare2',
     description: `another example using multiple overlays to achieve a different looking flare. Note the technique used to generating intermediate debugging and example images showing the steps involved.`,
@@ -300,10 +593,6 @@ convert -size 100x1 xc: +noise Random -channel G -separate +channel \\
     -colorspace sRGB flare_2_final.png
 `.trim(),
   },
-
-
-
-
 
 ]
 

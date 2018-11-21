@@ -29,12 +29,13 @@ export interface ExecuteConfig {
  * `)
  * ```
  *
- * Also, command line strings support breaking the same command in multiple lines by using `\` like in:
+ * Also, command line strings support breaking the same command in multiple lines by using `\` and adding bash-shell like commands in lines that starts with `#`, like in:
  *
  * ```js
  * const result = await execute(`
  *   convert -size 250x100 xc: +noise Random -channel R -threshold .4% \\
  *     -negate -channel RG -separate +channel \\
+ *     # heads up! this is a comment because the line started with #
  *     \( +clone \) -compose multiply -flatten \\
  *     -virtual-pixel Tile -background Black \\
  *     -blur 0x.6 -motion-blur 0x15-90 -normalize \\

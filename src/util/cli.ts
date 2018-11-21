@@ -42,6 +42,9 @@ export function arrayToCli(command: Command | Command[]): string {
  * Generates a command in the form of array of strings, compatible with {@link call} from given command line string . The string must contain only one command (no newlines).
  */
 function cliToArrayOne(cliCommand: string): Command {
+  if(cliCommand.trim().startsWith('#')){
+    return undefined
+  }
   let inString = false
   const spaceIndexes = [0]
   for (let index = 0; index < cliCommand.length; index++) {
