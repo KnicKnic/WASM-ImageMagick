@@ -1,7 +1,7 @@
 import { compare, execute, executeAndReturnOutputFile } from '../src'
 import { absolutize } from './testUtil'
 
-export default describe('executeVirtualCommand', () => {
+export default fdescribe('executeVirtualCommand', () => {
 
   describe('ls', () => {
     it('virtual command ls found', async done => {

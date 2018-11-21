@@ -40,3 +40,10 @@
 ## 1.2.1
 
  * First automated release
+ * emcc update to 1.38.19
+ * wasm build can be done locally
+ * string commands support for:
+   * bash comment lines (#)
+   * virtual command ls and cat - support for wildcards
+   * virtual command buildInputFile and uniqueName
+   * virtual command for shell substitution with backquote: example: ``'convert `buildInputImage foo.png` -resize \`uniqueName\`.gif'``
