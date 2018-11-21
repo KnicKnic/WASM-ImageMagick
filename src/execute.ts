@@ -10,6 +10,7 @@ export type Command = (string | number)[]
 export interface ExecuteConfig {
   inputFiles?: MagickInputFile[]
   commands: ExecuteCommand
+  executionId?: number
 }
 
 /**
@@ -169,16 +170,14 @@ export interface ExecuteResult extends CallResult {
  */
 
 export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCommand | MagickInputFile[], command?: ExecuteCommand): Promise<ExecuteResult> {
-
-  const executionId = executionIdCounter++
   const config = asExecuteConfig(configOrCommandOrFiles, command)
+  const executionId = config.executionId || ++executionIdCounter
   config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}
   const allInputFiles: { [name: string]: MagickInputFile } = {}
   config.inputFiles.forEach(f => {
     allInputFiles[f.name] = f
   })
-  // let allErrors = []
   const results: CallResult[] = []
   let allStdout = []
   let allStderr = []
@@ -200,7 +199,6 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       result = await executeOne(thisConfig)
     }
     results.push(result)
-    // allErrors = allErrors.concat(result.errors || [])
     allStdout = allStdout.concat(result.stdout || [])
     allStderr = allStderr.concat(result.stderr || [])
     await pMap(result.outputFiles, async f => {
@@ -214,7 +212,6 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   const resultWithError = results.find(r => r.exitCode !== 0)
   return {
     outputFiles: values(allOutputFiles),
-    // errors: allErrors,
     results,
     stdout: allStdout,
     stderr: allStderr,
@@ -225,4 +222,4 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   }
 }
 
-let executionIdCounter = 0
+let executionIdCounter = 1

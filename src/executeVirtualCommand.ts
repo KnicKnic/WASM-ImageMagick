@@ -33,6 +33,90 @@ export function registerVirtualCommand(c: VirtualCommand) {
   virtualCommands.push(c)
 }
 
+
+
+registerVirtualCommand({
+  name: 'variable declaration',
+  predicate(config: VirtualCommandContext): boolean {
+    return !!config.command.find(c => {
+      const decl = !!c.match(/^\s*([A-Za-z0-9]+)=(.+)$/)
+      if (decl) {
+        return true
+      }
+      else {
+        return variableDeclarations[config.executionId] && !!Object.keys(variableDeclarations[config.executionId]).find(varName => c.includes(`$${varName}`))
+      }
+    })
+  },
+  async execute(config: VirtualCommandContext): Promise<ExecuteResult> {
+    const decl = config.command.join(' ').match(/^\s*([A-Za-z0-9]+)(=.+)$/)
+    if (decl) {
+      const variableName = decl[1]
+      const variableValue = decl[2].replace('=\'', '')
+      variableDeclarations[config.executionId] = variableDeclarations[config.executionId] || {}
+      variableDeclarations[config.executionId][variableName] = variableValue
+      return newExecuteResult(config)
+    }
+    // TODO: support variable inside substitution
+    let varNameMatch
+    console.log('log',config.executionId,  variableDeclarations[config.executionId], config.command.join(' ').includes(`$${'color'}`))
+    
+    const newCommand = config.command.map(c => {
+      varNameMatch = Object.keys(variableDeclarations[config.executionId]).find(varName => c.includes(`$${varName}`))
+      if (varNameMatch) {
+        return c.replace(`$${varNameMatch}`, variableDeclarations[config.executionId][varNameMatch])
+      }
+      return c
+    })
+      const result = await execute({ inputFiles: values(config.files), commands: [newCommand] })
+      return newExecuteResult(config, result)
+  },
+})
+
+const variableDeclarations: { [key: number]: { [varName: string]: string } } = {}
+
+
+registerVirtualCommand({
+  name: 'substitution',
+  predicate(c: VirtualCommandContext): boolean {
+    return !!resolveCommandSubstitution(c.command).substitution
+  },
+  async execute(c: VirtualCommandContext): Promise<ExecuteResult> {
+    const { fixedCommand, substitution } = resolveCommandSubstitution(c.command)
+    const files = values(c.files)
+    const result = await execute({ inputFiles: files, commands: [substitution.command], executionId: c.executionId })
+    if (result.stdout.length) {
+
+      result.stdout[result.stdout.length - 1] = result.stdout[result.stdout.length - 1] + substitution.rest
+    }
+    fixedCommand.splice(substitution.index, 0, result.stdout.join('\n'))
+    const result2 = await execute({ inputFiles: files.concat(await pMap(result.outputFiles, f => asInputFile(f))), commands: [fixedCommand] , executionId: c.executionId})
+    return {
+      ...result2, results: [result, result2], stdout: result.stdout.concat(result2.stdout),
+      stderr: result.stderr.concat(result2.stderr), commands: [c.command],
+      exitCode: result.exitCode || result2.exitCode, outputFiles: result.outputFiles.concat(result2.outputFiles),
+    }
+  },
+})
+
+function resolveCommandSubstitution(command: string[]): { fixedCommand: string[], substitution: { index: number, command: string[], rest: string } } {
+  const indexes = command.map((c, i) => c.startsWith('`') || c.endsWith('`') ? i : undefined).filter(c => typeof c !== 'undefined')
+  if (!indexes.length) {
+    return { fixedCommand: command, substitution: undefined }
+  }
+  if (indexes.length === 1) {
+    indexes.push(indexes[0])
+  }
+  let rest = ''
+  let substitution = command.slice(indexes[0], indexes[1] + 1).map(c => (c.startsWith('`') && c.endsWith('`')) ? c.substring(1, c.length - 1) : (c.lastIndexOf('`') === 0) ? c.substring(1, c.length) : (c.indexOf('`') === c.length - 1) ? c.substring(0, c.length - 1) : c.includes('`') ? (rest = c.substring(c.lastIndexOf('`'), c.length), c.substring(0, c.lastIndexOf('`'))) : c)
+  substitution = substitution.map(c => c.replace(/`/g, ''))
+  rest = rest.replace(/`/g, '')
+  const fixedCommand = command.map(s => s)
+  fixedCommand.splice(indexes[0], indexes[1] + 1 - indexes[0])
+  return { fixedCommand, substitution: { index: indexes[0], command: substitution, rest } }
+}
+
+
 registerVirtualCommand({
   name: 'ls',
   predicate(c: VirtualCommandContext): boolean {
@@ -72,46 +156,6 @@ registerVirtualCommand({
     return result
   },
 })
-
-registerVirtualCommand({
-  name: 'substitution',
-  predicate(c: VirtualCommandContext): boolean {
-    return !!resolveCommandSubstitution(c.command).substitution
-  },
-  async execute(c: VirtualCommandContext): Promise<ExecuteResult> {
-    const { fixedCommand, substitution } = resolveCommandSubstitution(c.command)
-    const files = values(c.files)
-    const result = await execute({ inputFiles: files, commands: [substitution.command] })
-    if (result.stdout.length) {
-
-      result.stdout[result.stdout.length - 1] = result.stdout[result.stdout.length - 1] + substitution.rest
-    }
-    fixedCommand.splice(substitution.index, 0, result.stdout.join('\n'))
-    const result2 = await execute({ inputFiles: files.concat(await pMap(result.outputFiles, f => asInputFile(f))), commands: [fixedCommand] })
-    return {
-      ...result2, results: [result, result2], stdout: result.stdout.concat(result2.stdout),
-      stderr: result.stderr.concat(result2.stderr), commands: [c.command],
-      exitCode: result.exitCode || result2.exitCode, outputFiles: result.outputFiles.concat(result2.outputFiles),
-    }
-  },
-})
-
-function resolveCommandSubstitution(command: string[]): { fixedCommand: string[], substitution: { index: number, command: string[], rest: string } } {
-  const indexes = command.map((c, i) => c.startsWith('`') || c.endsWith('`') ? i : undefined).filter(c => typeof c !== 'undefined')
-  if (!indexes.length) {
-    return { fixedCommand: command, substitution: undefined }
-  }
-  if (indexes.length === 1) {
-    indexes.push(indexes[0])
-  }
-  let rest = ''
-  let substitution = command.slice(indexes[0], indexes[1] + 1).map(c => (c.startsWith('`') && c.endsWith('`')) ? c.substring(1, c.length - 1) : (c.lastIndexOf('`') === 0) ? c.substring(1, c.length) : (c.indexOf('`') === c.length - 1) ? c.substring(0, c.length - 1) : c.includes('`') ? (rest = c.substring(c.lastIndexOf('`'), c.length), c.substring(0, c.lastIndexOf('`'))) : c)
-  substitution = substitution.map(c => c.replace(/`/g, ''))
-  rest = rest.replace(/`/g, '')
-  const fixedCommand = command.map(s => s)
-  fixedCommand.splice(indexes[0], indexes[1] + 1 - indexes[0])
-  return { fixedCommand, substitution: { index: indexes[0], command: substitution, rest } }
-}
 
 registerVirtualCommand({
   name: 'get image',
@@ -163,39 +207,3 @@ function newExecuteResult(c: VirtualCommandContext, result: Partial<ExecuteResul
   }
   return { ...r, results: [r] }
 }
-
-// registerVirtualCommand({
-//   name: 'variable declaration',
-//   predicate(config: VirtualCommandContext): boolean {
-//     return !!config.command.find(c => {
-//       const decl = !!c.match(/^\s*([A-Za-z0-9]+)=(.+)$/)
-//       // variableDeclarations[config.executionId] = variableDeclarations[config.executionId] || {}
-//       if (decl) {
-//         return true//variableDeclarations[config.executionId] && variableDeclarations[config.executionId][decl[1]]
-//       }
-//       else {
-//         return variableDeclarations[config.executionId] && !!Object.keys(variableDeclarations[config.executionId]).find(varName => !!new RegExp(`[^\\]$${varName}=`).exec(c))
-//       }
-//     })
-//   },
-//   async execute(config: VirtualCommandContext): Promise<ExecuteResult> {
-//     const decl = config.command.join(' ').match(/^\s*([A-Za-z0-9]+)=(.+)$/)
-//     if (decl) {
-//       variableDeclarations[config.executionId] = variableDeclarations[config.executionId] || {}
-//       variableDeclarations[config.executionId][decl[1]] = decl[2]
-//       return newExecuteResult(config)
-//     }
-//     // TODO: support variable inside substitution
-//     let varNameMatch
-//     const newCommand = config.command.map(c => {
-//       const varNameMatch = Object.keys(variableDeclarations[config.executionId]).find(varName=>!!c.match(new RegExp(`[^\\]$${varName}`)))
-//       return c.replace(new RegExp(`[^\\]$${varNameMatch}`, 'g'), variableDeclarations[config.executionId][varNameMatch])
-//     })
-//     if(varNameMatch){
-//       const result = await execute({inputFiles: values(config.files),commands: [newCommand]} )
-//       return newExecuteResult(config, result)
-//     }
-//   },
-// })
-
-// const variableDeclarations: { [key: number]: { [varName: string]: string } } = {}
