@@ -11,7 +11,7 @@
  * source code ported to TypeScript
  * Types for input files, output files
 
-## 1.2.0 published yet
+## 1.2.0
 
  * src/util with utilities for 
    * working with magick files, 
@@ -35,3 +35,8 @@
  * apidocs using typedoc to generate markdown - published in /apidocs and linked in readme - see [apidocs](https://github.com/KnicKnic/WASM-ImageMagick/tree/sample-sinteractive-/apidocs)
  * getPixelColor
  * dependencies updated (most importantly gulp 4)
+
+ 
+## 1.2.1
+
+ * First automated release
