@@ -1,5 +1,8 @@
-import { blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, getFileName, asInputFile,
-  asOutputFile, executeAndReturnOutputFile, isImage, readFileAsText, getPixelColor, getBuiltInImages, getBuiltInImage } from '../../src'
+import {
+  blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, getFileName, asInputFile,
+  asOutputFile, executeAndReturnOutputFile, isImage, readFileAsText, getPixelColor, getBuiltInImages, getBuiltInImage
+} from '../../src'
+import { showImages } from '../testUtil';
 
 export default describe('util/file', () => {
 
@@ -17,7 +20,6 @@ export default describe('util/file', () => {
       const processedFiles2 = await Call([file], ['convert', 'fn.png', '-scale', '77x99!', 'scaled.png'])
       info = await extractInfo(processedFiles2[0])
       expect(info[0].image.geometry.width).toBe(77)
-
     }
 
     it('should work with relative url and query params', async done => {
@@ -34,7 +36,17 @@ export default describe('util/file', () => {
       done()
     })
 
-    xit('should support data:// urls with embedded image content', () => { })
+    it('error', async done => {
+      buildInputFile('dontexists.png').then(()=>{expect('resolved').toBe('rejected'); done()}).catch(()=>{expect('rejected').toBe('rejected'); done()})
+    })
+
+    it('should support data:// urls with embedded image content', async done => { 
+      const img = await buildInputFile('fn.png')
+      const els = await showImages(img)
+      const img2 = await buildInputFile(els[0].src)
+      expect(await compare(img, img2)).toBe(true)
+      done()
+    })
   })
 
   describe('asInputFile and asOutputFile', () => {
@@ -59,7 +71,6 @@ export default describe('util/file', () => {
   })
 
   describe('readFileAsText and isImage, getPixelColor, getBuiltInImage', () => { // TODO: separate
-
     it('basic test', async done => {
       const file = await executeAndReturnOutputFile(`convert logo: -format '%[pixel:p{0,0}]' info:info.txt`)
       expect(await isImage(file)).toBe(false)
@@ -67,7 +78,6 @@ export default describe('util/file', () => {
       const file2 = await buildInputFile('fn.png')
       expect(await isImage(file2)).toBe(true)
       expect(await readFileAsText(file2)).toContain('PNG')
-
       expect(await getPixelColor(await getBuiltInImage('logo:'), 0, 0)).toBe('white')
       done()
     })

@@ -12,7 +12,11 @@ export enum ExampleTag {
   info,
   drawing,
   gradient,
-  morph
+  morph,
+  color,
+  append,
+  format,
+  distort
 }
 
 export const commandExamples: Example[] = [
@@ -21,6 +25,7 @@ export const commandExamples: Example[] = [
     name: 'identify simple',
     description: `runs identify program to print to stdout image info`,
     command: `identify rose:`.trim(),
+    tags: [ExampleTag.info],
   },
 
   {
@@ -33,11 +38,13 @@ convert $$IMAGE_0 \\
   -print '\\n__Options__\\n\\n%[option:*]\\n' \\
 info:
 `.trim(),
+tags: [ExampleTag.info],
   },
 
   {
     name: 'animate_granularity',
     description: `https://imagemagick.org/Usage/canvas/#granularity`,
+    tags: [ExampleTag.animation, ExampleTag.gradient],
     command: `
 # Generate initial random image (also  granularity=0 image
 convert -size 150x150 xc: +noise random \\
@@ -66,12 +73,14 @@ convert -size 150x150 xc: +noise random \\
 
   {
     name: 'extract pixel color',
+    tags: [ExampleTag.info, ExampleTag.color],
     description: `extract pixel color at 0,0 and save it to info.txt file`,
     command: `convert logo: -format '%[pixel:p{0,0}]' info:$$UNIQUE_NAME.txt  `.trim(),
   },
 
   {
     name: 'extract image information',
+    tags: [ExampleTag.info],
     description: `extract image information in json format and store it in output file roseinfo.json`,
     command: `convert rose: $$UNIQUE_NAME.json  `.trim(),
   },
@@ -88,7 +97,65 @@ convert -size 150x150 xc: +noise random \\
     \( -clone 0 -level 40,100% +level-colors ,#F46 \) \\
     -delete 0  -duplicate 1,-2-1 -set delay 1x30 -loop 0 $$UNIQUE_NAME.gif
     `.trim(),
+    tags: [ExampleTag.animation]
   },
+
+
+
+  {
+    name: 'color wheels',
+    description: `https://imagemagick.org/Usage/color_basics/`,
+    tags: [ExampleTag.gradient, ExampleTag.color],
+    command: `
+convert -size 100x300 gradient: -rotate 90 \\
+    -distort Arc '360 -90.1 50' +repage \\
+    -gravity center -crop 100x100+0+0 +repage  angular.png
+convert -size 100x100 xc:white                     solid.png
+convert -size 100x100 radial-gradient: -negate     radial.png
+
+convert angular.png solid.png radial.png \\
+    -combine -set colorspace HSL \\
+    -colorspace sRGB colorwheel_HSL.png
+convert angular.png solid.png radial.png \\
+    -combine -set colorspace HSB \\
+    -colorspace sRGB colorwheel_HSB.png
+convert angular.png solid.png radial.png \\
+    -combine -set colorspace HCL \\
+    -colorspace sRGB colorwheel_HCL.png
+convert angular.png solid.png radial.png \\
+    -combine -set colorspace HCLp \\
+    -colorspace sRGB colorwheel_HCLp.png
+
+convert -size 100x100 xc:black \\
+    -fill white  -draw 'circle 49.5,49.5 40,4' \\
+    -fill black  -draw 'circle 49.5,49.5 40,30' \\
+    -alpha copy -channel A -morphology dilate diamond anulus.png
+convert angular.png -size 100x100 xc:white xc:gray50 \\
+    -combine -set colorspace HSL -colorspace RGB \\
+    anulus.png -alpha off -compose Multiply -composite \\
+    anulus.png -alpha on  -compose DstIn -composite \\
+    -colorspace sRGB hues_HSL.png
+
+convert angular.png -size 100x100 xc:white xc:gray50 \\
+    -combine -set colorspace HCL -colorspace RGB \\
+    anulus.png -alpha off -compose Multiply -composite \\
+    anulus.png -alpha on  -compose DstIn -composite \\
+    -colorspace sRGB hues_HCL.png
+
+convert radial.png solid.png angular.png \\
+    -combine -set colorspace LCHab \\
+    -colorspace sRGB colorwheel_LCHab.png
+convert radial.png solid.png angular.png \\
+    -combine -set colorspace LCHuv \\
+    -colorspace sRGB colorwheel_LCHuv.png
+
+
+    `.trim(),
+  },
+
+
+
+
 
   {
     name: 'warping local region',
@@ -108,6 +175,7 @@ convert -size 150x150 xc: +noise random \\
     -region 101x70+480+0  -wave 10x50 -crop 0x70+0+10! \\
     +region lines_regions.gif
     `.trim(),
+    tags: [ExampleTag.drawing]
   },
 
   {
@@ -133,11 +201,13 @@ convert -size 100x100 xc:red \\
   \( rose: -rotate -90 \) \\
   +append $$UNIQUE_NAME.png
   `.trim(),
+  tags: [ExampleTag.append]
   },
 
   {
     name: 'write pdf',
     description: `append a couple of images and then all images and output a pdf`,
+    tags: [ExampleTag.format],
     command: `
 montage \\
   null: \\
@@ -152,6 +222,7 @@ montage \\
 
   {
     name: 'montage polaroid',
+    tags: [ExampleTag.append],
     description: `https://www.imagemagick.org/Usage/montage/#overlap`,
     command: `
 montage -size 400x400 null: $$ALLIMAGES null: \\
@@ -208,7 +279,7 @@ convert test.png \\
   {
     name: 'morph resize',
     description: `https://www.imagemagick.org/Usage/anim_mods/#morph_resize`,
-    tags: [ExampleTag.morph],
+    tags: [ExampleTag.morph,ExampleTag.animation],
     command: `
     convert rose: $$IMAGE_0 -morph 10 \\
     -layers TrimBounds -set dispose previous -coalesce \\
@@ -221,7 +292,7 @@ convert test.png \\
   {
     name: 'morph color',
     description: `https://www.imagemagick.org/Usage/anim_mods/#morph_color`,
-    tags: [ExampleTag.morph],
+    tags: [ExampleTag.morph,ExampleTag.animation],
     command: `
     convert rose: $$IMAGE_0  -morph 5 \\
     -set delay '%[fx:(t>0&&t<n-1)?10:240]' \\
@@ -233,7 +304,7 @@ convert test.png \\
   {
     name: 'morph tile',
     description: `https://www.imagemagick.org/Usage/anim_mods/#morph_color`,
-    tags: [ExampleTag.morph],
+    tags: [ExampleTag.morph,ExampleTag.animation],
     command: `
  convert rose: $$IMAGE_0 \\
     \( -clone 0 -crop 3x0 \) \\
@@ -255,7 +326,7 @@ convert test.png \\
   {
     name: 'glitter_tiles tile',
     description: `https://www.imagemagick.org/Usage/anim_mods/#glitter_tiles`,
-    tags: [ExampleTag.morph],
+    tags: [ExampleTag.morph,ExampleTag.animation],
     command: `
     convert -size 600x600 xc: +noise Random -separate \\
     null: \( xc: +noise Random -separate -threshold 30% -negate \) \\
@@ -282,7 +353,7 @@ convert test.png \\
     {
     name: 'animated distorts',
     description: `https://www.imagemagick.org/Usage/anim_mods/#distort`,
-    tags: [ExampleTag.morph],
+    tags: [ExampleTag.morph,ExampleTag.animation],
     command: `
 
     convert $$IMAGE_0  -duplicate 29  -virtual-pixel tile \\
@@ -394,7 +465,7 @@ convert -size 100x100 xc: -colorspace RGB -define shepards:power=8 \\
   {
     name: 'histogram',
     description: ``,
-    tags: [ExampleTag.info],
+    tags: [ExampleTag.info, ExampleTag.color],
     command: `
     convert $$IMAGE_0 histogram:histogram.gi
 
@@ -426,13 +497,11 @@ convert -size 100x100 xc: -colorspace RGB -define shepards:power=8 \\
          `.trim(),
   },
 
-  
-
-
 
   {
     name: 'Hourglass Distortion Map',
     description: `https://imagemagick.org/Usage/mapping/#hourglass`,
+    tags: [ExampleTag.distort],
     command: `
 convert -size 100x100 xc:  -channel G \\
     -fx 'sc=.15; (i/w-.5)/(1+sc*cos(j*pi*2/h)-sc)+.5' \\
@@ -448,6 +517,7 @@ convert $$IMAGE_0 -alpha set  -virtual-pixel transparent -channel RGBA \\
   {
     name: 'Spherical Distortion Map',
     description: `https://imagemagick.org/Usage/mapping/#spherical`,
+    tags: [ExampleTag.distort],
     command: `
 convert -size 100x100 xc:  -channel R \\
     -fx 'yy=(j+.5)/h-.5; (i/w-.5)/(sqrt(1-4*yy^2))+.5' \\
@@ -469,6 +539,7 @@ convert $$IMAGE_0 -resize 100x100!   sphere_lut.png   -fx 'p{ v*w, j }' \\
   {
     name: 'stars spiral and inwards',
     description: `By Polar Distorting the image we can make the comets flying or spiraling into a point!`,
+    tags: [ExampleTag.drawing],
     command: `
 convert -size 250x100 xc: +noise Random -channel R -threshold .4% \\
   -negate -channel RG -separate +channel \\
@@ -493,70 +564,68 @@ convert -size 100x100 xc: +noise Random -channel R -threshold .4% \\
     -negate -channel RG -separate +channel \\
     \( +clone \) -compose multiply -flatten \\
     -virtual-pixel tile -blur 0x.4 -motion-blur 0x20+45 -normalize \\
-    star_fall.gif`.trim(),
-  },
-  {
-    name: 'simple stars',
-    description: `A random noise image is used to thin itself out generate a speckle pattern. Then some effects and colors`,
-    command: `
+    star_fall.gif
+ 
 convert -size 100x100 xc: +noise Random -channel R -threshold 5% \\
-  -negate -channel RG -separate +channel \\
-  -compose multiply -composite   speckles.gif
+-negate -channel RG -separate +channel \\
+-compose multiply -composite   speckles.gif
 
 convert -size 100x100 xc: +noise Random -channel R -threshold 1% \\
-  -negate -channel RG -separate +channel \\
-  \( +clone \) -compose multiply -flatten \\
-  -virtual-pixel tile -blur 0x.4 -contrast-stretch .8% \\
-  stars.gif
+-negate -channel RG -separate +channel \\
+\( +clone \) -compose multiply -flatten \\
+-virtual-pixel tile -blur 0x.4 -contrast-stretch .8% \\
+stars.gif
 
 convert -size 100x100 xc: +noise Random -channel R -threshold 1% \\
-  -negate -channel RG -separate +channel \\
-  \( xc: +noise Random \) -compose multiply -flatten \\
-  -virtual-pixel tile -blur 0x.4 -contrast-stretch .8% \\
-  stars_colored.gif
-`.trim(),
+-negate -channel RG -separate +channel \\
+\( xc: +noise Random \) -compose multiply -flatten \\
+-virtual-pixel tile -blur 0x.4 -contrast-stretch .8% \\
+stars_colored.gif
+
+    `.trim(),
   },
 
-  // commented - not working :
-  {
-    name: 'star bursts',
-    description: `Here we motion blur the stars in six directions (in pairs) then merge them together to create a field of 'star bursts', such as you get in a glass lens.`,
-    command: `
-convert -size 100x100 xc: +noise Random -channel R -threshold .2% \\
-  -negate -channel RG -separate +channel \\
-  \( +clone \) -compose multiply -flatten \\
-  -virtual-pixel tile  -blur 0x.3 \\
-  \( -clone 0  -motion-blur 0x10+15  -motion-blur 0x10+195 \) \\
-  \( -clone 0  -motion-blur 0x10+75  -motion-blur 0x10+255 \) \\
-  \( -clone 0  -motion-blur 0x10-45  -motion-blur 0x10+135 \) \\
-  -compose screen -background black -flatten  -normalize \\
-    -compose multiply -layers composite \\
-    -set delay 30 -loop 0 -layers Optimize    \\
-  star_field.gif`.trim(),
-  },
+//   // commented - not working :
+//   {
+//     name: 'star bursts',
+//     description: `Here we motion blur the stars in six directions (in pairs) then merge them together to create a field of 'star bursts', such as you get in a glass lens.`,
+//     command: `
+// convert -size 100x100 xc: +noise Random -channel R -threshold .2% \\
+//   -negate -channel RG -separate +channel \\
+//   \( +clone \) -compose multiply -flatten \\
+//   -virtual-pixel tile  -blur 0x.3 \\
+//   \( -clone 0  -motion-blur 0x10+15  -motion-blur 0x10+195 \) \\
+//   \( -clone 0  -motion-blur 0x10+75  -motion-blur 0x10+255 \) \\
+//   \( -clone 0  -motion-blur 0x10-45  -motion-blur 0x10+135 \) \\
+//   -compose screen -background black -flatten  -normalize \\
+//     -compose multiply -layers composite \\
+//     -set delay 30 -loop 0 -layers Optimize    \\
+//   star_field.gif`.trim(),
+//   },
 
   {
     name: 'stars animation',
     description: `By combining the above with a plasma glitter animation you can make set of stars that look like christmas decorations.`,
+    tags: [ExampleTag.animation]
     command: `
-convert -size 100x100 xc: +noise Random -separate \\
+convert -size 200x200 xc: +noise Random -separate \\
   null: \\
-    \( xc: +noise Random -separate -threshold 50% -negate \) \\
+    ( xc: +noise Random -separate -threshold 50% -negate ) \\
     -compose CopyOpacity -layers composite \\
   null: \\
-    plasma:red-firebrick plasma:red-firebrick plasma:red-firebrick \\
+    plasma:red-firebrick plasma:red-firebrick plasma:red-firebrick plasma:red-firebrick plasma:red-firebrick \\
     -compose Screen -layers composite \\
   null:  \\
-    \( xc: +noise Random -channel R -threshold .08% \\
+    ( xc: +noise Random -channel R -threshold 1% \\
       -negate -channel RG -separate +channel \\
-      \( +clone \) -compose multiply -flatten \\
-      -virtual-pixel tile  -blur 0x.4 \\
-      \( -clone 0  -motion-blur 0x15+90  -motion-blur 0x15-90 \) \\
-      \( -clone 0  -motion-blur 0x15+30  -motion-blur 0x15-150 \) \\
-      \( -clone 0  -motion-blur 0x15-30  -motion-blur 0x15+150 \) \\
-      -compose screen -background black -flatten  -normalize \) \\
+      ( +clone ) -compose multiply -flatten \\
+      -virtual-pixel tile  -blur 1x1 \\
+      ( -clone 0  -motion-blur 111x135+90  -motion-blur 110x35-90 ) \\
+      ( -clone 0  -motion-blur 10x15+30  -motion-blur 10x15-50 ) \\
+      ( -clone 0  -motion-blur 10x15-30  -motion-blur 10x15+150 ) \\
+      -compose screen -background black -flatten  -normalize ) \\
     -compose multiply -layers composite \\
-  -set delay 30 -loop 0 -layers Optimize       stars_xmas.gif
+  -set delay 30 -loop 0 -layers Optimize       $$UNIQUE_NAME.gif
 
 `.trim(),
   },
@@ -574,25 +643,25 @@ convert -size 100x100 xc: +noise Random -separate \\
 // `.trim(),
 //   },
 
-  {
-    name: 'radial flare2',
-    description: `another example using multiple overlays to achieve a different looking flare. Note the technique used to generating intermediate debugging and example images showing the steps involved.`,
-    command: `
-convert -size 100x1 xc: +noise Random -channel G -separate +channel \\
-    -size 100x99 xc:black -append -motion-blur 0x35-90 \\
-    \( -size 100x50 gradient:gray(0) \\
-       -evaluate cos .5 -sigmoidal-contrast 3,100% \\
-       -size 100x50 xc:gray(0) -append \) \\
-    \( -size 1x50 xc:gray(0) \\
-       -size 1x1 xc:gray(50%) \\
-       -size 1x49 xc:gray(0) \\
-       -append -blur 0x2 -scale 100x100! \) \\
-    -scene 10 +write flare_2%x.png \\
-    -background gray(0) -compose screen -flatten +write flare_2f.png \\
-    -virtual-pixel HorizontalTileEdge -distort Polar -1 \\
-    -colorspace sRGB flare_2_final.png
-`.trim(),
-  },
+//   {
+//     name: 'radial flare2',
+//     description: `another example using multiple overlays to achieve a different looking flare. Note the technique used to generating intermediate debugging and example images showing the steps involved.`,
+//     command: `
+// convert -size 100x1 xc: +noise Random -channel G -separate +channel \\
+//     -size 100x99 xc:black -append -motion-blur 0x35-90 \\
+//     \( -size 100x50 gradient:gray(0) \\
+//        -evaluate cos .5 -sigmoidal-contrast 3,100% \\
+//        -size 100x50 xc:gray(0) -append \) \\
+//     \( -size 1x50 xc:gray(0) \\
+//        -size 1x1 xc:gray(50%) \\
+//        -size 1x49 xc:gray(0) \\
+//        -append -blur 0x2 -scale 100x100! \) \\
+//     -scene 10 +write flare_2%x.png \\
+//     -background gray(0) -compose screen -flatten +write flare_2f.png \\
+//     -virtual-pixel HorizontalTileEdge -distort Polar -1 \\
+//     -colorspace sRGB flare_2_final.png
+// `.trim(),
+//   },
 
 ]
 

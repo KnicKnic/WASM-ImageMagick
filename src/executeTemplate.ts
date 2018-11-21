@@ -1,5 +1,7 @@
 /*
 
+TODO: this probably is obsolete by executeVirtualCommand
+
 The idea is that the user can put placeholders or wildcards in its execute commands to refer to existing images, to create unique names, etc.
 Done: refer to exiting images by index, refer to all images, create unique names
 TODO/ ideas :

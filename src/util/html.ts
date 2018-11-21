@@ -9,8 +9,9 @@ import { asInputFile, asOutputFile, execute, getFileNameExtension, MagickFile, M
  * @param forceBrowserSupport if true and the image extension is not supported by browsers, it will convert the image to png
  * and return that src so it can be shown in browsers
  */
-export async function loadImageElement(image: MagickFile, el: HTMLImageElement, forceBrowserSupport: boolean = false) {
+export async function loadImageElement(image: MagickFile, el: HTMLImageElement, forceBrowserSupport: boolean = false): Promise<HTMLImageElement> {
   el.src = await buildImageSrc(image, forceBrowserSupport)
+  return el
 }
 
 /**

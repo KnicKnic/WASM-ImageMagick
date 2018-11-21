@@ -55,10 +55,13 @@ export async function isImage(file: MagickFile): Promise<boolean> {
 }
 /**
  * Builds a new {@link MagickInputFile} by fetching the content of given url and optionally naming the file using given name
- * or extracting the file name from the url otherwise.
+ * or extracting the file name from the url otherwise. It will throw the response object in case there's an error, 
  */
 export async function buildInputFile(url: string, name: string = getFileName(url)): Promise<MagickInputFile> {
   const fetchedSourceImage = await fetch(url)
+  if(!fetchedSourceImage.ok){
+    throw fetchedSourceImage.status+' - '+fetchedSourceImage.statusText
+  }
   const arrayBuffer = await fetchedSourceImage.arrayBuffer()
   const content = new Uint8Array(arrayBuffer)
   return { name, content }

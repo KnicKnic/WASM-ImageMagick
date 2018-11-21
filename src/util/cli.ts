@@ -42,7 +42,7 @@ export function arrayToCli(command: Command | Command[]): string {
  * Generates a command in the form of array of strings, compatible with {@link call} from given command line string . The string must contain only one command (no newlines).
  */
 function cliToArrayOne(cliCommand: string): Command {
-  if(cliCommand.trim().startsWith('#')){
+  if (cliCommand.trim().startsWith('#')) {
     return undefined
   }
   let inString = false
@@ -100,15 +100,20 @@ export function cliToArray(cliCommand: string): Command[] {
  * Makes sure that given {@link ExecuteCommand}, in whatever syntax, is transformed to the form `string[][]` that is compatible with {@link call}
  */
 export function asCommand(c: ExecuteCommand): Command[] {
-  if(!c){return []}
+  if (!c) {return []}
   if (typeof c === 'string') { return asCommand([c]) }
   if (!c[0]) { return [] }
   if (isArrayOfStrings(c)) {
     return flat(c.map(cliToArray))
   }
-  if(isArrayOfArrayOfStrings(c)){
+  if (isArrayOfArrayOfStrings(c)) {
     // this means that the command is already a valid Command. This means that Execute Commands cannot be [['convert a'], ['convert b']]
     return c as Command[]
   }
-  
+
+}
+
+export function unquote(s: string): string {
+  s = s.startsWith('\'') ? s.substring(1, s.length) : s
+  return s.endsWith('\'') ? s.substring(0, s.length - 1) : s
 }

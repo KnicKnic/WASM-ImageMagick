@@ -48,17 +48,17 @@ export interface ExecuteConfig {
  */
 export type ExecuteCommand = Command[] | Command | string
 
-export interface ExecuteResultOne extends CallResult {
-  errors: any[]
-  exitCode: number
-}
+// export interface CallResult extends CallResult {
+//   // errors: any[]
+//   // exitCode: number
+// }
 
 /**
  * Execute first command in given config.
  *
  * @see [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute) for full documentation on accepted signatures
  */
-export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand | MagickInputFile[], execCommand?: ExecuteCommand): Promise<ExecuteResultOne> {
+export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand | MagickInputFile[], execCommand?: ExecuteCommand): Promise<CallResult> {
   const config = asExecuteConfig(configOrCommand, execCommand)
   config.inputFiles = config.inputFiles || []
   const command = asCommand(config.commands)[0]
@@ -74,12 +74,15 @@ export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand
   try {
     result = await call(config.inputFiles, command.map(c => c + ''))
     if (result.exitCode) {
-      return { ...result, errors: ['exit code: ' + result.exitCode + ' stderr: ' + result.stderr.join('\n')] }
+      return { ...result, //errors: ['exit code: ' + result.exitCode + ' stderr: ' + result.stderr.join('\n')] 
     }
-    return { ...result, errors: [undefined] }
+    }
+    return { ...result, //errors: [undefined] 
+    }
 
   } catch (error) {
-    return { ...result, errors: [error + ', exit code: ' + result.exitCode + ', stderr: ' + result.stderr.join('\n')] }
+    return { ...result, //errors: [error + ', exit code: ' + result.exitCode + ', stderr: ' + result.stderr.join('\n')]
+   }
   }
 }
 
@@ -122,8 +125,8 @@ export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig 
 }
 
 
-export interface ExecuteResult extends ExecuteResultOne {
-  results: ExecuteResultOne[],
+export interface ExecuteResult extends CallResult {
+  results: CallResult[],
   /** the original commands used in the execute() call */
   commands: ExecuteCommand[],
   // breakOnError?: boolean
@@ -167,6 +170,7 @@ export interface ExecuteResult extends ExecuteResultOne {
 
 export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCommand | MagickInputFile[], command?: ExecuteCommand): Promise<ExecuteResult> {
 
+  const executionId = executionIdCounter++
   const config = asExecuteConfig(configOrCommandOrFiles, command)
   config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}
@@ -174,8 +178,8 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   config.inputFiles.forEach(f => {
     allInputFiles[f.name] = f
   })
-  let allErrors = []
-  const results: ExecuteResultOne[] = []
+  // let allErrors = []
+  const results: CallResult[] = []
   let allStdout = []
   let allStderr = []
   async function mapper(c: string[]) {
@@ -186,8 +190,9 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     const virtualCommandContext: VirtualCommandContext = {
       command: c, 
       files: allInputFiles, 
+      executionId
     }
-    let result: ExecuteResultOne
+    let result: CallResult
     if(isVirtualCommand(virtualCommandContext)){
       result = await dispatchVirtualCommand(virtualCommandContext)
     }
@@ -195,7 +200,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       result = await executeOne(thisConfig)
     }
     results.push(result)
-    allErrors = allErrors.concat(result.errors || [])
+    // allErrors = allErrors.concat(result.errors || [])
     allStdout = allStdout.concat(result.stdout || [])
     allStderr = allStderr.concat(result.stderr || [])
     await pMap(result.outputFiles, async f => {
@@ -209,7 +214,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   const resultWithError = results.find(r => r.exitCode !== 0)
   return {
     outputFiles: values(allOutputFiles),
-    errors: allErrors,
+    // errors: allErrors,
     results,
     stdout: allStdout,
     stderr: allStderr,
@@ -220,4 +225,4 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   }
 }
 
-
+let executionIdCounter = 0
