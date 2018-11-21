@@ -26,9 +26,9 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
 
 ## Demos and examples
 
- * Basic playground (React & TypeScript project): [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59).
+ * Basic playground (React & TypeScript project): [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/ox58qw3jjy).
 
- * Image Diff Example (React & TypeScript project): [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z).
+ * [Showcase of all known supported formats](https://cancerberosgx.github.io/demos/WASM-ImageMagick/supported-formats/)
 
  * [Interactive execute context demo](https://cancerberosgx.github.io/demos/WASM-ImageMagick/interactive-execute-context/). Add images, execute commands using different syntaxes, manage and reuse output/input images, and choose commands examples to learn ImageMagick. [Project lives here](./samples/interactive-execute-context)
 

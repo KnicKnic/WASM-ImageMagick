@@ -52,8 +52,6 @@
   },
   "homepage": "https://github.com/KnicKnic/WASM-ImageMagick",
   "devDependencies": {
-    "@babel/core": "^7.1.6",
-    "@babel/preset-env": "^7.1.6",
     "@types/jasmine": "^2.8.11",
     "@types/node": "^10.12.3",
     "@types/shelljs": "^0.8.0",
@@ -84,6 +82,7 @@
     "webpack-config-utils": "^2.3.1"
   },
   "dependencies": {
-    "p-map": "^2.0.0"
+    "p-map": "^2.0.0",
+    "shell-parse": "0.0.2"
   }
 }

@@ -7,8 +7,10 @@ TODO/ ideas :
  *
  * be able to declare variables: imagine: commands: `
  * convert $$IMAGE_0 -format '%[pixel:p{$$USER_x, $$USER_y}]' info:$$UNIQUE_NAME.txt
-$$SET_VAR_backgroundColor=\`
+$$SET_VAR_FROM OUTPUT_FILE_0_CONTENT backgroundColor=\`
   convert $$IMAGE_0 -format '%[pixel:p{0,0}]' info:$$UNIQUE_NAME.txt
+\`
+$$SET_VAR_FROM OUTPUT_FILE_0_NAME auxFile = \`
 \`
     `
   ]

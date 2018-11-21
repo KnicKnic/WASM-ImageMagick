@@ -3,6 +3,7 @@ import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
 import { CallResult } from './magickApi'
 import { asInputFile, isInputFile } from './util'
 import { values } from './util/misc'
+import { isVirtualCommand, dispatchVirtualCommand, VirtualCommandContext } from './executeVirtualCommand';
 
 export type Command = (string | number)[]
 
@@ -59,7 +60,6 @@ export interface ExecuteResultOne extends CallResult {
  */
 export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand | MagickInputFile[], execCommand?: ExecuteCommand): Promise<ExecuteResultOne> {
   const config = asExecuteConfig(configOrCommand, execCommand)
-
   config.inputFiles = config.inputFiles || []
   const command = asCommand(config.commands)[0]
   let result: CallResult = {
@@ -70,6 +70,7 @@ export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand
     command: command.map(c=>c+''), 
     inputFiles: config.inputFiles
   }
+  
   try {
     result = await call(config.inputFiles, command.map(c => c + ''))
     if (result.exitCode) {
@@ -170,7 +171,6 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}
   const allInputFiles: { [name: string]: MagickInputFile } = {}
-  // const allCommands = []
   config.inputFiles.forEach(f => {
     allInputFiles[f.name] = f
   })
@@ -178,13 +178,22 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   const results: ExecuteResultOne[] = []
   let allStdout = []
   let allStderr = []
-  async function mapper(c: Command) {
+  async function mapper(c: string[]) {
     const thisConfig = {
       inputFiles: values(allInputFiles),
       commands: [c],
     }
-    const result = await executeOne(thisConfig)
-    // allCommands.push(result.command)
+    const virtualCommandContext: VirtualCommandContext = {
+      command: c, 
+      files: allInputFiles, 
+    }
+    let result: ExecuteResultOne
+    if(isVirtualCommand(virtualCommandContext)){
+      result = await dispatchVirtualCommand(virtualCommandContext)
+    }
+    else {
+      result = await executeOne(thisConfig)
+    }
     results.push(result)
     allErrors = allErrors.concat(result.errors || [])
     allStdout = allStdout.concat(result.stdout || [])
@@ -210,3 +219,5 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     inputFiles:  config.inputFiles
   }
 }
+
+
