@@ -137,7 +137,7 @@ export default describe('executeVirtualCommand', () => {
     })
   })
 
-  fdescribe('variable decl', () => {
+  describe('variable decl', () => {
     it('variable decl good', async done => {
       const result = await execute(`
       color='white'
@@ -156,7 +156,7 @@ export default describe('executeVirtualCommand', () => {
       convert \`buildInputFile $img1\` -resize 45% $img2
     `)
       expect(result.exitCode).toBe(0)
-      expect(result.outputFiles[0].name).toBe('foo.png')
+      expect(result.outputFiles[1].name).toBe('foo.png')
       const result2 = await execute([await buildInputFile('fn.png')], `convert fn.png -resize 45% output.png`)
       expect(await compare(result.outputFiles[1], result2.outputFiles[0])).toBe(true)
       done()
