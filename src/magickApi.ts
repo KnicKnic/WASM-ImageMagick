@@ -80,7 +80,37 @@ function CreatePromiseEvent() {
   return emptyPromise
 }
 
-const magickWorker = new Worker('magick.js')
+
+function ChangeUrl(url, fileName)
+{
+    let splitUrl = url.split('/')
+    splitUrl[splitUrl.length -1] = fileName
+    return splitUrl.join('/')
+}
+function GetCurrentUrlDifferentFilename(fileName)
+{
+    return ChangeUrl(currentJavascriptURL, fileName)
+}
+let currentJavascriptURL = './magickApi.js';
+try {
+    // @ts-ignore
+    let packageUrl = import.meta.url;
+    currentJavascriptURL = packageUrl;
+} catch (error) {
+    // eat
+}
+const magickWorkerUrl = GetCurrentUrlDifferentFilename('magick.js')
+
+function GenerateMagickWorkerText(magickUrl){
+  // generates code for the following
+  // var magickJsCurrentPath = 'magickUrl';
+  // importScripts(magickJsCurrentPath);
+
+  return "var magickJsCurrentPath = '" + magickUrl +"';\n" +
+         'importScripts(magickJsCurrentPath);'
+}
+
+const magickWorker = new Worker(window.URL.createObjectURL(new Blob([GenerateMagickWorkerText(magickWorkerUrl)])));
 
 const magickWorkerPromises = {}
 let magickWorkerPromisesKey = 1
