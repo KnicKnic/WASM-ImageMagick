@@ -35,7 +35,7 @@ if (typeof Module == 'undefined') {
       exitCode = status
     }
   }
-  if(magickJsCurrentPath !== undefined){
+  if(typeof magickJsCurrentPath !== "undefined"){
       Module.locateFile = GetCurrentUrlDifferentFilename;
   }
 
