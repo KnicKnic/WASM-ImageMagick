@@ -1,6 +1,6 @@
 {
   "name": "wasm-imagemagick",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Webassembly compilation of ImageMagick",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -20,7 +20,7 @@
     "lint-and-fix": "tslint \"src/**/*.ts\" \"spec/**/*.ts\" --fix",
     "generateImEnums": "npx ts-node scripts/generateImEnums.ts",
     "test": "npm run test-node && npm run test-browser",
-    "test-node-prepare":  "cp tests/rotate/node_header.js tests/rotate/node.js && cat ImageMagick/utilities/magick.js >> tests/rotate/node.js && cp magick.wasm tests/rotate",
+    "test-node-prepare": "cp tests/rotate/node_header.js tests/rotate/node.js && cat ImageMagick/utilities/magick.js >> tests/rotate/node.js && cp magick.wasm tests/rotate",
     "test-node": "npm run test-node-prepare && cd tests/rotate && node node",
     "test-browser-build": "tsc && browserify -d dist/spec/index.js -o dist/bundle.js",
     "test-browser": "rm -rf dist && npm run test-browser-build  &&  npm run copy && gulp --gulpfile spec/gulpfile.js jasmine",
@@ -83,6 +83,7 @@
     "webpack-config-utils": "^2.3.1"
   },
   "dependencies": {
-    "p-map": "^2.0.0"
+    "p-map": "^2.0.0",
+    "stacktrace-js": "^2.0.0"
   }
 }
