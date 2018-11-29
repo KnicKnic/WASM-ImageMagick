@@ -98,7 +98,7 @@ export default describe('executeVirtualCommand', () => {
       done()
     })
   })
- 
+
   describe('buildInputFile', () => {
     it('buildInputFile good', async done => {
       const result = await execute(`
@@ -162,8 +162,7 @@ export default describe('executeVirtualCommand', () => {
       done()
     })
 
-
-    xit('variable decl from substitution ouput', async done => { //TODO: this is failing - probably we need to separate variable declaration in two plugins - variable-declaration and variable references. and put variable declarations AFTER substitution
+    xit('variable decl from substitution ouput', async done => { // TODO: this is failing - probably we need to separate variable declaration in two plugins - variable-declaration and variable references. and put variable declarations AFTER substitution
       const result = await execute(`
          var1='\`identify rose:\`'
     `)
@@ -183,7 +182,7 @@ export default describe('executeVirtualCommand', () => {
     // it('variable decl wrong - used not existent', async done => {
     //     const result = await execute(`
     //     color=white
-        
+
     // `)
     //     expect(result.exitCode).not.toBe(0)
     //     expect(result.stderr.join('\n')).toContain('nonex.txt')

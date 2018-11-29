@@ -6,11 +6,14 @@
 
 **ExecuteConfig**
 
+↳  [ExecuteContextPlaceholders](executecontextplaceholders.md)
+
 ## Index
 
 ### Properties
 
 * [commands](executeconfig.md#commands)
+* [executionId](executeconfig.md#executionid)
 * [inputFiles](executeconfig.md#inputfiles)
 
 ---
@@ -23,7 +26,16 @@
 
 **● commands**: *[ExecuteCommand](../#executecommand)*
 
-*Defined in [execute.ts:13](https://github.com/KnicKnic/WASM-ImageMagick/blob/a45b8ff/src/execute.ts#L13)*
+*Defined in [execute.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/execute.ts#L12)*
+
+___
+<a id="executionid"></a>
+
+### `<Optional>` executionId
+
+**● executionId**: *`number`*
+
+*Defined in [execute.ts:13](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/execute.ts#L13)*
 
 ___
 <a id="inputfiles"></a>
@@ -32,7 +44,7 @@ ___
 
 **● inputFiles**: *[MagickInputFile](magickinputfile.md)[]*
 
-*Defined in [execute.ts:10](https://github.com/KnicKnic/WASM-ImageMagick/blob/a45b8ff/src/execute.ts#L10)*
+*Defined in [execute.ts:11](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/execute.ts#L11)*
 
 ___
 

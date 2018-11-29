@@ -1,8 +1,8 @@
 import {
   blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, getFileName, asInputFile,
-  asOutputFile, executeAndReturnOutputFile, isImage, readFileAsText, getPixelColor, getBuiltInImages, getBuiltInImage
+  asOutputFile, executeAndReturnOutputFile, isImage, readFileAsText, getPixelColor, getBuiltInImages, getBuiltInImage,
 } from '../../src'
-import { showImages, absolutize } from '../testUtil';
+import { showImages, absolutize } from '../testUtil'
 
 export default describe('util/file', () => {
 
@@ -36,10 +36,10 @@ export default describe('util/file', () => {
       done()
     })
     it('error', async done => {
-      buildInputFile('dontexists.png').then(()=>{expect('resolved').toBe('rejected'); done()}).catch(()=>{expect('rejected').toBe('rejected'); done()})
+      buildInputFile('dontexists.png').then(() => {expect('resolved').toBe('rejected'); done()}).catch(() => {expect('rejected').toBe('rejected'); done()})
     })
 
-    it('should support data:// urls with embedded image content', async done => { 
+    it('should support data:// urls with embedded image content', async done => {
       const img = await buildInputFile('fn.png')
       const els = await showImages(img)
       const img2 = await buildInputFile(els[0].src)

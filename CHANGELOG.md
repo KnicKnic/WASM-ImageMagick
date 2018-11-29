@@ -40,10 +40,15 @@
 ## 1.2.1
 
  * First automated release
- * emcc update to 1.38.19
- * wasm build can be done locally
- * string commands support for:
-   * bash comment lines (#)
-   * virtual command ls and cat - support for wildcards
-   * virtual command buildInputFile and uniqueName
-   * virtual command for shell substitution with backquote: example: ``'convert `buildInputImage foo.png` -resize \`uniqueName\`.gif'``
+ * emcc update to 1.38.20
+ * execute promises resolved with more info: commands, inputFiles
+ * utils: isImage, buildImageSrc, loadImageElement optionally output to browser compatible formats
+ * wasm build can be done locally if emscripten is installed ```export BUILD_WASM_LOCAL=-local && npm run build```
+ * more format tests and support information: knownSupportedReadWriteImageFormats, knownSupportedWriteOnlyImageFormats, knownSupportedReadOnlyImageFormats. formats demo. 
+ * string commands syntax support for:
+   * bash comment lines starting with `#`
+   * virtual command for shell substitution with backquote. See next examples:
+   * virtual command: ls with support for wildcards (globs) : ``convert `ls foo/**/bar*.png` o.gif``
+   * virtual command: cat with support for wildcards (globs) : ``convert in.png -fill `cat out2.txt` foo.gif``
+   * virtual command: buildInputFile: ``convert `buildInputFile fn.png` -rotate 22 out.gif``
+   * virtual command uniqueName: ``convert rose: -rotate 22 `uniqueName`.gif``
