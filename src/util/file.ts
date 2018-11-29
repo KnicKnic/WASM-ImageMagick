@@ -125,3 +125,8 @@ export function getFileNameExtension(filePathOrUrlOrFile: string | MagickFile) {
   const s = getFileName(typeof filePathOrUrlOrFile === 'string' ? filePathOrUrlOrFile : filePathOrUrlOrFile.name)
   return s.substring(s.lastIndexOf('.') + 1, s.length)
 }
+
+export function getFileNameWithoutExtension(filePathOrUrlOrFile: string | MagickFile) {
+  const s = getFileName(typeof filePathOrUrlOrFile === 'string' ? filePathOrUrlOrFile : filePathOrUrlOrFile.name)
+  return s.substring(0, s.lastIndexOf('.'))
+}

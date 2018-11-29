@@ -9,7 +9,6 @@
     ],
     "target": "es2018",
     "module": "commonjs", 
-    "skipLibCheck": true
   },
   "include": [
     "src",

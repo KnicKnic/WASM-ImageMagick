@@ -3,7 +3,8 @@ import * as React from 'react';
 import { style } from 'typestyle';
 import {
   arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo,
-  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText, getFileNameExtension, knownSupportedWriteOnlyImageFormats, flat, renderCommand
+  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText, 
+  getFileNameExtension, knownSupportedWriteOnlyImageFormats, flat, renderCommand
 } from 'wasm-imagemagick';
 import { commandExamples, Example } from './commandExamples';
 import { blobToString } from 'imagemagick-browser';
@@ -29,6 +30,7 @@ export interface AppState {
   prettyJSON: boolean
   isImageArray: boolean[]
   finalCommand: string[][]
+  memory: number
 }
 
 export class App extends React.Component<AppProps, AppState> {
@@ -49,7 +51,8 @@ export class App extends React.Component<AppProps, AppState> {
     exitCode: 0,
     prettyJSON: false,
     isImageArray: [], 
-    finalCommand: [[]]
+    finalCommand: [[]],
+    memory: getMemory()
   }
 
   protected styles = {
@@ -82,6 +85,7 @@ export class App extends React.Component<AppProps, AppState> {
       <div>
 
         <div>
+          {/* <p>Memory: {this.state.memory}%</p> */}
           <h4>Images available (#{this.state.files.length}) :</h4>
           <div>Show images and info: <input type='checkbox' checked={this.state.showImagesAndInfo} onChange={this.showImagesAndInfoChange.bind(this)}></input></div>
 
@@ -180,6 +184,10 @@ export class App extends React.Component<AppProps, AppState> {
     if (!this.state.files.find(f => f.name === this.defaultImage)) {
       await this.addInputFiles([await buildInputFile(this.defaultImage)])
     }
+  }
+  
+  componentWillUpdate(){
+    this.state.memory=getMemory()
   }
 
   protected async prettyJSONChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -297,4 +305,9 @@ async function buildFileSrc(file: MagickFile, isImage_?: boolean): Promise<strin
   else {
     return await readFileAsText(file)
   }
+}
+
+function getMemory() {
+  // return ((performance as any).memory.usedJSHeapSize) /(performance as any).memory.totalJSHeapSize
+  return Math.round(((performance as any).memory.usedJSHeapSize)*100 /(performance as any).memory.totalJSHeapSize)
 }
