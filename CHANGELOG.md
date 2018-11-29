@@ -40,8 +40,11 @@
 ## 1.2.1
 
  * First automated release
+
+## 1.2.2
+
  * emcc update to 1.38.20
- * execute promises resolved with more info: commands, inputFiles
+ * call() resolves with more info: commands, inputFiles
  * utils: isImage, buildImageSrc, loadImageElement optionally output to browser compatible formats
  * wasm build can be done locally if emscripten is installed ```export BUILD_WASM_LOCAL=-local && npm run build```
  * more format tests and support information: knownSupportedReadWriteImageFormats, knownSupportedWriteOnlyImageFormats, knownSupportedReadOnlyImageFormats. formats demo. 
