@@ -6,25 +6,24 @@ export async function showImages(images: MagickFile[]|MagickFile): Promise<HTMLI
   return await pMap(images, async image => {
     const el = document.createElement('img')
     el.title = el.alt = image.name
-    
+
     document.body.appendChild(el)
     return loadImageElement(image, el)
   }, {concurrency: 1})
 }
-
 
 export async function showDownloadLink(images: MagickFile[]): Promise<void> {
   await pMap(images, async image => {
     const el = document.createElement('a')
     const o = await asOutputFile(image)
     el.href = URL.createObjectURL(o.blob)
-    el.target='_blank'
-    el.innerHTML=el.download =image.name
+    el.target = '_blank'
+    el.innerHTML = el.download = image.name
     document.body.appendChild(el)
     return Promise.resolve()
   }, {concurrency: 1})
 }
 
-export function absolutize(s){
+export function absolutize(s) {
   return `${window.location.protocol}//${window.location.host}/${s}`
 }

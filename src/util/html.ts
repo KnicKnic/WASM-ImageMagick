@@ -1,5 +1,5 @@
 import { asInputFile, asOutputFile, execute, getFileNameExtension, MagickFile, MagickInputFile } from '..'
-import { getFileName, getFileNameWithoutExtension } from './file';
+import { getFileName, getFileNameWithoutExtension } from './file'
 
 // utilities related to HTML (img) elements
 
@@ -24,7 +24,7 @@ export async function buildImageSrc(image: MagickFile, forceBrowserSupport: bool
   let img = image
   const extension = getFileNameExtension(image.name)
   if (!extension || forceBrowserSupport && browserSupportedImageExtensions.indexOf(extension) === -1) {
-    const { outputFiles } = await execute({ inputFiles: [await asInputFile(image)], commands: `convert ${image.name} ${getFileNameWithoutExtension(image.name)||'output'}.png` })
+    const { outputFiles } = await execute({ inputFiles: [await asInputFile(image)], commands: `convert ${image.name} ${getFileNameWithoutExtension(image.name) || 'output'}.png` })
     outputFiles[0].name = image.name
     img = outputFiles[0]
   }

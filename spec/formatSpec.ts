@@ -1,5 +1,5 @@
 import pmap from 'p-map'
-import { asInputFile, buildInputFile, compare, execute, executeOne, extractInfo, knownSupportedReadOnlyImageFormats, 
+import { asInputFile, buildInputFile, compare, execute, executeOne, extractInfo, knownSupportedReadOnlyImageFormats,
   knownSupportedReadWriteImageFormats, knownSupportedWriteOnlyImageFormats, readFileAsText, _knownSupportedImageFormatsInFolderForTest } from '../src'
 import { combinations } from '../src/util/misc'
 import { showDownloadLink } from './testUtil'

@@ -47,7 +47,7 @@ registerVirtualCommand(buildInputFile)
 
 registerVirtualCommand(uniqueName)
 
-export function newExecuteResult(c: VirtualCommandContext, result: Partial<ExecuteResult> = {}): ExecuteResult {
+export function _newExecuteResult(c: VirtualCommandContext, result: Partial<ExecuteResult> = {}): ExecuteResult {
   const r: ExecuteResult = {
     ...{
       outputFiles: [],

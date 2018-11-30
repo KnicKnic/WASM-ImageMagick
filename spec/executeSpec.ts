@@ -140,7 +140,7 @@ export default describe('execute', () => {
       const result3 = await execute([img], [`convert fn.png -rotate 70 out1.png`, 'convert out1.png -resize 70% out2.gif'])
       const out3 = result3.outputFiles[1]
 
-      const result4 = await execute([img], [["convert", "fn.png", "-rotate", "70", "out1.png"], ["convert", "out1.png", "-resize", "70%", "out2.gif"]])
+      const result4 = await execute([img], [['convert', 'fn.png', '-rotate', '70', 'out1.png'], ['convert', 'out1.png', '-resize', '70%', 'out2.gif']])
       const out4 = result4.outputFiles[1]
 
       expect(await compare(out1, out2)).toBe(true)
@@ -221,7 +221,6 @@ export default describe('execute', () => {
     })
 
   })
-
 
   xit('event emitter', () => { })
 })

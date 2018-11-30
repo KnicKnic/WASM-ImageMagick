@@ -52,10 +52,10 @@ export const knownSupportedWriteOnlyImageFormats = [
  * list of image formats that are known to be supported by wasm-imagemagick but only for read operation. See `spec/formatSpec.ts`
  */
 export const knownSupportedReadOnlyImageFormats = [
-  // 'pix', 
-  'mat'
+  // 'pix',
+  'mat',
 ]
 
 export const _knownSupportedImageFormatsInFolderForTest = [
-  'mat'
+  'mat',
 ]

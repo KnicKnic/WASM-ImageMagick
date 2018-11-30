@@ -1,6 +1,5 @@
-import pMap from 'p-map'
-import { asInputFile, execute, ExecuteResult, values } from '..'
-import { VirtualCommand, VirtualCommandContext, newExecuteResult } from './VirtualCommand'
+import { execute, ExecuteResult, values } from '..'
+import { VirtualCommand, VirtualCommandContext, _newExecuteResult } from './VirtualCommand'
 
 export default {
   name: 'variable declaration',
@@ -22,12 +21,10 @@ export default {
       const variableValue = decl[2].replace('=\'', '')
       variableDeclarations[config.executionId] = variableDeclarations[config.executionId] || {}
       variableDeclarations[config.executionId][variableName] = variableValue
-      return newExecuteResult(config)
+      return _newExecuteResult(config)
     }
     // TODO: support variable inside substitution
     let varNameMatch
-    // console.log('log', config.executionId,  variableDeclarations[config.executionId], config.command.join(' ').includes(`$${'color'}`))
-
     const newCommand = config.command.map(c => {
       varNameMatch = Object.keys(variableDeclarations[config.executionId]).find(varName => c.includes(`$${varName}`))
       if (varNameMatch) {
@@ -36,7 +33,7 @@ export default {
       return c
     })
     const result = await execute({ inputFiles: values(config.files), commands: [newCommand] })
-    return newExecuteResult(config, result)
+    return _newExecuteResult(config, result)
   },
 } as VirtualCommand
 

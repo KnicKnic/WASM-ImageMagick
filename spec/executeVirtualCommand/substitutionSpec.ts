@@ -1,6 +1,136 @@
-import { buildInputFile, compare, execute, executeAndReturnOutputFile } from '../../src'
+import { buildInputFile, compare, execute, executeAndReturnOutputFile, asCommand } from '../../src'
+import { resolveCommandSubstitution } from '../../src/executeVirtualCommand/substitution'
 
 export default describe('substitution', () => {
+
+  describe('resolveCommandSubstitution', () => {
+
+    it('simple', () => {
+      const result = resolveCommandSubstitution(asCommand(`convert \`foo\` foo2.png`)[0].map(s => s + ''))
+      expect(result).toEqual({
+        fixedCommand: [
+          'convert',
+          'foo2.png',
+        ],
+        substitution: {
+          index: 1,
+          command: [
+            'foo',
+          ],
+          restStart: '',
+          restEnd: '',
+        },
+      })
+    })
+
+    it('command with multiple args', () => {
+      const result = resolveCommandSubstitution(asCommand(`convert \`foo 1 two three.png 'four and 4'\` foo2.png`)[0].map(s => s + ''))
+      expect(result).toEqual({
+        fixedCommand: [
+          'convert',
+          'foo2.png',
+        ],
+        substitution: {
+          index: 1,
+          command: [
+            'foo',
+            '1',
+            'two',
+            'three.png',
+            'four and 4',
+          ],
+          restStart: '',
+          restEnd: '',
+        },
+      })
+    })
+
+    it('command with 1 arg and postfix', () => {
+      const result = resolveCommandSubstitution(asCommand(`convert  foo2.png \`uniqueName\`.png`)[0].map(s => s + ''))
+      expect(result).toEqual({
+        fixedCommand: [
+          'convert',
+          'foo2.png',
+        ],
+        substitution: {
+          index: 2,
+          command: [
+            'uniqueName',
+          ],
+          restStart: '',
+          restEnd: '.png',
+        },
+      })
+    })
+
+    it('command with multiple args and postfix', () => {
+      const result = resolveCommandSubstitution(asCommand(`convert rose: -resize \`cat xCoord.txt\`x55 foo2.png`)[0].map(s => s + ''))
+      expect(result).toEqual({
+        fixedCommand: [
+          'convert',
+          'rose:',
+          '-resize',
+          'foo2.png',
+        ],
+        substitution: {
+          index: 3,
+          command: [
+            'cat', 'xCoord.txt',
+          ],
+          restStart: '',
+          restEnd: 'x55',
+        },
+      })
+    })
+
+    it('command with multiple args and prefix', () => {
+      const result = resolveCommandSubstitution(asCommand(`convert prefix\`foo 1 two three.png 'four and 4'\` foo2.png`)[0].map(s => s + ''))
+      console.log(result)
+
+      expect(result).toEqual({
+        fixedCommand: [
+          'convert',
+          'foo2.png',
+        ],
+        substitution: {
+          index: 1,
+          command: [
+            'foo',
+            '1',
+            'two',
+            'three.png',
+            'four and 4',
+          ],
+          restStart: 'prefix',
+          restEnd: '',
+        },
+      })
+    })
+
+    it('command with both prefix and suffix', () => {
+      const result = resolveCommandSubstitution(asCommand(`convert prefix\`foo 1 two three.png 'four and 4'\`postfix foo2.png`)[0].map(s => s + ''))
+      expect(result).toEqual({
+        fixedCommand: [
+          'convert',
+          'foo2.png',
+        ],
+        substitution: {
+          index: 1,
+          command: [
+            'foo',
+            '1',
+            'two',
+            'three.png',
+            'four and 4',
+          ],
+          restStart: 'prefix',
+          restEnd: 'postfix',
+        },
+      })
+    })
+  })
+
+  describe('virtual commands', () => {
 
     it('substitution simple', async done => {
       const result = await execute(`
@@ -14,11 +144,10 @@ export default describe('substitution', () => {
       done()
     })
 
-    xit('substitution part of argument', async done => {
+    it('substitution part of argument', async done => {
       const result = await execute(`
         convert rose: -rotate 22 foo\`uniqueName\`.gif
       `)
-      debugger
       expect(result.exitCode).toBe(0)
       expect(result.outputFiles[0].name.startsWith('foo')).toBe(true)
       expect(result.outputFiles[0].name.endsWith('.gif')).toBe(true)
@@ -36,4 +165,5 @@ export default describe('substitution', () => {
       done()
     })
 
+  })
 })

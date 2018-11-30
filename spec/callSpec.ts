@@ -28,7 +28,7 @@ export default describe('call', () => {
       // this is currently broken because of https://github.com/kripken/emscripten/issues/7360
       // this command won't print 'bar' if -print doesn't end with a new line convert rose: -print '\nfoo\nbar' -format '%f' info:
 
-      let result = await call([], ['convert', 'rose:', '-format', 'lorem %f ipsum', 'info:'])
+      const result = await call([], ['convert', 'rose:', '-format', 'lorem %f ipsum', 'info:'])
       expect(result.stdout.join('\n')).toContain(`lorem 46 ipsum`) // fails because of that issue
 
       // // this works:

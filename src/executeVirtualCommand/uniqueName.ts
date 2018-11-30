@@ -1,5 +1,5 @@
 import { ExecuteResult, values } from '..'
-import { VirtualCommandContext, newExecuteResult, VirtualCommand } from './VirtualCommand'
+import { VirtualCommandContext, _newExecuteResult, VirtualCommand } from './VirtualCommand'
 
 export default {
   name: 'uniqueName',
@@ -7,7 +7,7 @@ export default {
     return c.command[0] === 'uniqueName'
   },
   async execute(c: VirtualCommandContext): Promise<ExecuteResult> {
-    return newExecuteResult(c, { stdout: ['unique_' + (uniqueNameCounter++)] })
+    return _newExecuteResult(c, { stdout: ['unique_' + (uniqueNameCounter++)] })
   },
 } as VirtualCommand
 

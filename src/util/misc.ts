@@ -13,20 +13,20 @@ export function flat<T>(arr: T[][]): T[] {
 // }
 
 export function isArrayOfStrings(a: any): a is string[] {
-  return Array.isArray(a) && (a.length === 0 || typeof a[0]==='string')
+  return Array.isArray(a) && (a.length === 0 || typeof a[0] === 'string')
 }
 
 export function isArrayOfArrays(a: any): a is any[][] {
   return Array.isArray(a) && (a.length === 0 || Array.isArray(a[0]))
 }
 export function isArrayOfArrayOfStrings(a: any): a is any[][] {
-  return isArrayOfArrays(a) && (a[0][0].length==0||typeof a[0][0] === 'string')
+  return isArrayOfArrays(a) && (a[0][0].length === 0 || typeof a[0][0] === 'string')
 }
-export function combinations<T>(arr: T[], fn: (a: T, b: T) => Promise<any>) : Promise<any> {
+export function combinations<T>(arr: T[], fn: (a: T, b: T) => Promise<any>): Promise<any> {
   const promises = []
   arr.forEach(f1 => {
     arr.
-      filter((f2, i, arr) => i > arr.indexOf(f1))
+      filter((f2, i, subarr) => i > subarr.indexOf(f1))
       .forEach(f2 => promises.push(fn(f1, f2)))
   })
   return Promise.all(promises)
