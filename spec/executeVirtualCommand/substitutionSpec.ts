@@ -1,0 +1,39 @@
+import { buildInputFile, compare, execute, executeAndReturnOutputFile } from '../../src'
+
+export default describe('substitution', () => {
+
+    it('substitution simple', async done => {
+      const result = await execute(`
+      convert logo: -format '%[pixel:p{0,0}]' info:color.txt
+      convert -size 10x6 xc:skyblue  -fill \`cat color.txt\` \\
+        -draw 'point 3,2' -scale 100x60  draw_point.gif
+    `)
+      expect(result.exitCode).toBe(0)
+      expect(await compare(result.outputFiles[1],
+        await executeAndReturnOutputFile(`convert -size 10x6 xc:skyblue -fill white -draw 'point 3,2' -scale 100x60 draw_point2.gif`))).toBe(true)
+      done()
+    })
+
+    xit('substitution part of argument', async done => {
+      const result = await execute(`
+        convert rose: -rotate 22 foo\`uniqueName\`.gif
+      `)
+      debugger
+      expect(result.exitCode).toBe(0)
+      expect(result.outputFiles[0].name.startsWith('foo')).toBe(true)
+      expect(result.outputFiles[0].name.endsWith('.gif')).toBe(true)
+      expect(result.outputFiles[0].name).not.toContain('uniqueName')
+      done()
+    })
+
+    it('substitution command error', async done => {
+      const result = await execute(`
+        convert - size 10x6 xc: skyblue  - fill \`cat nonex.txt\` \\
+        -draw 'point 3,2'         -scale 100x60   draw_point.gif
+    `)
+      expect(result.exitCode).not.toBe(0)
+      expect(result.stderr.join('\n')).toContain('nonex.txt')
+      done()
+    })
+
+})

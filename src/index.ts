@@ -1,4 +1,5 @@
 export * from './execute'
+export * from './executeVirtualCommand/VirtualCommand'
 export * from './imageHome'
 export * from './executionContext'
 export * from './executeTemplate'

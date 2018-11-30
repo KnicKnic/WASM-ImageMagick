@@ -3,13 +3,14 @@ import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
 import { CallResult } from './magickApi'
 import { asInputFile, isInputFile } from './util'
 import { values } from './util/misc'
-import { isVirtualCommand, dispatchVirtualCommand, VirtualCommandContext } from './executeVirtualCommand';
+import { isVirtualCommand, dispatchVirtualCommand, VirtualCommandContext } from './executeVirtualCommand/VirtualCommand'
 
 export type Command = (string | number)[]
 
 export interface ExecuteConfig {
   inputFiles?: MagickInputFile[]
   commands: ExecuteCommand
+  /** internal id for execution calls so execute() extensions like virtual commands have a chance to identify each call if they also invoke execute() internally */
   executionId?: number
 }
 
@@ -68,22 +69,15 @@ export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand
     stdout: [],
     outputFiles: [],
     exitCode: 1,
-    command: command.map(c=>c+''), 
-    inputFiles: config.inputFiles
+    command: command.map(c => c + ''),
+    inputFiles: config.inputFiles,
   }
-  
+
   try {
     result = await call(config.inputFiles, command.map(c => c + ''))
-    if (result.exitCode) {
-      return { ...result, //errors: ['exit code: ' + result.exitCode + ' stderr: ' + result.stderr.join('\n')] 
-    }
-    }
-    return { ...result, //errors: [undefined] 
-    }
-
+    return { ...result}
   } catch (error) {
-    return { ...result, //errors: [error + ', exit code: ' + result.exitCode + ', stderr: ' + result.stderr.join('\n')]
-   }
+    return { ...result}
   }
 }
 
@@ -124,7 +118,6 @@ export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig 
   const result = await execute(config)
   return result.outputFiles.length && result.outputFiles[0] || undefined
 }
-
 
 export interface ExecuteResult extends CallResult {
   results: CallResult[],
@@ -187,12 +180,12 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       commands: [c],
     }
     const virtualCommandContext: VirtualCommandContext = {
-      command: c, 
-      files: allInputFiles, 
-      executionId
+      command: c,
+      files: allInputFiles,
+      executionId,
     }
     let result: CallResult
-    if(isVirtualCommand(virtualCommandContext)){
+    if (isVirtualCommand(virtualCommandContext)) {
       result = await dispatchVirtualCommand(virtualCommandContext)
     }
     else {
@@ -217,8 +210,8 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     stderr: allStderr,
     exitCode: resultWithError ? resultWithError.exitCode : 0,
     command: [],
-    commands, 
-    inputFiles:  config.inputFiles
+    commands,
+    inputFiles:  config.inputFiles,
   }
 }
 
