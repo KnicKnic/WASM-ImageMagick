@@ -18,6 +18,6 @@
     "importHelpers": true,
   },
   "exclude": [
-    "spec", "samples", "scripts"
+    "spec", "samples", "scripts", "node_modules/jasmine-expect"
   ]
 }

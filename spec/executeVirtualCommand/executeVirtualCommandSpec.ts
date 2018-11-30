@@ -123,8 +123,8 @@ export default describe('executeVirtualCommand', () => {
       convert rose: -rotate 22 \`uniqueName\`.gif
     `)
       expect(result.exitCode).toBe(0)
-      expect(result.outputFiles[0].name.startsWith('foo')).toBe(true)
-      expect(result.outputFiles[0].name.endsWith('.gif')).toBe(true)
+      expect(result.outputFiles[0].name).toStartWith('foo')
+      expect(result.outputFiles[0].name).toEndWith('.gif')
       done()
     })
 

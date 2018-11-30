@@ -26,6 +26,7 @@ export function blobToString(blb: Blob): Promise<string> {
 export function isInputFile(file: any): file is MagickInputFile {
   return !!(file as MagickInputFile).content
 }
+
 export function isOutputFile(file: any): file is MagickOutputFile {
   return !!(file as MagickOutputFile).blob
 }
@@ -53,6 +54,7 @@ export async function isImage(file: MagickFile): Promise<boolean> {
   const { exitCode } = await execute({ inputFiles: [await asInputFile(file)], commands: `identify ${file.name}` })
   return exitCode === 0
 }
+
 /**
  * Builds a new {@link MagickInputFile} by fetching the content of given url and optionally naming the file using given name
  * or extracting the file name from the url otherwise. It will throw the response object in case there's an error,
@@ -121,6 +123,7 @@ export function getFileName(url: string): string {
     }
   }
 }
+
 export function getFileNameExtension(filePathOrUrlOrFile: string | MagickFile) {
   const s = getFileName(typeof filePathOrUrlOrFile === 'string' ? filePathOrUrlOrFile : filePathOrUrlOrFile.name)
   return s.substring(s.lastIndexOf('.') + 1, s.length)

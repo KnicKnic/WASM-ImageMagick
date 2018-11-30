@@ -66,20 +66,16 @@ export default describe('formats', () => {
     it('svg is not supported', async done => {
       const img = await buildInputFile('react.svg')
       const { outputFiles, exitCode } = await executeOne({ inputFiles: [img], commands: `convert MSVG:react.svg react.tiff` })
-      expect(outputFiles.length).toBe(0)
+      expect(outputFiles).toBeArrayOfSize(0)
       expect(exitCode).not.toBe(0)
-      // expect(errors.length).toBeGreaterThan(0)
       done()
     })
 
     it('djvu doesn\'t work even read only', async done => {
       const img = await buildInputFile('formats/to_rotate.djvu')
       const { outputFiles, exitCode } = await executeOne({ inputFiles: [img], commands: `convert to_rotate.djvu out.tiff` })
-      // expect(await compare(img, outputFiles[0])).toBe(true)
-      expect(outputFiles.length).toBe(0)
+      expect(outputFiles).toBeArrayOfSize(0)
       expect(exitCode).not.toBe(0)
-      // expect(errors).toBeDefined()
-      // expect(errors.length).toBeGreaterThan(0)
       done()
     })
 

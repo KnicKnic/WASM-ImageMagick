@@ -12,6 +12,7 @@
   },
   "include": [
     "src",
-    "spec"
+    "spec",
+    "node_modules/jasmine-expect/jasmine-matchers.d.ts"
   ]
 }

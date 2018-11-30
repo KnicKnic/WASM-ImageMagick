@@ -140,7 +140,8 @@ export default describe('substitution', () => {
     `)
       expect(result.exitCode).toBe(0)
       expect(await compare(result.outputFiles[1],
-        await executeAndReturnOutputFile(`convert -size 10x6 xc:skyblue -fill white -draw 'point 3,2' -scale 100x60 draw_point2.gif`))).toBe(true)
+        await executeAndReturnOutputFile(`convert -size 10x6 xc:skyblue -fill white -draw 'point 3,2' -scale 100x60 draw_point2.gif`)),
+        ).toBe(true)
       done()
     })
 
@@ -149,8 +150,8 @@ export default describe('substitution', () => {
         convert rose: -rotate 22 foo\`uniqueName\`.gif
       `)
       expect(result.exitCode).toBe(0)
-      expect(result.outputFiles[0].name.startsWith('foo')).toBe(true)
-      expect(result.outputFiles[0].name.endsWith('.gif')).toBe(true)
+      expect(result.outputFiles[0].name).toStartWith('foo')
+      expect(result.outputFiles[0].name).toEndWith('.gif')
       expect(result.outputFiles[0].name).not.toContain('uniqueName')
       done()
     })

@@ -13,7 +13,7 @@ export default describe('call', () => {
 
     it('should resolve with stdout when there\'s one', async done => {
       const result = await call([], ['identify', 'rose:'])
-      expect(result.stderr.length).toBe(0)
+      expect(result.stderr).toBeArrayOfSize(0)
       expect(result.stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
       done()
     })
@@ -30,10 +30,6 @@ export default describe('call', () => {
 
       const result = await call([], ['convert', 'rose:', '-format', 'lorem %f ipsum', 'info:'])
       expect(result.stdout.join('\n')).toContain(`lorem 46 ipsum`) // fails because of that issue
-
-      // // this works:
-      // result = await call([], ["convert", "rose:", "-format", "lorem %f ipsum\\n", "info:"])
-      // expect(result.stdout.join('\n')).toContain(`lorem 46 ipsum`) // fails because of that issue
 
       done()
     })
