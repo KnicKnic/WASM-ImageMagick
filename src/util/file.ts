@@ -24,11 +24,15 @@ export function blobToString(blb: Blob): Promise<string> {
 }
 
 export function isInputFile(file: any): file is MagickInputFile {
-  return !!(file as MagickInputFile).content
+  return !!((file as MagickInputFile).content && (file as MagickInputFile).name)
 }
 
 export function isOutputFile(file: any): file is MagickOutputFile {
-  return !!(file as MagickOutputFile).blob
+  return !!((file as MagickOutputFile).blob && (file as MagickInputFile).name)
+}
+
+export function isMagickFile(file: any): file is MagickFile {
+  return isInputFile(file) || isOutputFile(file)
 }
 
 function uint8ArrayToString(arr: Uint8Array, charset: string = 'utf-8'): string {
