@@ -41,7 +41,7 @@
 
  * First automated release
 
-## 1.2.2
+## this branch
 
  * emcc update to 1.38.20
  * call() resolves with more info: commands, inputFiles
@@ -55,3 +55,4 @@
    * virtual command: cat with support for wildcards (globs) : ``convert in.png -fill `cat out2.txt` foo.gif``
    * virtual command: buildInputFile: ``convert `buildInputFile fn.png` -rotate 22 out.gif``
    * virtual command uniqueName: ``convert rose: -rotate 22 `uniqueName`.gif``
+ * using jasmine-expect library for better matchers

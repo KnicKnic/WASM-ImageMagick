@@ -51,6 +51,16 @@
     "url": "https://github.com/KnicKnic/WASM-ImageMagick/issues"
   },
   "homepage": "https://github.com/KnicKnic/WASM-ImageMagick",
+  "contributors": [
+    {
+      "name": "Nick Maliwacki",
+      "url": "https://github.com/KnicKnic"
+    },
+    {
+      "name": "Sebastián Gurin",
+      "url": "https://github.com/cancerberosgx"
+    }
+  ],
   "devDependencies": {
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
