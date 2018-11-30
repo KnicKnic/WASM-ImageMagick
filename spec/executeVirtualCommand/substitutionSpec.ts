@@ -85,8 +85,6 @@ export default describe('substitution', () => {
 
     it('command with multiple args and prefix', () => {
       const result = resolveCommandSubstitution(asCommand(`convert prefix\`foo 1 two three.png 'four and 4'\` foo2.png`)[0].map(s => s + ''))
-      console.log(result)
-
       expect(result).toEqual({
         fixedCommand: [
           'convert',

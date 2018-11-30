@@ -13,12 +13,9 @@ import pkg from './package.json'
 const env = process.env.NODE_ENV || 'development'
 const { ifProduction } = getIfUtils(env)
 
-const LIB_NAME = pkg.name//pascalCase(normalizePackageName(pkg.name))
+const LIB_NAME = pkg.name
 const ROOT = resolve(__dirname, '.')
 const DIST = resolve(ROOT, 'dist')
-
-console.log(LIB_NAME);
-
 
 /**
  * Object literals are open-ended for js checking, so we need to be explicit
@@ -32,31 +29,9 @@ const PATHS = {
   bundles: resolve(DIST, 'bundles'),
 }
 
-
-// helpers
-
-// function dashToCamelCase(myStr) {
-//   return myStr.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
-// }
-
-// function toUpperCase(myStr) {
-//   return `${myStr.charAt(0).toUpperCase()}${myStr.substr(1)}`
-// }
-
-// function pascalCase(myStr) {
-//   return toUpperCase(dashToCamelCase(myStr))
-// }
-
-// function normalizePackageName(rawPackageName) {
-//   const scopeEnd = rawPackageName.indexOf('/') + 1
-
-//   return rawPackageName.substring(scopeEnd)
-// }
-
 function getOutputFileName(fileName, isProd = false) {
   return isProd ? fileName.replace(/\.js$/, '.min.js') : fileName
 }
-
 
 const external = Object.keys(pkg.peerDependencies || {}) || []
 

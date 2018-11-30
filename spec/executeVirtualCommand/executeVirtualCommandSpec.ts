@@ -1,4 +1,4 @@
-import { compare, execute, executeAndReturnOutputFile, buildInputFile } from '../../src'
+import { compare, execute } from '../../src'
 import { absolutize } from '../testUtil'
 
 export default describe('executeVirtualCommand', () => {
@@ -121,23 +121,31 @@ export default describe('executeVirtualCommand', () => {
       const result = await execute(`
       convert rose: -rotate 22 foo\`uniqueName\`.gif
       convert rose: -rotate 22 \`uniqueName\`.gif
-    `)
+    ` )
       expect(result.exitCode).toBe(0)
       expect(result.outputFiles[0].name).toStartWith('foo')
       expect(result.outputFiles[0].name).toEndWith('.gif')
+      expect(result.outputFiles[0].name).not.toContain('uniqueName')
       done()
     })
 
     it('uniqueName gives unique names', async done => {
       const result = await execute(`
       convert rose: -rotate 22 \`uniqueName\`.gif
-    `)
+      convert rose: -rotate 22 \`uniqueName\`.gif
+      `)
       expect(result.exitCode).toBe(0)
+      expect(result.outputFiles[0].name).not.toContain('uniqueName')
+      expect(result.outputFiles[1].name).not.toContain('uniqueName')
+      expect(result.outputFiles[0].name).not.toBe(result.outputFiles[1].name)
+
       const result2 = await execute(`
       convert rose: -rotate 22 \`uniqueName\`.gif
-    `)
+      `)
       expect(result2.exitCode).toBe(0)
+      expect(result2.outputFiles[0].name).not.toContain('uniqueName')
       expect(result.outputFiles[0].name).not.toBe(result2.outputFiles[0].name)
+      expect(result.outputFiles[1].name).not.toBe(result2.outputFiles[0].name)
       done()
     })
   })
