@@ -1,5 +1,5 @@
 import { compare, execute } from '../../src'
-import { absolutize } from '../testUtil'
+import { absolutize, showImages } from '../testUtil'
 
 export default describe('executeVirtualCommand', () => {
 
@@ -42,6 +42,22 @@ export default describe('executeVirtualCommand', () => {
       expect(result.stdout).toEqual(['foo_out1.png', 'foo_jo__jo_out4.png'])
       done()
     })
+
+    it('virtual command ls wildcard in substitution', async done => {
+      const result = await execute(`
+      convert rose: -shear 10x30 -resize 50x50! 1.miff
+      convert rose: -shear 10x40 -resize 50x50! 2.miff
+      convert rose: -shear 10x60 -resize 50x50! 3.miff
+      convert -delay 100 \`ls *.miff\` out1.gif
+      convert -delay 100 1.miff 2.miff 3.miff out2.gif
+      convert out1.gif -coalesce -append out1_append.png
+      convert out2.gif -coalesce -append out2_append.png
+      `)
+      expect(await compare(result.outputFiles.filter(f=>['out1_append.png', 'out2_append.png'].includes(f.name)))).toBe(true)
+      expect(result.exitCode).toBe(0)
+      done()
+    })
+
 
   })
 

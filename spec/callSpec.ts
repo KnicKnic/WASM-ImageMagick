@@ -18,21 +18,56 @@ export default describe('call', () => {
       done()
     })
 
-    it('should preserve empty new lines in stdout', async done => {
+    xit('should preserve empty new lines in stdout', async done => { // commented because convert -print or convert -format is breaking all following identify commands
       const result = await call([], ['convert', 'rose:', '-print', '\\n\\nfoo\\n\\n\\nbar\\n\\n', 'info:'])
       expect(result.stdout.join('\n')).toContain(`\n\nfoo\n\n\nbar\n\n`)
       done()
     })
 
-    xit('should print last chars in stdout and stderr no matter if it doesn\'t end with new line', async done => {
-      // this is currently broken because of https://github.com/kripken/emscripten/issues/7360
-      // this command won't print 'bar' if -print doesn't end with a new line convert rose: -print '\nfoo\nbar' -format '%f' info:
 
-      const result = await call([], ['convert', 'rose:', '-format', 'lorem %f ipsum', 'info:'])
-      expect(result.stdout.join('\n')).toContain(`lorem 46 ipsum`) // fails because of that issue
+    describe('stdout flush issues', () => {
 
-      done()
+      xit('should print last chars in stdout and stderr no matter if it doesn\'t end with new line', async done => {
+        // this is currently broken because of https://github.com/kripken/emscripten/issues/7360
+
+        let result
+        result = await call([], ['identify', '-format', '%m:%f %wx%h foo', 'rose:'])
+        expect(result.stdout.join('\n')).toContain(`PNM: 70x46 foo`)
+        done()
+      })
+
+
+      it('regarding to previous error, it works if we append a new line char', async done => {
+        let result
+        result = await call([], ['identify', '-format', '%m:%f %wx%h foo\\n', 'rose:'])
+        expect(result.stdout.join('\n')).toContain(`PNM: 70x46 foo`)
+
+        result = await call([await buildInputFile('fn.png')], ['identify', '-format', '%m:%f %wx%h foo\\n', 'fn.png'])
+        expect(result.stdout.join('\n')).toContain(`PNG:fn.png 109x145 foo`)
+
+        done()
+      })
+
+
+      xit('and related to the same error, using convert info: will just break all the following commands no matter the new line', async done => {
+        // this is currently broken because of https://github.com/kripken/emscripten/issues/7360
+        let result
+        result = await call([], ['identify', '-format', '%m:%f %wx%h foo\\n', 'rose:'])
+        expect(result.stdout.join('\n')).toContain(`PNM: 70x46 foo`) // THIS works
+
+        result = await call([], ["convert", "rose:", "-format", "%m:%f %wx%h foo\\n", "info:"])
+        expect(result.stdout.join('\n')).toContain(`PNM: 70x46 foo`) // fails because of that issue
+
+
+        result = await call([], ['identify', '-format', '%m:%f %wx%h foo\\n', 'rose:'])
+        expect(result.stdout.join('\n')).toContain(`PNM: 70x46 foo`) // STOP WORKING ! and previous stdout comes here because lack of flush
+
+
+        done()
+      })
+
     })
+
 
   })
 

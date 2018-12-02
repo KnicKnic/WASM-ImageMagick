@@ -14,7 +14,7 @@ export async function getBuiltInImages(): Promise<MagickInputFile[]> {
       const {outputFiles} = await execute({commands: `convert ${name} ${`output1.${info[0].image.format.toLowerCase()}`}`} )
       outputFiles[0].name = name
       return await asInputFile(outputFiles[0])
-    })
+    }, {concurrency: 1})
   }
   return builtInImages
 }

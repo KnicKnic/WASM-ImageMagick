@@ -1,13 +1,13 @@
-import pMap from 'p-map';
-import * as React from 'react';
-import { style } from 'typestyle';
+import pMap from 'p-map'
+import * as React from 'react'
+import { style } from 'typestyle'
 import {
   arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo,
-  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText, 
-  getFileNameExtension, knownSupportedWriteOnlyImageFormats, flat, renderCommand
-} from 'wasm-imagemagick';
-import { commandExamples, Example } from './commandExamples';
-import { blobToString } from 'imagemagick-browser';
+  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText,
+  getFileNameExtension, knownSupportedWriteOnlyImageFormats, flat, renderCommand,
+} from 'wasm-imagemagick'
+import { commandExamples, Example } from './commandExamples'
+import { blobToString } from 'imagemagick-browser'
 
 export interface AppProps {
   context: ExecutionContext
@@ -50,9 +50,9 @@ export class App extends React.Component<AppProps, AppState> {
     stderr: '',
     exitCode: 0,
     prettyJSON: false,
-    isImageArray: [], 
+    isImageArray: [],
     finalCommand: [[]],
-    memory: getMemory()
+    memory: getMemory(),
   }
 
   protected styles = {
@@ -108,7 +108,7 @@ export class App extends React.Component<AppProps, AppState> {
               <tbody>
                 {this.state.files.map((f, i) =>
                   <tr>
-                    <td><a download={f.name} target="_blank" href={URL.createObjectURL(new Blob([f.content]))}>{f.name}</a></td>
+                    <td><a download={f.name} target='_blank' href={URL.createObjectURL(new Blob([f.content]))}>{f.name}</a></td>
                     <td>
                       <button data-image={f.name} onClick={this.removeImage.bind(this)}>remove</button>
                     </td>
@@ -144,7 +144,7 @@ export class App extends React.Component<AppProps, AppState> {
             <label>Pretty JSON ? <input type='checkbox' onChange={this.prettyJSONChange.bind(this)}></input></label>
           </div>
           <div>
-            Final Command: 
+            Final Command:
             <textarea className={this.styles.textarea} disabled={true} value={JSON.stringify(this.state.finalCommand)}></textarea>
           </div>
           <div>
@@ -185,9 +185,9 @@ export class App extends React.Component<AppProps, AppState> {
       await this.addInputFiles([await buildInputFile(this.defaultImage)])
     }
   }
-  
-  componentWillUpdate(){
-    this.state.memory=getMemory()
+
+  componentWillUpdate() {
+    this.state.memory = getMemory()
   }
 
   protected async prettyJSONChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -233,7 +233,7 @@ export class App extends React.Component<AppProps, AppState> {
   protected async execute() {
     this.state.finalCommand = this.buildFinalCommand()
     const cmd = this.state.finalCommand
-    console.log('Final Command: '+JSON.stringify(cmd));
+    console.log('Final Command: ' + JSON.stringify(cmd))
     const result = await this.props.context.execute(cmd)
     this.state.outputFiles = result.outputFiles
     this.state.stderr = result.stderr.join('\n')
@@ -287,7 +287,7 @@ export class App extends React.Component<AppProps, AppState> {
     const example = commandExamples[e.currentTarget.selectedIndex]
     const command = await this.commandExampleAsCommand(example)
     this.state.commandString = typeof example.command === 'string' ? example.command : arrayToCli(command)
-    this.state.commandArray=JSON.stringify(command)
+    this.state.commandArray = JSON.stringify(command)
     this.setState({ ...this.state,  finalCommand: this.buildFinalCommand() })
   }
 
@@ -309,5 +309,5 @@ async function buildFileSrc(file: MagickFile, isImage_?: boolean): Promise<strin
 
 function getMemory() {
   // return ((performance as any).memory.usedJSHeapSize) /(performance as any).memory.totalJSHeapSize
-  return Math.round(((performance as any).memory.usedJSHeapSize)*100 /(performance as any).memory.totalJSHeapSize)
+  return Math.round(((performance as any).memory.usedJSHeapSize) * 100 / (performance as any).memory.totalJSHeapSize)
 }

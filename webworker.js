@@ -9,27 +9,23 @@ if (typeof Module == 'undefined') {
     noInitialRun: true,
     moduleLoaded: false,
     messagesToProcess: [],
-
-    print: text => { 
-      stdout.push(text) 
-      // console.log(text)      
+    onRuntimeInitialized: function () {
+      FS.mkdir('/pictures')
+      FS.currentPath = '/pictures'
+      Module.moduleLoaded = true
+      processFiles()
     },
-    printErr: text => { 
+    print: text => {
+      // console.log('LOG', text);
+      stdout.push(text)
+    },
+    printErr: text => {
       stderr.push(text)
-      console.error(text);      
+      console.error(text);
     },
-    quit: status=> {
+    quit: status => {
       exitCode = status
     }
-  }
-
-  // see https://kripken.github.io/emscripten-site/docs/api_reference/module.html
-  Module.onRuntimeInitialized = function () {
-    FS.mkdir('/pictures')
-    FS.currentPath = '/pictures'
-
-    Module.moduleLoaded = true
-    processFiles()
   }
 }
 
@@ -52,11 +48,13 @@ processFiles = function () {
     try {
       Module.callMain(message.args)
     }
-    catch (e) { }
+    catch (error) {
+      console.error('Error in Module.callMain worker thread: ', error, error && error.stack)
+    }
+    // cleanup source files
     for (let file of message.files) {
-      // cleanup source files
-      // mogrify then output files have same name, so skip
       if (message.args[0] != 'mogrify') {
+        // heads up: mogrify command override input files so we skip file unlink
         FS.unlink(file.name)
       }
     }

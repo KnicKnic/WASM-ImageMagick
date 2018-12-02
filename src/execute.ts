@@ -198,7 +198,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       allOutputFiles[f.name] = f
       const inputFile = await asInputFile(f)
       allInputFiles[inputFile.name] = inputFile
-    })
+    }, {concurrency: 1})
   }
   const commands = asCommand(config.commands)
   await pMap(commands, mapper, { concurrency: 1 })

@@ -12,10 +12,9 @@ export default {
     const files = values(c.files)
     const result = await execute({ inputFiles: files, commands: [substitution.command], executionId: c.executionId })
     if (result.stdout.length) {
-
       result.stdout[result.stdout.length - 1] = substitution.restStart + result.stdout[result.stdout.length - 1] + substitution.restEnd
     }
-    fixedCommand.splice(substitution.index, 0, result.stdout.join('\n'))
+    fixedCommand.splice(substitution.index, 0, ...result.stdout)
     const result2 = await execute({ inputFiles: files.concat(await pMap(result.outputFiles, f => asInputFile(f))), commands: [fixedCommand], executionId: c.executionId })
     return {
       ...result2, results: [result, result2], stdout: result.stdout.concat(result2.stdout),

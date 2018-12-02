@@ -72,7 +72,7 @@ class ImageHomeImpl implements ImageHome {
 
   async addBuiltInImages() {
     if (!this.builtInImagesAdded) {
-      await pMap(await getBuiltInImages(), img => this.register(img))
+      await pMap(await getBuiltInImages(), img => this.register(img), {concurrency: 1})
       this.builtInImagesAdded = true
     }
   }
