@@ -13,6 +13,7 @@
 * [command](virtualcommandcontext.md#command)
 * [executionId](virtualcommandcontext.md#executionid)
 * [files](virtualcommandcontext.md#files)
+* [virtualCommandLogs](virtualcommandcontext.md#virtualcommandlogs)
 
 ---
 
@@ -24,7 +25,7 @@
 
 **● command**: *`string`[]*
 
-*Defined in [executeVirtualCommand.ts:11](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/executeVirtualCommand.ts#L11)*
+*Defined in [executeVirtualCommand/VirtualCommand.ts:20](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executeVirtualCommand/VirtualCommand.ts#L20)*
 
 ___
 <a id="executionid"></a>
@@ -33,7 +34,7 @@ ___
 
 **● executionId**: *`number`*
 
-*Defined in [executeVirtualCommand.ts:13](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/executeVirtualCommand.ts#L13)*
+*Defined in [executeVirtualCommand/VirtualCommand.ts:22](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executeVirtualCommand/VirtualCommand.ts#L22)*
 
 ___
 <a id="files"></a>
@@ -42,11 +43,20 @@ ___
 
 **● files**: *`object`*
 
-*Defined in [executeVirtualCommand.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/executeVirtualCommand.ts#L12)*
+*Defined in [executeVirtualCommand/VirtualCommand.ts:21](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executeVirtualCommand/VirtualCommand.ts#L21)*
 
 #### Type declaration
 
 [name: `string`]: [MagickInputFile](magickinputfile.md)
+
+___
+<a id="virtualcommandlogs"></a>
+
+###  virtualCommandLogs
+
+**● virtualCommandLogs**: *[VirtualCommandLogs](../#virtualcommandlogs)*
+
+*Defined in [executeVirtualCommand/VirtualCommand.ts:23](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executeVirtualCommand/VirtualCommand.ts#L23)*
 
 ___
 

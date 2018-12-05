@@ -3,7 +3,7 @@ import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
 import { CallResult } from './magickApi'
 import { asInputFile, isInputFile } from './util'
 import { values } from './util/misc'
-import { isVirtualCommand, dispatchVirtualCommand, VirtualCommandContext } from './executeVirtualCommand/VirtualCommand'
+import { isVirtualCommand, _dispatchVirtualCommand, VirtualCommandContext, VirtualCommandLogs } from './executeVirtualCommand/VirtualCommand'
 
 export type Command = (string | number)[]
 
@@ -124,8 +124,8 @@ export interface ExecuteResult extends CallResult {
   /** the original commands used in the execute() call */
   commands: ExecuteCommand[],
   // breakOnError?: boolean
+  virtualCommandLogs?: VirtualCommandLogs
 }
-
 /**
  * Execute all commands in given config serially in order. Output files from a command become available as
  * input files in next commands. In the following example we execute two commands. Notice how the second one uses `image2.png` which was the output file of the first one:
@@ -174,6 +174,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   const results: CallResult[] = []
   let allStdout = []
   let allStderr = []
+  const virtualCommandLogs: VirtualCommandLogs = {}
   async function mapper(c: string[]) {
     const thisConfig = {
       inputFiles: values(allInputFiles),
@@ -183,10 +184,11 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       command: c,
       files: allInputFiles,
       executionId,
+      virtualCommandLogs
     }
     let result: CallResult
     if (isVirtualCommand(virtualCommandContext)) {
-      result = await dispatchVirtualCommand(virtualCommandContext)
+      result = await _dispatchVirtualCommand(virtualCommandContext)
     }
     else {
       result = await executeOne(thisConfig)
@@ -212,6 +214,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     command: [],
     commands,
     inputFiles:  config.inputFiles,
+    virtualCommandLogs
   }
 }
 

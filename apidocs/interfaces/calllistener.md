@@ -23,7 +23,7 @@
 
 ▸ **afterCall**(event: *[CallEvent](callevent.md)*): `void`
 
-*Defined in [magickApi.ts:130](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/magickApi.ts#L130)*
+*Defined in [magickApi.ts:142](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L142)*
 
 **Parameters:**
 
@@ -40,7 +40,7 @@ ___
 
 ▸ **beforeCall**(event: *[CallEvent](callevent.md)*): `void`
 
-*Defined in [magickApi.ts:131](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/magickApi.ts#L131)*
+*Defined in [magickApi.ts:143](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L143)*
 
 **Parameters:**
 

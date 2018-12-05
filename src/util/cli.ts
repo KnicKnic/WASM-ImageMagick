@@ -31,7 +31,7 @@ export function arrayToCli(command: Command | Command[]): string {
 /**
  * Generates a command in the form of array of strings, compatible with {@link call} from given command line string . The string must contain only one command (no newlines).
  */
-function cliToArrayOne(cliCommand: string): Command {
+export function cliToArrayOne(cliCommand: string): Command {
   if (cliCommand.trim().startsWith('#')) {
     return undefined
   }
@@ -39,7 +39,7 @@ function cliToArrayOne(cliCommand: string): Command {
   const spaceIndexes = [0]
   for (let index = 0; index < cliCommand.length; index++) {
     const c = cliCommand[index]
-    if (c.match(/[\s]/im) && !inString) {
+    if (c.match(/[ ]/im) && !inString) {
       spaceIndexes.push(index)
     }
     if (c === `'`) {
@@ -48,7 +48,8 @@ function cliToArrayOne(cliCommand: string): Command {
   }
   spaceIndexes.push(cliCommand.length)
   const command = spaceIndexes
-    .map((spaceIndex, i) => cliCommand.substring(i === 0 ? 0 : spaceIndexes[i - 1], spaceIndexes[i]).trim())
+    // .map((spaceIndex, i) => cliCommand.substring(i === 0 ? 0 : spaceIndexes[i - 1], spaceIndexes[i]).trim())
+    .map((spaceIndex, i) => cliCommand.substring(i === 0 ? 0 : spaceIndexes[i - 1], spaceIndexes[i]).replace(/^[ ]+/, '').replace(/[ ]+$/, ''))
     .filter(s => !!s)
 
     // remove quotes
@@ -58,6 +59,9 @@ function cliToArrayOne(cliCommand: string): Command {
     //  unescape parenthesis
     .map(s => s === `\\(` ? `(` : s === `\\)` ? `)` : s)
 
+    .map(s=>s.replace(/\\n/g, '\n')) // so `%w\\n` is transformed to `%w\n' - we cant have new lines because of cliToArray split('\n') - so user must escape it and here we unescape
+    // .map(s=>s)
+  // debugger1
   return command
 }
 
@@ -68,7 +72,8 @@ function cliToArrayOne(cliCommand: string): Command {
  */
 export function cliToArray(cliCommand: string): Command[] {
   const lines = cliCommand.split('\n')
-    .map(s => s.trim()).map(cliToArrayOne)
+    .map(s => s.trim())
+    .map(cliToArrayOne)
     .filter(a => a && a.length)
   const result = []
   let currentCommand: Command = []

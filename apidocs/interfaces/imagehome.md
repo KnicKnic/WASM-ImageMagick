@@ -29,7 +29,7 @@ Manager for `MagickFiles`.
 
 ▸ **addBuiltInImages**(): `Promise`<`void`>
 
-*Defined in [imageHome.ts:26](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/imageHome.ts#L26)*
+*Defined in [imageHome.ts:26](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/imageHome.ts#L26)*
 
 Add ImageMagick built-in images like `rose:`, `logo:`, etc to this execution context so they are present in `getAll()`.
 
@@ -42,7 +42,7 @@ ___
 
 ▸ **get**(name: *`string`*): `Promise`<[MagickInputFile](magickinputfile.md)>
 
-*Defined in [imageHome.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/imageHome.ts#L12)*
+*Defined in [imageHome.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/imageHome.ts#L12)*
 
 Get a file by name.
 
@@ -61,7 +61,7 @@ ___
 
 ▸ **getAll**(): `Promise`<[MagickInputFile](magickinputfile.md)[]>
 
-*Defined in [imageHome.ts:22](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/imageHome.ts#L22)*
+*Defined in [imageHome.ts:22](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/imageHome.ts#L22)*
 
 Get all the files currently available in this context.
 
@@ -74,7 +74,7 @@ ___
 
 ▸ **isRegistered**(name: *`string`*): `boolean`
 
-*Defined in [imageHome.ts:18](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/imageHome.ts#L18)*
+*Defined in [imageHome.ts:18](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/imageHome.ts#L18)*
 
 **Parameters:**
 
@@ -91,7 +91,7 @@ ___
 
 ▸ **register**(file: *[MagickFile](magickfile.md)*, name?: *`string`*): `void`
 
-*Defined in [imageHome.ts:17](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/imageHome.ts#L17)*
+*Defined in [imageHome.ts:17](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/imageHome.ts#L17)*
 
 Programmatically add new files.
 
@@ -111,7 +111,7 @@ ___
 
 ▸ **remove**(names: *`string`[]*): [MagickInputFile](magickinputfile.md)[]
 
-*Defined in [imageHome.ts:31](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/imageHome.ts#L31)*
+*Defined in [imageHome.ts:31](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/imageHome.ts#L31)*
 
 Remove files by name.
 

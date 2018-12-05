@@ -6,7 +6,8 @@ import cat from './cat'
 import ls from './ls'
 import uniqueName from './uniqueName'
 import substitution from './substitution'
-import variable from './variable'
+import variableDeclaration from './variableDeclaration'
+import variableSubstitution from './variableSubstitution';
 
 export interface VirtualCommand {
   name: string
@@ -14,10 +15,12 @@ export interface VirtualCommand {
   predicate(c: VirtualCommandContext): boolean
 }
 
+export type VirtualCommandLogs = {[virtualCommandName: string]: any[]}
 export interface VirtualCommandContext {
   command: string[]
   files: { [name: string]: MagickInputFile }
   executionId: number
+  virtualCommandLogs:  VirtualCommandLogs
 }
 
 const virtualCommands: VirtualCommand[] = []
@@ -26,26 +29,27 @@ export function isVirtualCommand(context: VirtualCommandContext): boolean {
   return !!virtualCommands.find(c => c.predicate(context))
 }
 
-export function dispatchVirtualCommand(context: VirtualCommandContext): Promise<ExecuteResult> {
+export function _dispatchVirtualCommand(context: VirtualCommandContext): Promise<ExecuteResult> {
   const cmd = virtualCommands.find(c => c.predicate(context))
+  context.virtualCommandLogs[cmd.name] = context.virtualCommandLogs[cmd.name] ||[]
   return cmd.execute(context)
 }
 
-export function registerVirtualCommand(c: VirtualCommand) {
+export function registerExecuteVirtualCommand(c: VirtualCommand) {
   virtualCommands.push(c)
 }
 
-registerVirtualCommand(variable)
+// registerExecuteVirtualCommand(variableSubstitution)
+registerExecuteVirtualCommand(substitution)
+// registerExecuteVirtualCommand(variableDeclaration)
 
-registerVirtualCommand(substitution)
+registerExecuteVirtualCommand(ls)
 
-registerVirtualCommand(ls)
+registerExecuteVirtualCommand(cat)
 
-registerVirtualCommand(cat)
+registerExecuteVirtualCommand(buildInputFile)
 
-registerVirtualCommand(buildInputFile)
-
-registerVirtualCommand(uniqueName)
+registerExecuteVirtualCommand(uniqueName)
 
 export function _newExecuteResult(c: VirtualCommandContext, result: Partial<ExecuteResult> = {}): ExecuteResult {
   const r: ExecuteResult = {
@@ -55,7 +59,8 @@ export function _newExecuteResult(c: VirtualCommandContext, result: Partial<Exec
       command: c.command,
       exitCode: 0,
       stderr: [], stdout: [],
-      inputFiles: values(c.files), results: [],
+      inputFiles: values(c.files), 
+      results: []
     }, ...result,
   }
   return { ...r, results: [r] }

@@ -74,13 +74,25 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
 
   const t0 = performance.now()
   const id = magickWorkerPromisesKey
-  callListeners.forEach(listener => listener.beforeCall({ inputFiles, command, id }))
+  callListeners.forEach(listener => {
+    if (listener.beforeCall) {
+      listener.beforeCall({ inputFiles, command, id })
+    }
+  })
+
+  promise.then(async callResult => {
+    const took = performance.now() - t0
+    callListeners.forEach(listener => {
+      if (listener.afterCall) {
+        listener.afterCall({ inputFiles, command, id, callResult, took })
+      }
+    })
+    return callResult
+  })
 
   magickWorker.postMessage(request)
-
-  promise.then(callResult => callListeners.forEach(listener => listener.afterCall({ inputFiles, command, id, callResult, took: performance.now() - t0 })))
-
   magickWorkerPromisesKey++
+
   return promise
 }
 
@@ -116,7 +128,7 @@ magickWorker.onmessage = e => {
   promise.resolve(result)
 }
 
-// execute event emitter
+// call() global event emitter
 
 export interface CallEvent {
   command: string[]
@@ -133,6 +145,13 @@ export interface CallListener {
 
 const callListeners: CallListener[] = []
 
+/**
+ * Adds a new call() listener notified before and after call() executes.
+ */
 export function addCallListener(l: CallListener) {
   callListeners.push(l)
+}
+
+export function removeAllCallListeners() {
+  callListeners.splice(0, callListeners.length)
 }

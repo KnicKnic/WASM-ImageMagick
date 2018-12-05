@@ -63,6 +63,27 @@ export default describe('substitution', () => {
       })
     })
 
+    xit('cvar decl', () => { // variable support disabled 
+      const c = asCommand(`vv='\`identify -format %w\\n rose:\`'`)[0].map(s => s + '')
+      const result = resolveCommandSubstitution(c)
+      // console.log(result)
+
+      expect(result).toEqual({
+        fixedCommand: [],
+        substitution: {
+          index: 0,
+          command: [
+            'identify',
+            '-format',
+            '%w\n',
+            'rose:',
+          ],
+          restStart: 'vv=',
+          restEnd: '',
+        },
+      })
+    })
+
     it('command with multiple args and postfix', () => {
       const result = resolveCommandSubstitution(asCommand(`convert rose: -resize \`cat xCoord.txt\`x55 foo2.png`)[0].map(s => s + ''))
       expect(result).toEqual({

@@ -64,6 +64,27 @@ convert bar.gif -resize 50% out.tiff
 
     })
 
+    it('', async done=>{
+      // expect(cliToArray(` 
+      // identify -format %wx%h\\n
+      // `).map(s=>s+'')).toEqual(['identify', '-format', '%wx%h\n'])
+      
+      console.log(cliToArray(` 
+      identify -format %wx%h\\n
+      `));
+      
+    //   // expect(cliToArray(` 
+    //   // identify -format '%wx%h\n'
+    //   // `)).toBe([])
+      
+    //   // expect(cliToArray(` 
+    //   // convert logo: -resize \`identify -format %wx%h\\n rose:\` out1.png
+    //   // `)).toBe([])
+
+      done()
+    })
+
+
     describe('asCommand', () => {
       it('should support multiple commands separated by new line and respect the \\ character to continue the same command in another line - all in the same string - no arrays', () => {
 
@@ -104,6 +125,7 @@ convert bar.gif -resize 50% out.tiff
             ['convert', 'bar.gif', '-resize', '50%', 'out.tiff']])
 
       })
+
     })
   })
 

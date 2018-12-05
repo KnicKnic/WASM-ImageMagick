@@ -27,7 +27,7 @@
 
 **● name**: *`string`*
 
-*Defined in [executeVirtualCommand.ts:28](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/executeVirtualCommand.ts#L28)*
+*Defined in [executeVirtualCommand/VirtualCommand.ts:13](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executeVirtualCommand/VirtualCommand.ts#L13)*
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 ▸ **execute**(c: *[VirtualCommandContext](virtualcommandcontext.md)*): `Promise`<[ExecuteResult](executeresult.md)>
 
-*Defined in [executeVirtualCommand.ts:29](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/executeVirtualCommand.ts#L29)*
+*Defined in [executeVirtualCommand/VirtualCommand.ts:14](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executeVirtualCommand/VirtualCommand.ts#L14)*
 
 **Parameters:**
 
@@ -56,7 +56,7 @@ ___
 
 ▸ **predicate**(c: *[VirtualCommandContext](virtualcommandcontext.md)*): `boolean`
 
-*Defined in [executeVirtualCommand.ts:30](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/executeVirtualCommand.ts#L30)*
+*Defined in [executeVirtualCommand/VirtualCommand.ts:15](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executeVirtualCommand/VirtualCommand.ts#L15)*
 
 **Parameters:**
 

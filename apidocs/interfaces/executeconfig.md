@@ -6,8 +6,6 @@
 
 **ExecuteConfig**
 
-↳  [ExecuteContextPlaceholders](executecontextplaceholders.md)
-
 ## Index
 
 ### Properties
@@ -26,7 +24,7 @@
 
 **● commands**: *[ExecuteCommand](../#executecommand)*
 
-*Defined in [execute.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/execute.ts#L12)*
+*Defined in [execute.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/execute.ts#L12)*
 
 ___
 <a id="executionid"></a>
@@ -35,7 +33,9 @@ ___
 
 **● executionId**: *`number`*
 
-*Defined in [execute.ts:13](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/execute.ts#L13)*
+*Defined in [execute.ts:14](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/execute.ts#L14)*
+
+internal id for execution calls so execute() extensions like virtual commands have a chance to identify each call if they also invoke execute() internally
 
 ___
 <a id="inputfiles"></a>
@@ -44,7 +44,7 @@ ___
 
 **● inputFiles**: *[MagickInputFile](magickinputfile.md)[]*
 
-*Defined in [execute.ts:11](https://github.com/KnicKnic/WASM-ImageMagick/blob/b63753c/src/execute.ts#L11)*
+*Defined in [execute.ts:11](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/execute.ts#L11)*
 
 ___
 
