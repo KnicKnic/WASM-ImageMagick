@@ -1,5 +1,5 @@
-import * as template from 'lodash.template'
 import { ExecuteConfig } from './execute'
+const template = require('lodash.template')
 
 export interface CommandPreprocessor {
   name: string,
@@ -10,16 +10,13 @@ const commandPreprocessors: CommandPreprocessor[] = []
 
 /** internal - executes all registered preprocessors on given config */
 export function _preprocessCommand(config: ExecuteConfig): ExecuteConfig {
-  if (typeof (config.commands) === 'string') {
-    let cfg = config
-    commandPreprocessors.forEach(p => {
-      cfg = p.execute(cfg)
-    })
-    return { ...cfg }
-  }
-  else {
-    return config
-  }
+
+  let cfg = config
+  commandPreprocessors.forEach(p => {
+    cfg = p.execute(cfg)
+  })
+  return { ...cfg }
+
 }
 
 export function registerCommandPreprocessor(p: CommandPreprocessor) {
@@ -29,8 +26,13 @@ export function registerCommandPreprocessor(p: CommandPreprocessor) {
 registerCommandPreprocessor({
   name: 'template',
   execute(context) {
-    const commandTemplate = template(context.commands)
-    const commands = commandTemplate(context)
-    return { ...context, commands }
+    if (typeof (context.commands) === 'string') {
+      const commandTemplate = template(context.commands)
+      const commands = commandTemplate(context)
+      return { ...context, commands }
+    }
+    else {
+      return context
+    }
   },
 })

@@ -50,15 +50,13 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
 
 ### Image formats supported
 
-Supports PNG, TIFF, JPEG, BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/), and more! 
-
-See a list of known supported formats in this [demo](https://cancerberosgx.github.io/demos/WASM-ImageMagick/supported-formats/)
+ * Supports PNG, TIFF, JPEG, BMP, GIF, [PhotoShop](https://www.adobe.com/products/photoshop.html), [GIMP](https://www.gimp.org/), and many more! See a list of known supported formats in this [demo](https://cancerberosgx.github.io/demos/WASM-ImageMagick/supported-formats/).
+ * [Text](https://www.imagemagick.org/Usage/text/). 
 
 ### Features **not** supported 
 
- * [Text](https://www.imagemagick.org/Usage/text/)
- * [Fourier Transforms](https://www.imagemagick.org/Usage/fourier/)
- * Formats not listed above, particularly webp.
+ * [Fourier Transforms](https://www.imagemagick.org/Usage/fourier/).
+ * Formats not listed above, particularly webp. Some formats are write-only, like PS, PDF, SVG, DJVU. 
  
 
 

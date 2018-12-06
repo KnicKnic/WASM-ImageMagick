@@ -7,3 +7,7 @@ investigate https://github.com/bgrins/videoconverter.js - that supports ffmpeg i
  * maybe we can use https://github.com/coolwanglu/emscripten/tree/master/tests/poppler for reading pdfs - configure IM delegate
 
  * investigate if freetype from emscripten ports is compatible with what IM requires. there are some undefined symbols if using .h files from ports so my guess IM requires FT version 2 while the port is version 1.
+
+ * TODO: be able to configure IM using xml files could be useful for the case of fonts so we don't have to load input files for each.
+
+ * idea: a font manager app: convert ttf to preview image or gif animation. export ttf to svgs ? or to others

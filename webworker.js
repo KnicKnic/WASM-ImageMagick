@@ -58,6 +58,8 @@ function processFiles() {
       // flush stdio so stdout gets string that doesn't end with new line
       if(Module._fflush) {
         Module._fflush(0)
+        Module._fflush(1)
+        Module._fflush(2)
       }
     }
     catch (error) {
