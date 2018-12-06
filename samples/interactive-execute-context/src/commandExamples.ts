@@ -30,8 +30,8 @@ export const commandExamples: Example[] = [
     tags: [ExampleTag.info],
   },
 {
-  name: 'text spiral',
-    description: `create text in spiral shape using helvetica ttf font`,
+  name: 'text transformations and decorations 1',
+    description: `render text in cool mannercreate cool text in spiral shape using helvetica ttf font`,
   command: `# Heads up: we first build the input file of the font 
 # and then use it explicitly referencing it by file name
 buildFile helvetica.ttf
@@ -54,12 +54,24 @@ convert -size 400x120 xc:lightblue  -font helvetica.ttf  -pointsize 72 \\
   -fill black  -annotate +45+95 'Sebastián' -motion-blur 0x1+65 \\
   \`uniqueName\`.jpg
 
-# next command: : smoking font
-convert -size 340x150 xc:lightblue  -font helvetica.ttf  -pointsize 62 \\
+# next command:  smoking font - using waltographUI.ttf
+buildFile waltographUI.ttf
+convert -size 340x150 xc:lightblue  -font waltographUI.ttf  -pointsize 62 \\
   -fill black  -annotate +20+105 'Sebastián'  -motion-blur 0x25+145 \\
   -background lightblue -rotate 6  -wave 3x35  -rotate -6 \\
 -fill navy   -annotate +25+105 'Sebastián'  \\ 
   \`uniqueName\`.jpg
+
+
+convert -background none -fill DodgerBlue \
+-font \`buildFile 'http://webpagepublicity.com/free-fonts/y/y.n.w.u.a.y.ttf'\` -pointsize 72  label:A  -trim +repage \\
+-bordercolor None -border 1x1 \\
+aqua_shape.png
+convert aqua_shape.png \\
+-alpha Extract -blur 0x8  -shade 130x30 -alpha On \\
+-background gray50 -alpha background -auto-level \\
+\`uniqueName\`.png
+
   
   
   `,

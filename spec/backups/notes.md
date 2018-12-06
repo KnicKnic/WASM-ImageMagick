@@ -14,6 +14,8 @@ investigate https://github.com/bgrins/videoconverter.js - that supports ffmpeg i
 
  * issue this doesn't work `convert foo.png \\ # a comment at the end of the line - could be empty`
 
+ * build file should memoize
+
  * issue: if i dont put the second commend then it breaks and both commands get concatenated: 
  ```
    command: `# Heads up: we first build the input file of the font 
