@@ -1,10 +1,10 @@
-import * as template from 'lodash.template'
 import pMap from 'p-map'
 import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
 import { isVirtualCommand, VirtualCommandContext, VirtualCommandLogs, _dispatchVirtualCommand } from './executeVirtualCommand/VirtualCommand'
 import { CallResult } from './magickApi'
 import { asInputFile, isInputFile } from './util'
 import { values } from './util/misc'
+import { _preprocessCommand } from './executeCommandPreprocessor';
 
 export type Command = (string | number)[]
 
@@ -81,39 +81,6 @@ export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand
   }
 }
 
-export interface CommandPreprocessor {
-  name: string,
-  execute: (context: ExecuteConfig) => ExecuteConfig
-}
-
-const commandPreprocessors: CommandPreprocessor[] = []
-
-function preprocessCommand(config: ExecuteConfig): ExecuteConfig {
-  if (typeof (config.commands) === 'string') {
-    let cfg = config
-    commandPreprocessors.forEach(p => {
-      cfg = p.execute(cfg)
-    })
-    return { ...cfg }
-  }
-  else {
-    return config
-  }
-}
-
-export function registerCommandPreprocessor(p: CommandPreprocessor) {
-  commandPreprocessors.push(p)
-}
-
-registerCommandPreprocessor({
-  name: 'template',
-  execute(context) {
-    const commandTemplate = template(context.commands)
-    const commands = commandTemplate(context)
-    return { ...context, commands }
-  },
-})
-
 export function isExecuteConfig(arg: any): arg is ExecuteConfig {
   return !!arg.commands
 }
@@ -140,9 +107,8 @@ export function asExecuteConfig(configOrCommandOrFiles: ExecuteConfig | ExecuteC
       inputFiles: [],
       commands: configOrCommandOrFiles as ExecuteCommand,
     }
-
   }
-  return result.skipCommandPreprocessors ? result : preprocessCommand(result)
+  return result.skipCommandPreprocessors ? result : _preprocessCommand(result)
 }
 
 /**

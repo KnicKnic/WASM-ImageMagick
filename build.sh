@@ -1,21 +1,30 @@
 
-export CPPFLAGS="-I/code/libpng -I/code/zlib -I/code/libjpeg -I/code/libtiff/libtiff `pkg-config --cflags freetype2`"
+# heads up : if pointing to freetype emscripten_ports then ld will warn about undefined symbols: error: undefined symbol: FT_Done_Face probably because is version 1. This doesn't happen if pointing to system freetype2: like `pkg-config --cflags freetype2` - pointing to emscripten_ports any way cause is safer. - emcc won't fail regardless undefined symbols:
+export CPPFLAGS="-I/code/libpng -I/code/zlib -I/code/libjpeg -I/code/libtiff/libtiff -I ~/.emscripten_ports/freetype/FreeType-version_1/include/"
+
 export LDFLAGS="-L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -L/code/libtiff/libtiff"
+
 export CFLAGS="-O3"
+
 export CXXFLAGS="$CFLAGS"
-MAKE_FLAGS="-s BINARYEN_TRAP_MODE=clamp -s ALLOW_MEMORY_GROWTH=1 -s EXIT_RUNTIME=1 -s USE_FREETYPE=1 -s USE_HARFBUZZ=1"
+
+MAKE_FLAGS="-s BINARYEN_TRAP_MODE=clamp -s ALLOW_MEMORY_GROWTH=1 -s EXIT_RUNTIME=1 -s USE_FREETYPE=1"
 
 export PKG_CONFIG_PATH="/code/libpng:/code/zlib:/code/libjpeg:/code/libtiff:/code/libtiff/libtiff:"
+
 export PNG_LIBS="-L/code/libpng -L/code/libpng/.libs"
+
 
 cd /code/zlib
 emconfigure ./configure --static
 emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
 
+
 cd /code/libjpeg
 autoreconf -fvi
 emconfigure ./configure --disable-shared
 emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
+
 
 cd /code/libpng
 libtoolize
@@ -26,12 +35,12 @@ automake --add-missing
 emconfigure ./configure --disable-shared
 emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
 
+
 cd /code/libtiff
 libtoolize --force
 ###
 aclocal
 ###
-
 autoreconf --force
 #### 
 automake --add-missing
@@ -39,7 +48,6 @@ automake --add-missing
 autoconf
 autoreconf
 ####
-
 emconfigure ./configure --disable-shared
 emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
 
