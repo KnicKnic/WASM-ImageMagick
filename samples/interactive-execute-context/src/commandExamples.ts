@@ -33,13 +33,24 @@ export const commandExamples: Example[] = [
   name: 'text spiral',
     description: `create text in spiral shape using helvetica ttf font`,
   command: `# Heads up: we first build the input file of the font 
-\`buildFile helvetica.ttf\`
-
-# and then use it explicitly referencing it by file name:
-convert -font helvetica.ttf -pointsize 132 -background lightblue \\
+# and then use it explicitly referencing it by file name
+buildFile helvetica.ttf
+# next command: spiral like text
+convert -font helvetica.ttf -pointsize 100 -background lightblue \\
   -fill navy  'label:Sebastian Gurin IM Examples in the browser' \\
   -rotate 12 -virtual-pixel background -distort Arc 270 \\
   -trim -bordercolor lightblue -border 5x5  \`uniqueName\`.jpg
+# net command: a wave like label
+convert -size 380x100 xc:lightblue -font helvetica.ttf -pointsize 72 \\
+  -fill navy  -annotate +25+65 Sebastián \\
+  -background lightblue -rotate 85  -wave 2x5   -rotate -85 \\
+  -gravity center  -crop 380x100+0+-50 +repage \`uniqueName\`.jpg
+
+# next label: commt font like label
+convert -size 400x120 xc:lightblue  -font helvetica.ttf  -pointsize 72 \\
+  -fill navy   -annotate +45+95 'Sebastián' -motion-blur 0x25+65 \\ 
+  -fill black  -annotate +45+95 'Sebastián' -motion-blur 0x1+65 \\
+  \`uniqueName\`.jpg
   `,
   tags: [ExampleTag.text, ExampleTag.virtualCommand],
 },

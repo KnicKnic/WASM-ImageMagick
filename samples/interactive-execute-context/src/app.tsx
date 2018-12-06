@@ -4,7 +4,7 @@ import { style } from 'typestyle'
 import {
   arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo,
   getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText,
-  getFileNameExtension, knownSupportedWriteOnlyImageFormats,
+  getFileNameExtension, knownSupportedWriteOnlyImageFormats, addCallListener,
 } from 'wasm-imagemagick'
 import { commandExamples, Example } from './commandExamples'
 import { blobToString } from 'imagemagick-browser'
@@ -188,6 +188,7 @@ export class App extends React.Component<AppProps, AppState> {
     if (!this.state.files.find(f => f.name === this.defaultImage)) {
       await this.addInputFiles([await buildInputFile(this.defaultImage)])
     }
+    addCallListener({beforeCall: console.log})
   }
 
   componentWillUpdate() {
@@ -272,7 +273,7 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   protected async updateImages() {
-    const files = (await this.props.context.getAllFiles())//.filter(f=>!f.ignore)
+    const files = (await this.props.context.getAllFiles())
     const isImageArray = await pMap(files, isImage)
     const imgSrcs = this.state.showImagesAndInfo ? await pMap(files, (f, i) => buildFileSrc(f, isImageArray[i])) : this.state.imgSrcs
     const filesInfo = this.state.showImagesAndInfo ? await pMap(files, (f, i) => {
