@@ -7,7 +7,7 @@
     "all": "npm run clean && npm run build && npm run copy",
     "build": "tsc && npm run bundle",
     "bundle": "browserify dist/index.js -o static/bundle.js",
-    "copy": "here=`pwd` && cd ../.. && npm run copy && cd $here && cp -r ../../spec/assets/fn.png ../../spec/assets/magick.* src/static/* static",
+    "copy": "here=`pwd` && cd ../.. && npm run copy && cd $here && cp -r ../../spec/assets/fn.png ../../spec/assets/helvetica.ttf ../../spec/assets/magick.* src/static/* static",
     "clean": "rm -rf dist static",
     "start": "npm run all && npm run watch-all",
     "server": "http-server static",

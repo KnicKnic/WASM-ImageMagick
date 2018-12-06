@@ -239,6 +239,8 @@ export class App extends React.Component<AppProps, AppState> {
     const cmd = this.state.finalCommand
     console.log('Final Command: ' + JSON.stringify(cmd))
     const result = await this.props.context.execute(cmd)
+    console.log(result);
+    
     this.state.outputFiles = result.outputFiles
     this.state.stderr = result.stderr.join('\n')
     this.state.stdout = result.stdout.join('\n')
