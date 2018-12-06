@@ -32,6 +32,7 @@ export interface AppState {
   isImageArray: boolean[]
   finalCommand: string[][]
   memory: number
+  selectedExampleDescription: string
 }
 
 export class App extends React.Component<AppProps, AppState> {
@@ -54,6 +55,7 @@ export class App extends React.Component<AppProps, AppState> {
     isImageArray: [],
     finalCommand: [[]],
     memory: getMemory(),
+    selectedExampleDescription: ''
   }
 
   protected styles = {
@@ -154,6 +156,7 @@ export class App extends React.Component<AppProps, AppState> {
               {commandExamples.map(t =>
                 <option>{t.name}</option>)}
             </select>
+            <span>{this.state.selectedExampleDescription ? 'Description: '+this.state.selectedExampleDescription : ''}</span>
           </div>
         </div>
 
@@ -236,7 +239,6 @@ export class App extends React.Component<AppProps, AppState> {
     const cmd = this.state.finalCommand
     console.log('Final Command: ' + JSON.stringify(cmd))
     const result = await this.props.context.execute(cmd)
-    debugger
     this.state.outputFiles = result.outputFiles
     this.state.stderr = result.stderr.join('\n')
     this.state.stdout = result.stdout.join('\n')
@@ -290,7 +292,7 @@ export class App extends React.Component<AppProps, AppState> {
     const command = await this.commandExampleAsCommand(example)
     this.state.commandString = typeof example.command === 'string' ? example.command : arrayToCli(command)
     this.state.commandArray = JSON.stringify(command)
-    this.setState({ ...this.state,  finalCommand: this.buildFinalCommand() })
+    this.setState({ ...this.state,  finalCommand: this.buildFinalCommand(), selectedExampleDescription: example.description })
   }
 
   protected async commandExampleAsCommand(example: Example): Promise<Command[]> {

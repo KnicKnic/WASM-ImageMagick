@@ -7,7 +7,7 @@ steps:
   inputs:
     versionSpec: '11.x'
 
-- script: npm install
+- script: npm install && npm build
   displayName: install and build
 
 - script: npm test

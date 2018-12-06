@@ -74,8 +74,11 @@ convert -size 150x150 xc: +noise random \\
   {
     name: 'extract pixel color',
     tags: [ExampleTag.info, ExampleTag.color],
-    description: `extract pixel color at 0,0 and save it to info.txt file`,
-    command: `convert logo: -format '%[pixel:p{0,0}]' info:$$UNIQUE_NAME.txt  `.trim(),
+    description: `extract pixel color at 0,0 and use command substitution to paint a rectangle with that color`,
+    command: `
+convert -size 100x60 xc:skyblue \\
+  -fill \`convert logo: -format '%[pixel:p{0,0}]' info:\` -stroke black \\
+  -draw 'rectangle 20,10 80,50' draw_rect2.gif`.trim(),
   },
 
   {
