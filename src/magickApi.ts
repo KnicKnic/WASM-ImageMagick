@@ -70,6 +70,8 @@ magickWorker.onmessage = e => {
  */
 export interface MagickFile {
   name: string
+  /** Internal flag so some commands (virtual) can flag an (output) to be ignored by manager / UI */
+  ignore?: boolean
 }
 
 /**

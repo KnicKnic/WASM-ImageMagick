@@ -54,6 +54,8 @@
    * virtual command for shell substitution with backquote. See next examples:
    * virtual command: ls with support for wildcards (globs) : ``convert `ls foo/**/bar*.png` o.gif``
    * virtual command: cat with support for wildcards (globs) : ``convert in.png -fill `cat out2.txt` foo.gif``
-   * virtual command: buildInputFile: ``convert `buildInputFile fn.png` -rotate 22 out.gif``
+   * virtual command: buildFile: ``convert `buildFile fn.png` -rotate 22 out.gif``
    * virtual command uniqueName: ``convert rose: -rotate 22 `uniqueName`.gif``
  * using jasmine-expect library for better matchers
+ * fix stdout/stderr flush problems with `-s EXIT_RUNTIME=1`
+ * supports fonts and text by using emscripten freetype port. supports ttf fonts. 

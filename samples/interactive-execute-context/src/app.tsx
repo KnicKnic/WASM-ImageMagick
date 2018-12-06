@@ -172,7 +172,7 @@ export class App extends React.Component<AppProps, AppState> {
                 <img src={this.state.outputFileSrcs[i]}></img> :
                 <textarea className={this.styles.infoTextarea} value={this.state.outputFileSrcs[i]}></textarea>}
             </li>,
-          )}
+          )} 
           </ul>}
         </div>
         <h5 className={this.styles.h5}><span className={this.state.exitCode ? this.styles.executionBad : this.styles.executionGood}>Exit code: {this.state.exitCode + ''}</span></h5>
@@ -229,7 +229,7 @@ export class App extends React.Component<AppProps, AppState> {
       this.setState({ ...this.state, builtInImagesAdded: true })
     }
   }
-
+ 
   buildFinalCommand() {
     return renderCommand({commands: JSON.parse(this.state.commandArray) as string[][], files: this.state.files})
   } 
@@ -272,7 +272,7 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   protected async updateImages() {
-    const files = await this.props.context.getAllFiles()
+    const files = (await this.props.context.getAllFiles())//.filter(f=>!f.ignore)
     const isImageArray = await pMap(files, isImage)
     const imgSrcs = this.state.showImagesAndInfo ? await pMap(files, (f, i) => buildFileSrc(f, isImageArray[i])) : this.state.imgSrcs
     const filesInfo = this.state.showImagesAndInfo ? await pMap(files, (f, i) => {
@@ -280,7 +280,7 @@ export class App extends React.Component<AppProps, AppState> {
         return extractInfo(f)
       }
     }) : this.state.filesInfo
-    const outputFileSrcs = await pMap(this.state.outputFiles, (f, i) => buildFileSrc(f))
+    const outputFileSrcs = await pMap(this.state.outputFiles.filter(f=>!f.ignore), f => buildFileSrc(f))
     this.setState({ ...this.state, files, imgSrcs, outputFileSrcs, filesInfo, isImageArray })
   }
 

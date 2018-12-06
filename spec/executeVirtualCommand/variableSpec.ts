@@ -62,7 +62,7 @@ export default xdescribe('executeVirtualCommand variable', () => {
     const result = await execute(`
       img1='fn.png'
       img2='foo.png'
-      convert \`buildInputFile $img1\` -resize 45% $img2
+      convert \`buildFile $img1\` -resize 45% $img2
     `)
     expect(result.exitCode).toBe(0)
     expect(result.outputFiles[1].name).toBe('foo.png')
@@ -75,7 +75,7 @@ export default xdescribe('executeVirtualCommand variable', () => {
     const result = await execute(`
       img1='fn.png'
       outputExtension='png'
-      convert \`buildInputFile $img1\` -resize 45% \`uniqueName\`.$outputExtension
+      convert \`buildFile $img1\` -resize 45% \`uniqueName\`.$outputExtension
     `)
     expect(result.exitCode).toBe(0)
     expect(result.outputFiles[1].name.endsWith('.png')).toBe(true)

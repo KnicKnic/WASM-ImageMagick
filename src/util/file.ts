@@ -81,6 +81,7 @@ async function outputFileToInputFile(file: MagickOutputFile, name: string = file
   return {
     name,
     content: await blobToUint8Array(file.blob),
+    ignore: file.ignore
   }
 }
 
@@ -88,6 +89,7 @@ function inputFileToOutputFile(file: MagickInputFile, name: string = file.name):
   return {
     name,
     blob: uint8ArrayToBlob(file.content),
+    ignore: file.ignore
   }
 }
 

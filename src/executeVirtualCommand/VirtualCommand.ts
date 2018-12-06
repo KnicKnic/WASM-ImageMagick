@@ -1,7 +1,7 @@
 import { ExecuteResult } from '../execute'
 import { MagickInputFile } from '../magickApi'
 import { values } from '../util'
-import buildInputFile from './buildInputFile'
+import buildFile from './buildFile'
 import cat from './cat'
 import ls from './ls'
 import uniqueName from './uniqueName'
@@ -47,7 +47,7 @@ registerExecuteVirtualCommand(ls)
 
 registerExecuteVirtualCommand(cat)
 
-registerExecuteVirtualCommand(buildInputFile)
+registerExecuteVirtualCommand(buildFile)
 
 registerExecuteVirtualCommand(uniqueName)
 

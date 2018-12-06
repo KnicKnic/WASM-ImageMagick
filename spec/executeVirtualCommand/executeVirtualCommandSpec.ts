@@ -46,11 +46,11 @@ export default describe('executeVirtualCommand', () => {
     })
   })
 
-  describe('buildInputFile', () => {
+  describe('buildFile', () => {
 
-    it('buildInputFile good', async done => {
+    it('good', async done => {
       const result = await execute(`
-      convert \`buildInputFile fn.png\` -rotate 22 out.gif
+      convert \`buildFile fn.png\` -rotate 22 out.gif
       convert fn.png -rotate 22 out2.gif
       `)
       expect(result.exitCode).toBe(0)
@@ -58,17 +58,17 @@ export default describe('executeVirtualCommand', () => {
       done()
     })
 
-    it('buildInputFile with error', async done => {
+    it('with error', async done => {
       const result = await execute(`
-         convert \`buildInputFile dontexists.png\` -rotate 22 out.gif
+         convert \`buildFile dontexists.png\` -rotate 22 out.gif
       `)
       expect(result.exitCode).not.toBe(0)
       done()
     })
 
-    it('buildInputFile from absolute url and custom name', async done => {
+    it('from absolute url and custom name', async done => {
       const result = await execute(`
-         convert \`buildInputFile '${absolutize('fn.png')}' custom.png\` -rotate 22 out.gif
+         convert \`buildFile '${absolutize('fn.png')}' custom.png\` -rotate 22 out.gif
       `)
       expect(result.outputFiles[0].name).toBe('custom.png')
       expect(result.exitCode).toBe(0)

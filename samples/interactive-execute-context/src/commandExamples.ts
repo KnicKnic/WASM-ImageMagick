@@ -16,7 +16,9 @@ export enum ExampleTag {
   color,
   append,
   format,
-  distort
+  distort,
+  text,
+  virtualCommand
 }
 
 export const commandExamples: Example[] = [
@@ -27,7 +29,20 @@ export const commandExamples: Example[] = [
     command: `identify rose:`.trim(),
     tags: [ExampleTag.info],
   },
+{
+  name: 'text spiral',
+    description: `create text in spiral shape using helvetica ttf font`,
+  command: `# Heads up: we first build the input file of the font 
+\`buildFile helvetica.ttf\`
 
+# and then use it explicitly referencing it by file name:
+convert -font helvetica.ttf -pointsize 132 -background lightblue \\
+  -fill navy  'label:Sebastian Gurin IM Examples in the browser' \\
+  -rotate 12 -virtual-pixel background -distort Arc 270 \\
+  -trim -bordercolor lightblue -border 5x5  \`uniqueName\`.jpg
+  `,
+  tags: [ExampleTag.text, ExampleTag.virtualCommand],
+},
   {
     name: '-print all image info',
     description: `prints all properties artifacts and options of the image using -print and formatting the output`,
@@ -87,6 +102,7 @@ convert -size 100x60 xc:skyblue \\
     description: `extract image information in json format and store it in output file roseinfo.json`,
     command: `convert rose: $$UNIQUE_NAME.json  `.trim(),
   },
+
 
   {
     name: 'pulsing animation',

@@ -173,19 +173,19 @@ export default describe('formats', () => {
       done()
     })
 
-    // fit('read only', async done=>{
-    //   const readOnlyVideFormats =['avi']
+    xit('read only', async done=>{
+      const readOnlyVideFormats =['avi']
 
-    //   const files = await pmap(readOnlyVideFormats, f=>buildInputFile(`formats/video/video.${f}`), {concurrency: 1})
-    //   const results = await pmap(files, file=>execute([file], `convert ${file.name} out.png`), {concurrency: 1})
-    //   results.forEach((r, i)=>{
-    //     expect(r.exitCode).toBe(0)
-    //     expect(r.outputFiles[0].name).toContain('.png')
-    //     // expect(r.stdout.join().toLowerCase()).toContain(`${readWriteFormats[i]} 256x240`)
-    //   })
-    //   console.log(results);
+      const files = await pmap(readOnlyVideFormats, f=>buildInputFile(`formats/video/video.${f}`), {concurrency: 1})
+      const results = await pmap(files, file=>execute([file], `convert ${file.name} out.png`), {concurrency: 1})
+      results.forEach((r, i)=>{
+        expect(r.exitCode).toBe(0)
+        expect(r.outputFiles[0].name).toContain('.png')
+        // expect(r.stdout.join().toLowerCase()).toContain(`${readWriteFormats[i]} 256x240`)
+      })
+      console.log(results);
 
-    //   done()
-    // })
+      done()
+    })
   })
 })
