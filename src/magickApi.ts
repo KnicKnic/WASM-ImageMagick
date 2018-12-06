@@ -1,4 +1,4 @@
-import StackTrace from 'stacktrace-js'
+import * as StackTrace from 'stacktrace-js'
 
 // Worker loading
 
@@ -35,7 +35,10 @@ const magickWorkerUrl = changeUrl(currentJavascriptURL, 'magick.js')
 
 let magickWorker
 if (currentJavascriptURL.startsWith('http')) {
-  magickWorker = new Worker(window.URL.createObjectURL(new Blob([`importScripts('${magickWorkerUrl});`])))
+  magickWorker = new Worker(window.URL.createObjectURL(new Blob([`
+  magickJsCurrentPath = '${magickWorkerUrl}'
+  importScripts(magickJsCurrentPath)`
+])))
 }
 else {
   magickWorker = new Worker(magickWorkerUrl)

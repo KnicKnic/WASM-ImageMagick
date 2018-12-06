@@ -1,9 +1,10 @@
+import * as template from 'lodash.template'
 import pMap from 'p-map'
 import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
+import { isVirtualCommand, VirtualCommandContext, VirtualCommandLogs, _dispatchVirtualCommand } from './executeVirtualCommand/VirtualCommand'
 import { CallResult } from './magickApi'
 import { asInputFile, isInputFile } from './util'
 import { values } from './util/misc'
-import { isVirtualCommand, _dispatchVirtualCommand, VirtualCommandContext, VirtualCommandLogs } from './executeVirtualCommand/VirtualCommand'
 
 export type Command = (string | number)[]
 
@@ -54,11 +55,6 @@ export interface ExecuteConfig {
  */
 export type ExecuteCommand = Command[] | Command | string
 
-// export interface CallResult extends CallResult {
-//   // errors: any[]
-//   // exitCode: number
-// }
-
 /**
  * Execute first command in given config.
  *
@@ -79,50 +75,74 @@ export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand
 
   try {
     result = await call(config.inputFiles, command.map(c => c + ''))
-    return { ...result}
+    return { ...result }
   } catch (error) {
-    return { ...result}
+    return { ...result }
   }
 }
+
+export interface CommandPreprocessor {
+  name: string,
+  execute: (context: ExecuteConfig) => ExecuteConfig
+}
+
+const commandPreprocessors: CommandPreprocessor[] = []
+
+function preprocessCommand(config: ExecuteConfig): ExecuteConfig {
+  if (typeof (config.commands) === 'string') {
+    let cfg = config
+    commandPreprocessors.forEach(p => {
+      cfg = p.execute(cfg)
+    })
+    return { ...cfg }
+  }
+  else {
+    return config
+  }
+}
+
+export function registerCommandPreprocessor(p: CommandPreprocessor) {
+  commandPreprocessors.push(p)
+}
+
+registerCommandPreprocessor({
+  name: 'template',
+  execute(context) {
+    const commandTemplate = template(context.commands)
+    const commands = commandTemplate(context)
+    return { ...context, commands }
+  },
+})
 
 export function isExecuteConfig(arg: any): arg is ExecuteConfig {
   return !!arg.commands
 }
 
-// function preprocessCommand(config: ExecuteConfig): ExecuteConfig {
-//   if(!config.skipCommandPreprocessors && typeof(config.commands)==='string') {
-
-//   }
-// }
-// const commandPreprocessors = []
-// export type  CommandPreprocessor = (config: ExecuteConfig):string{
-
-// }
-// export function registerCommandPreprocessor(p: CommandPreprocessor) {
-
-// }
 /**
  * Transform  `configOrCommand: ExecuteConfig | ExecuteCommand` to a valid ExecuteConfig object
  */
 export function asExecuteConfig(configOrCommandOrFiles: ExecuteConfig | ExecuteCommand | MagickInputFile[], command?: ExecuteCommand): ExecuteConfig {
+  let result: ExecuteConfig
   if (isExecuteConfig(configOrCommandOrFiles)) {
-    return configOrCommandOrFiles
+    result = configOrCommandOrFiles
   }
-  else {
-    if (Array.isArray(configOrCommandOrFiles) && isInputFile(configOrCommandOrFiles[0])) {
-      if (!command) {
-        throw new Error('No command given')
-      }
-      return {
-        inputFiles: configOrCommandOrFiles as MagickInputFile[],
-        commands: command,
-      }
+  else if (Array.isArray(configOrCommandOrFiles) && isInputFile(configOrCommandOrFiles[0])) {
+    if (!command) {
+      throw new Error('No command given')
+    }
+    result = {
+      inputFiles: configOrCommandOrFiles as MagickInputFile[],
+      commands: command,
     }
   }
-  return {
-    inputFiles: [],
-    commands: configOrCommandOrFiles as ExecuteCommand,
+  else {
+    result = {
+      inputFiles: [],
+      commands: configOrCommandOrFiles as ExecuteCommand,
+    }
+
   }
+  return result.skipCommandPreprocessors ? result : preprocessCommand(result)
 }
 
 /**
@@ -135,13 +155,18 @@ export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig 
   return result.outputFiles.length && result.outputFiles[0] || undefined
 }
 
+/**
+ * Result object of an `execute()` operation.
+ */
 export interface ExecuteResult extends CallResult {
+  /** results of internal `call()` calls */
   results: CallResult[],
   /** the original commands used in the execute() call */
   commands: ExecuteCommand[],
   // breakOnError?: boolean
   virtualCommandLogs?: VirtualCommandLogs
 }
+
 /**
  * Execute all commands in given config serially in order. Output files from a command become available as
  * input files in next commands. In the following example we execute two commands. Notice how the second one uses `image2.png` which was the output file of the first one:
@@ -200,7 +225,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       command: c,
       files: allInputFiles,
       executionId,
-      virtualCommandLogs
+      virtualCommandLogs,
     }
     let result: CallResult
     if (!config.skipVirtualCommands && isVirtualCommand(virtualCommandContext)) {
@@ -216,7 +241,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       allOutputFiles[f.name] = f
       const inputFile = await asInputFile(f)
       allInputFiles[inputFile.name] = inputFile
-    }, {concurrency: 1})
+    }, { concurrency: 1 })
   }
   const commands = asCommand(config.commands)
   await pMap(commands, mapper, { concurrency: 1 })
@@ -229,8 +254,8 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     exitCode: resultWithError ? resultWithError.exitCode : 0,
     command: [],
     commands,
-    inputFiles:  config.inputFiles,
-    virtualCommandLogs
+    inputFiles: config.inputFiles,
+    virtualCommandLogs,
   }
 }
 

@@ -4,6 +4,7 @@ require('../../node_modules/jasmine-expect/src/index.js') // hack to load jasmin
 
 export * from './callSpec'
 export * from './executeSpec'
+export * from './fonts'
 export * from './formatSpec'
 export * from './imageHomeSpec'
 export * from './executionContextSpec'

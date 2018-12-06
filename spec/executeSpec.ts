@@ -147,7 +147,8 @@ export default describe('execute', () => {
     })
 
     it('can access stdout', async done => {
-      const { stdout } = await execute(`identify rose:`)
+      const { stdout, exitCode } = await execute(`identify rose:`)
+      expect(exitCode).toBe(0)
       expect(stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
       done()
     })
@@ -210,5 +211,20 @@ export default describe('execute', () => {
 
   })
 
-  xit('event emitter', () => { })
+
+  describe('command preprocessors', () => {
+    xit('should allow to register a new preprocessor', async done => {
+      done()
+    })
+
+    it('should support js templates out of the box ', async done => {
+      const result = await execute(`identify <%= 'rose:' %>`)
+      expect(result.exitCode).toBe(0)
+      expect(result.stdout.join('\n')).toContain(`rose:=>ROSE PNM 70x46 70x46+0+0 8-bit`)
+      expect()
+      done()
+    })
+
+  })
+
 })

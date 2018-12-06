@@ -4,17 +4,16 @@ const stdout = []
 const stderr = []
 let exitCode = 0
 
-
-function ChangeUrl(url, fileName)
-{
-    let splitUrl = url.split('/')
-    splitUrl[splitUrl.length -1] = fileName
-    return splitUrl.join('/')
-}
-// const magickJsCurrentPath = 'https://knicknic.github.io/wasm-imagemagick/magick.js';
-function GetCurrentUrlDifferentFilename(fileName)
-{
-    return ChangeUrl(magickJsCurrentPath, fileName)
+// function changeUrl(url, fileName) {
+//     let splitUrl = url.split('/')
+//     splitUrl[splitUrl.length -1] = fileName
+//     return splitUrl.join('/')
+// }
+function getMagickJsUrl(fileName) {
+  let splitUrl = magickJsCurrentPath.split('/')
+  splitUrl[splitUrl.length -1] = fileName
+  return splitUrl.join('/')
+    // return changeUrl(magickJsCurrentPath, fileName)
 }
 
 if (typeof Module == 'undefined') {
@@ -22,7 +21,7 @@ if (typeof Module == 'undefined') {
     noInitialRun: true,
     moduleLoaded: false,
     messagesToProcess: [],
-    locateFile = typeof magickJsCurrentPath !== "undefined" ? GetCurrentUrlDifferentFilename : undefined,
+    locateFile: typeof magickJsCurrentPath !== "undefined" ? getMagickJsUrl : undefined,
     onRuntimeInitialized: () => {
       FS.mkdir('/pictures')
       FS.currentPath = '/pictures'
