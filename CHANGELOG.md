@@ -18,7 +18,7 @@
    * html images/input elements, 
    * image compare, 
    * extract information, 
-   * command line string to `Call()` array conversion utility
+   * command line string to `call()` array conversion utility
  * `execute()` high level function
  * `ImageContext` and `ImageHome` auxiliary classes
  * jasmine specs that runs in chrome (puppeteer)
@@ -41,8 +41,9 @@
 
  * First automated release
 
-## this branch
-
+## 1.2.2
+ * Support auto discovery of magick.js & magick.wasm files
+   * Allows simple usage in CDNs
  * emcc update to 1.38.20
  * call() resolves with more info: commands, inputFiles
  * utils: isImage, buildImageSrc, loadImageElement optionally output to browser compatible formats

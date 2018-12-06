@@ -1,3 +1,67 @@
+import StackTrace from 'stacktrace-js'
+
+// Worker loading
+
+type CallPromise = Promise<CallResult> & { resolve?: (CallResult) => void, reject?: any }
+
+function createCallPromise(): CallPromise {
+  let resolver
+  const promise = new Promise(resolve => {
+    resolver = resolve
+  }) as CallPromise
+  promise.resolve = resolver
+  return promise
+}
+
+function changeUrl(url, fileName) {
+  const splitUrl = url.split('/')
+  splitUrl[splitUrl.length - 1] = fileName
+  return splitUrl.join('/')
+}
+
+// Heads up : instead of doing the sane code of being able to just use import.meta.url
+// (Edge doesn't work) (safari mobile, chrome, opera, firefox all do) . We use stacktrace-js library to get the current file name
+//
+// try {
+//   // @ts-ignore
+//   let packageUrl = import.meta.url
+//   currentJavascriptURL = packageUrl
+// } catch (error) {
+//   // eat
+// }
+const stacktrace = StackTrace.getSync()
+const currentJavascriptURL = stacktrace && stacktrace[0] && stacktrace[0].fileName || './magickApi.js'
+const magickWorkerUrl = changeUrl(currentJavascriptURL, 'magick.js')
+
+let magickWorker
+if (currentJavascriptURL.startsWith('http')) {
+  magickWorker = new Worker(window.URL.createObjectURL(new Blob([`importScripts('${magickWorkerUrl});`])))
+}
+else {
+  magickWorker = new Worker(magickWorkerUrl)
+}
+
+const magickWorkerPromises: { [key: string]: CallPromise } = {}
+let magickWorkerPromisesKey = 1
+
+// handle responses as they stream in after being outputFiles by image magick
+magickWorker.onmessage = e => {
+  const response = e.data
+  const promise = magickWorkerPromises[response.requestNumber]
+  delete magickWorkerPromises[response.requestNumber]
+  const result: CallResult = {
+    outputFiles: response.outputFiles,
+    stdout: response.stdout,
+    stderr: response.stderr,
+    exitCode: response.exitCode || 0,
+    command: (promise as any).command,
+    inputFiles: (promise as any).inputFiles,
+  }
+  promise.resolve(result)
+}
+
+// ImageMagick core types
+
 /**
  * Base class for ImageMagick input and output files.
  */
@@ -19,14 +83,6 @@ export interface MagickOutputFile extends MagickFile {
  */
 export interface MagickInputFile extends MagickFile {
   content: Uint8Array
-}
-
-/**
- * {@link call} shortcut that only returns the output files.
- */
-export async function Call(inputFiles: MagickInputFile[], command: string[]): Promise<MagickOutputFile[]> {
-  const result = await call(inputFiles, command)
-  return result.outputFiles
 }
 
 /**
@@ -57,8 +113,9 @@ export interface CallResult {
   inputFiles: MagickInputFile[]
 }
 
+// call() main operation
 /**
- * Low level execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute)
+ * Low level, core, IM command execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute)
  * ends up calling this one. It accept only one command and only in the form of array of strings.
  */
 export function call(inputFiles: MagickInputFile[], command: string[]): Promise<CallResult> {
@@ -67,7 +124,7 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
     args: command,
     requestNumber: magickWorkerPromisesKey,
   }
-  const promise = CreatePromiseEvent();
+  const promise = createCallPromise();
   (promise as any).command = command;
   (promise as any).inputFiles = inputFiles
   magickWorkerPromises[magickWorkerPromisesKey] = promise
@@ -96,36 +153,12 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
   return promise
 }
 
-type CallPromise = Promise<CallResult> & { resolve?: (CallResult) => void, reject?: any }
-
-function CreatePromiseEvent(): CallPromise {
-  let resolver
-  const promise = new Promise(resolve => {
-    resolver = resolve
-  }) as CallPromise
-  promise.resolve = resolver
-  return promise
-}
-
-const magickWorker = new Worker('magick.js')
-
-const magickWorkerPromises: { [key: string]: CallPromise } = {}
-let magickWorkerPromisesKey = 1
-
-// handle responses as they stream in after being outputFiles by image magick
-magickWorker.onmessage = e => {
-  const response = e.data
-  const promise = magickWorkerPromises[response.requestNumber]
-  delete magickWorkerPromises[response.requestNumber]
-  const result: CallResult = {
-    outputFiles: response.outputFiles,
-    stdout: response.stdout,
-    stderr: response.stderr,
-    exitCode: response.exitCode || 0,
-    command: (promise as any).command,
-    inputFiles: (promise as any).inputFiles,
-  }
-  promise.resolve(result)
+/**
+ * {@link call} shortcut that only returns the output files.
+ */
+export async function Call(inputFiles: MagickInputFile[], command: string[]): Promise<MagickOutputFile[]> {
+  const result = await call(inputFiles, command)
+  return result.outputFiles
 }
 
 // call() global event emitter

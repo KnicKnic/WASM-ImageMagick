@@ -1,6 +1,6 @@
 {
   "name": "wasm-imagemagick",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Webassembly compilation of ImageMagick",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -98,6 +98,7 @@
   "dependencies": {
     "lodash.template": "^4.4.0",
     "minimatch": "^3.0.4",
-    "p-map": "^2.0.0"
+    "p-map": "^2.0.0",
+    "stacktrace-js": "^2.0.0"
   }
 }
