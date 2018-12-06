@@ -12,6 +12,8 @@ investigate https://github.com/bgrins/videoconverter.js - that supports ffmpeg i
 
  * idea: a font manager app: convert ttf to preview image or gif animation. export ttf to svgs ? or to others
 
+ * issue this doesn't work `convert foo.png \\ # a comment at the end of the line - could be empty`
+
  * issue: if i dont put the second commend then it breaks and both commands get concatenated: 
  ```
    command: `# Heads up: we first build the input file of the font 

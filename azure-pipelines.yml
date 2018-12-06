@@ -2,6 +2,7 @@ pool:
   vmImage: 'Ubuntu 16.04'
 
 steps:
+- script: apt-get install libfreetype6-dev && echo `pkg-config --version` && echo `pkg-config --version freetype2`
 
 - task: NodeTool@0
   inputs:

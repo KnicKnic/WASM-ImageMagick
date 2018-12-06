@@ -35,22 +35,33 @@ export const commandExamples: Example[] = [
   command: `# Heads up: we first build the input file of the font 
 # and then use it explicitly referencing it by file name
 buildFile helvetica.ttf
+
 # next command: spiral like text
 convert -font helvetica.ttf -pointsize 100 -background lightblue \\
   -fill navy  'label:Sebastian Gurin IM Examples in the browser' \\
   -rotate 12 -virtual-pixel background -distort Arc 270 \\
   -trim -bordercolor lightblue -border 5x5  \`uniqueName\`.jpg
-# net command: a wave like label
+
+# next command: Vibrato Font 
 convert -size 380x100 xc:lightblue -font helvetica.ttf -pointsize 72 \\
   -fill navy  -annotate +25+65 Sebastián \\
   -background lightblue -rotate 85  -wave 2x5   -rotate -85 \\
   -gravity center  -crop 380x100+0+-50 +repage \`uniqueName\`.jpg
 
-# next label: commt font like label
+# next command: blur shadow 
 convert -size 400x120 xc:lightblue  -font helvetica.ttf  -pointsize 72 \\
   -fill navy   -annotate +45+95 'Sebastián' -motion-blur 0x25+65 \\ 
   -fill black  -annotate +45+95 'Sebastián' -motion-blur 0x1+65 \\
   \`uniqueName\`.jpg
+
+# next command: : smoking font
+convert -size 340x150 xc:lightblue  -font helvetica.ttf  -pointsize 62 \\
+  -fill black  -annotate +20+105 'Sebastián'  -motion-blur 0x25+145 \\
+  -background lightblue -rotate 6  -wave 3x35  -rotate -6 \\
+-fill navy   -annotate +25+105 'Sebastián'  \\ 
+  \`uniqueName\`.jpg
+  
+  
   `,
   tags: [ExampleTag.text, ExampleTag.virtualCommand],
 },
