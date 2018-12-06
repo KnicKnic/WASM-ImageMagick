@@ -4,10 +4,11 @@ import { style } from 'typestyle'
 import {
   arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo,
   getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText,
-  getFileNameExtension, knownSupportedWriteOnlyImageFormats, flat, renderCommand,
+  getFileNameExtension, knownSupportedWriteOnlyImageFormats,
 } from 'wasm-imagemagick'
 import { commandExamples, Example } from './commandExamples'
 import { blobToString } from 'imagemagick-browser'
+import { renderCommand } from './executeTemplate';
 
 export interface AppProps {
   context: ExecutionContext
@@ -228,13 +229,14 @@ export class App extends React.Component<AppProps, AppState> {
 
   buildFinalCommand() {
     return renderCommand({commands: JSON.parse(this.state.commandArray) as string[][], files: this.state.files})
-  }
+  } 
 
   protected async execute() {
     this.state.finalCommand = this.buildFinalCommand()
     const cmd = this.state.finalCommand
     console.log('Final Command: ' + JSON.stringify(cmd))
     const result = await this.props.context.execute(cmd)
+    debugger
     this.state.outputFiles = result.outputFiles
     this.state.stderr = result.stderr.join('\n')
     this.state.stdout = result.stdout.join('\n')

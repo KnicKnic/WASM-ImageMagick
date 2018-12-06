@@ -12,6 +12,10 @@ export interface ExecuteConfig {
   commands: ExecuteCommand
   /** internal id for execution calls so execute() extensions like virtual commands have a chance to identify each call if they also invoke execute() internally */
   executionId?: number
+  /** if true, virtual commands like command substitution, ls, cat, etc won't be executed */
+  skipVirtualCommands?: boolean
+  /** if true command string preprocessor (aka templates) won't be executed */
+  skipCommandPreprocessors?: boolean
 }
 
 /**
@@ -85,6 +89,18 @@ export function isExecuteConfig(arg: any): arg is ExecuteConfig {
   return !!arg.commands
 }
 
+// function preprocessCommand(config: ExecuteConfig): ExecuteConfig {
+//   if(!config.skipCommandPreprocessors && typeof(config.commands)==='string') {
+
+//   }
+// }
+// const commandPreprocessors = []
+// export type  CommandPreprocessor = (config: ExecuteConfig):string{
+
+// }
+// export function registerCommandPreprocessor(p: CommandPreprocessor) {
+
+// }
 /**
  * Transform  `configOrCommand: ExecuteConfig | ExecuteCommand` to a valid ExecuteConfig object
  */
@@ -187,7 +203,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       virtualCommandLogs
     }
     let result: CallResult
-    if (isVirtualCommand(virtualCommandContext)) {
+    if (!config.skipVirtualCommands && isVirtualCommand(virtualCommandContext)) {
       result = await _dispatchVirtualCommand(virtualCommandContext)
     }
     else {

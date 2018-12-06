@@ -9,7 +9,7 @@ if (typeof Module == 'undefined') {
     noInitialRun: true,
     moduleLoaded: false,
     messagesToProcess: [],
-    onRuntimeInitialized: function () {
+    onRuntimeInitialized: () => {
       FS.mkdir('/pictures')
       FS.currentPath = '/pictures'
       Module.moduleLoaded = true
@@ -29,36 +29,35 @@ if (typeof Module == 'undefined') {
   }
 }
 
-processFiles = function () {
+function processFiles() {
   if (!Module.moduleLoaded) {
     return
   }
 
-  // clean up stdout, stderr and exitCode
-  stdout.splice(0, stdout.length)
-  stderr.splice(0, stderr.length)
-  exitCode = undefined
-
   for (let message of Module.messagesToProcess) {
-
     for (let file of message.files) {
       FS.writeFile(file.name, file.content)
     }
 
     try {
+      Module.noExitRuntime = true // if not stdout might not be correctly flushed
       Module.callMain(message.args)
+      // flush stdio so stdout gets string that doesn't end with new line
+      if(Module._fflush) {
+        Module._fflush(0)
+      }
     }
     catch (error) {
       console.error('Error in Module.callMain worker thread: ', error, error && error.stack)
     }
-    // cleanup source files
+
+    // cleanup input files except if command if mogrify since it's the only one that can override input files
     for (let file of message.files) {
       if (message.args[0] != 'mogrify') {
-        // heads up: mogrify command override input files so we skip file unlink
+        // TODO : there could be output files that are not overwriting input files in that case we should remove them 
         FS.unlink(file.name)
       }
     }
-
     let dir = FS.open('/pictures')
     let files = dir.node.contents
     let responseFiles = []
@@ -66,8 +65,7 @@ processFiles = function () {
       let processed = {}
       processed.name = destFilename
       let read = FS.readFile(destFilename)
-      // cleanup read file
-      FS.unlink(destFilename)
+      FS.unlink(destFilename) // cleanup output file
       processed.blob = new Blob([read])
       responseFiles.push(processed)
     }
@@ -76,6 +74,11 @@ processFiles = function () {
     message.stderr = stderr.map(s => s)
     message.exitCode = exitCode
     postMessage(message)
+
+    // cleanup stdout, stderr and exitCode
+    stdout.splice(0, stdout.length)
+    stderr.splice(0, stderr.length)
+    exitCode = undefined
   }
   Module.messagesToProcess = []
 }
