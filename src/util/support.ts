@@ -22,7 +22,7 @@ export async function getConfigureFolders(): Promise<string[]> {
 export const knownSupportedReadWriteImageFormats = [
   'jpg', 'png',
   'psd',
-  // 'webp', should be working but it's not : ImageMagick/coders/webp.c
+  // 'webp',// should be working but it's not : ImageMagick/coders/webp.c
   'tiff', 'xcf', 'gif', 'bmp', 'tga', 'miff', 'ico', 'dcm', 'xpm', 'pcx',
   'fits',
   'ppm',
