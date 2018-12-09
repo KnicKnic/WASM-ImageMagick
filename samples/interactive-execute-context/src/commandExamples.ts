@@ -1,5 +1,5 @@
-import { ExecuteCommand, asCommand, Command, MagickInputFile, extractInfo } from 'wasm-imagemagick'
 import { sampleCommandTemplates } from 'imagemagick-browser'
+import { ExecuteCommand, extractInfo, MagickInputFile } from 'wasm-imagemagick'
 
 export interface Example {
   name: string
@@ -18,7 +18,11 @@ export enum ExampleTag {
   format,
   distort,
   text,
-  virtualCommand
+  virtualCommand,
+}
+
+function absolutize(s) {
+  return `${window.location.protocol}//${window.location.host}/${s}`
 }
 
 export const commandExamples: Example[] = [
@@ -29,10 +33,11 @@ export const commandExamples: Example[] = [
     command: `identify rose:`.trim(),
     tags: [ExampleTag.info],
   },
-{
-  name: 'text transformations and decorations 1',
-    description: `render text in cool mannercreate cool text in spiral shape using helvetica ttf font`,
-  command: `# Heads up: we first build the input file of the font 
+
+  {
+    name: 'text transformations and decorations 1',
+    description: `render text in cool mannercreate cool text indifferent fonts and shapes `,
+    command: `# Heads up: we first build the input file of the font
 # and then use it explicitly referencing it by file name
 buildFile helvetica.ttf
 
@@ -42,41 +47,118 @@ convert -font helvetica.ttf -pointsize 100 -background lightblue \\
   -rotate 12 -virtual-pixel background -distort Arc 270 \\
   -trim -bordercolor lightblue -border 5x5  \`uniqueName\`.jpg
 
-# next command: Vibrato Font 
+# next command: Vibrato Font
 convert -size 380x100 xc:lightblue -font helvetica.ttf -pointsize 72 \\
   -fill navy  -annotate +25+65 Sebastián \\
   -background lightblue -rotate 85  -wave 2x5   -rotate -85 \\
   -gravity center  -crop 380x100+0+-50 +repage \`uniqueName\`.jpg
 
-# next command: blur shadow 
+# next command: blur shadow
 convert -size 400x120 xc:lightblue  -font helvetica.ttf  -pointsize 72 \\
-  -fill navy   -annotate +45+95 'Sebastián' -motion-blur 0x25+65 \\ 
+  -fill navy   -annotate +45+95 'Sebastián' -motion-blur 0x25+65 \\
   -fill black  -annotate +45+95 'Sebastián' -motion-blur 0x1+65 \\
   \`uniqueName\`.jpg
 
-# next command:  smoking font - using waltographUI.ttf
-buildFile waltographUI.ttf
-convert -size 340x150 xc:lightblue  -font waltographUI.ttf  -pointsize 62 \\
-  -fill black  -annotate +20+105 'Sebastián'  -motion-blur 0x25+145 \\
-  -background lightblue -rotate 6  -wave 3x35  -rotate -6 \\
--fill navy   -annotate +25+105 'Sebastián'  \\ 
-  \`uniqueName\`.jpg
-
-
-convert -background none -fill DodgerBlue \
--font \`buildFile 'http://webpagepublicity.com/free-fonts/y/y.n.w.u.a.y.ttf'\` -pointsize 72  label:A  -trim +repage \\
--bordercolor None -border 1x1 \\
-aqua_shape.png
-convert aqua_shape.png \\
--alpha Extract -blur 0x8  -shade 130x30 -alpha On \\
--background gray50 -alpha background -auto-level \\
+convert -size 320x100 xc:lightblue -font \`buildFile 'helvetica.ttf'\` -pointsize 72 -fill white \\
+-stroke black -strokewidth 25 -annotate +25+65 'Seba' \\
+-stroke white -strokewidth 20 -annotate +25+65 'Seba' \\
+-stroke black -strokewidth 15 -annotate +25+65 'Seba' \\
+-stroke white -strokewidth 10 -annotate +25+65 'Seba' \\
+-stroke black -strokewidth  5 -annotate +25+65 'Seba' \\
+-stroke none                  -annotate +25+65 'Seba' \\
 \`uniqueName\`.png
 
-  
-  
+
+convert -size 320x40 xc:lightblue  -font \`buildFile 'helvetica.ttf'\` -pointsize 72 \\
+-fill RoyalBlue -annotate 0x125+20+0 'Seba' \\
+\\( -size 320x45 gradient:black -append \\) \\
+-compose Blur -set option:compose:args 20x5+45 -composite \\
+\\( -size 320x60 xc:lightblue \\
+   -fill Navy    -annotate 0x0+20+59   'Seba' \\) \\
++swap -append \`uniqueName\`.jpg
+
+# dirty print
+convert  xc: \\
+-font helvetica.ttf -pointsize 72 -annotate +25+65 'dirty print' \\
+-spread 1 -blur 0x1 -threshold 50% -blur 0x1 \`uniqueName\`_dirty.jpg
+
+# arabic text
+convert  -font \`buildFile 'AGA-Rasheeq-Regular.ttf'\` -pointsize 72 label:'اخبار دبیرخانه شورای عالی اطلاع رسانی' \`uniqueName\`_arabic.jpg
   `,
-  tags: [ExampleTag.text, ExampleTag.virtualCommand],
-},
+    tags: [ExampleTag.text, ExampleTag.virtualCommand],
+  },
+
+
+  {
+    name: 'text comet and smoked',
+    tags: [ExampleTag.text, ExampleTag.color],
+    description: `Comet font: one of the specialised blurs operators, "-motion-blur" allows you to create a comet like tail to objects in an image. 
+    Smoking Font: combining this with wave and you can make the comet font look like smoke, a smell, or even flames are rising off the font!`,
+    command: `
+<% 
+const angle=44 
+%>
+buildFile waltographUI.ttf
+convert -size 340x120 xc:lightblue  -font waltographUI.ttf  -pointsize 72 \\
+  -fill navy   -annotate +45+95 'Comet Font' -motion-blur 0x25+65 \\
+  -fill black  -annotate +45+95 'Comet Font' -motion-blur 0x1+65 \\
+  \`uniqueName\`_comet_font.jpg
+
+  convert -size 340x150 xc:lightblue  -font waltographUI.ttf  -pointsize 65 \\
+    -fill black  -annotate +10+105 'smoked'  -motion-blur 0x25+145 \\
+    -background lightblue -wave 3x35 \\
+    -fill navy   -annotate +15+105 'smoked'  \\
+    \`uniqueName\`_smoked_font.jpg
+
+  `.trim(),
+  },
+
+
+  {
+    name: 'text metallic',
+    tags: [ExampleTag.text, ExampleTag.color],
+    description: `This effect is essentually a rounding, and Color Lookup Table replacement effect. `,
+    command: `
+
+  convert \\
+  -size 1x1000 gradient: \\
+  -gamma 0.9 \\
+  -function Sinusoid 2.25,0,0.5,0.5 \\
+  ( gradient:rgb(100%,100%,80%)-black -gamma 1 ) \\
+  +swap \\
+  -compose Overlay -composite \\
+  -rotate 90 \\
+  metallic_clut.png
+
+convert \\
+  -pointsize 160 -font \`buildFile 'helvetica.ttf'\`  'label: seba' \\
+  -gaussian-blur 0x5 \\
+  -level 40%,60% \\
+  -gaussian-blur 0x3 \\
+  -alpha off \\
+  metallic_a.png
+
+convert \\
+  -size \`identify -format %wx%h\\n metallic_a.png\` \\
+  gradient:rgb(100%,100%,100%)-black \\
+  ( metallic_a.png -negate ) \\
+  -compose CopyOpacity -composite \\
+  ( metallic_a.png \\
+    ( +clone -negate -level 0%x10% ) \\
+    -compose CopyOpacity -composite \\
+    -shade 315x45 -auto-gamma -auto-level \\
+  ) \\
+  -compose Overlay -composite \\
+  metallic_clut.png -clut \\
+  ( +clone -background rgb(0,0,75%) -shadow 80x2+3+3 -write metallic_shad.png ) \\
+  +swap \\
+  -compose Over -composite \\
+  -trim +repage \\
+  \`uniqueName\`_metallic.png
+
+  `.trim(),
+  },
+
   {
     name: '-print all image info',
     description: `prints all properties artifacts and options of the image using -print and formatting the output`,
@@ -87,7 +169,7 @@ convert $$IMAGE_0 \\
   -print '\\n__Options__\\n\\n%[option:*]\\n' \\
 info:
 `.trim(),
-tags: [ExampleTag.info],
+    tags: [ExampleTag.info],
   },
 
   {
@@ -116,7 +198,7 @@ convert -size 150x150 xc: +noise random \\
   # make it a patrol cycle (see Animation Modifications)
   \( -clone -2-1 \) \\
   # final image save
-  -loop 0 animated_granularity.gif
+  -loop 0 \`uniqueName\`animated_granularity.gif
 `.trim(),
   },
 
@@ -127,16 +209,15 @@ convert -size 150x150 xc: +noise random \\
     command: `
 convert -size 100x60 xc:skyblue \\
   -fill \`convert logo: -format '%[pixel:p{0,0}]' info:\` -stroke black \\
-  -draw 'rectangle 20,10 80,50' draw_rect2.gif`.trim(),
+  -draw 'rectangle 20,10 80,50' \`uniqueName\`draw_rect2.gif`.trim(),
   },
 
   {
     name: 'extract image information',
     tags: [ExampleTag.info],
     description: `extract image information in json format and store it in output file roseinfo.json`,
-    command: `convert rose: $$UNIQUE_NAME.json  `.trim(),
+    command: `convert rose: \`uniqueName\`.json  `.trim(),
   },
-
 
   {
     name: 'pulsing animation',
@@ -148,12 +229,10 @@ convert -size 100x60 xc:skyblue \\
     \( -clone 0 -level 20,100% +level-colors ,#F24 \) \\
     \( -clone 0 -level 30,100% +level-colors ,#F36 \) \\
     \( -clone 0 -level 40,100% +level-colors ,#F46 \) \\
-    -delete 0  -duplicate 1,-2-1 -set delay 1x30 -loop 0 $$UNIQUE_NAME.gif
+    -delete 0  -duplicate 1,-2-1 -set delay 1x30 -loop 0 \`uniqueName\`_pulsing_anim.gif
     `.trim(),
-    tags: [ExampleTag.animation]
+    tags: [ExampleTag.animation],
   },
-
-
 
   {
     name: 'color wheels',
@@ -206,10 +285,6 @@ convert radial.png solid.png angular.png \\
     `.trim(),
   },
 
-
-
-
-
   {
     name: 'warping local region',
     description: `https://imagemagick.org/Usage/masking/#region_warping`,
@@ -226,9 +301,9 @@ convert radial.png solid.png angular.png \\
     -region 120x70+280+0  -implode 1.5 \\
     -region 100x70+380+0  -implode -7  \\
     -region 101x70+480+0  -wave 10x50 -crop 0x70+0+10! \\
-    +region lines_regions.gif
+    +region \`uniqueName\`_warping_regions.gif
     `.trim(),
-    tags: [ExampleTag.drawing]
+    tags: [ExampleTag.drawing],
   },
 
   {
@@ -241,7 +316,7 @@ convert radial.png solid.png angular.png \\
 convert difference.png  -threshold 15%  boolean_mask.png
 convert $$IMAGE_0  boolean_mask.png \\
     -alpha off -compose CopyOpacity -composite \\
-    differenceRemoveBackground.png
+    \`uniqueName\`_differenceRemoveBackground.png
     `.trim(),
   },
 
@@ -252,9 +327,9 @@ convert $$IMAGE_0  boolean_mask.png \\
 convert -size 100x100 xc:red \\
   $$ALLIMAGES \\
   \( rose: -rotate -90 \) \\
-  +append $$UNIQUE_NAME.png
+  +append \`uniqueName\`_append1.png
   `.trim(),
-  tags: [ExampleTag.append]
+    tags: [ExampleTag.append],
   },
 
   {
@@ -269,7 +344,7 @@ montage \\
   \( logo: -rotate -90 -resize 66% \) \\
   $$ALLIMAGES \\
   -page A4 -tile 2x3 -geometry +10+10 -shadow -frame 8   \\
-  $$UNIQUE_NAME.pdf
+  \`uniqueName\`_pdf.pdf
   `.trim(),
   },
 
@@ -282,10 +357,10 @@ montage -size 400x400 null: $$ALLIMAGES null: \\
   -auto-orient  -thumbnail 200x200 \\
   -bordercolor Lavender -background black +polaroid -resize 30% \\
   -gravity center -background none -extent 80x80 \\
-  -background SkyBlue -geometry -10+2  -tile x1  polaroid_overlap.jpg
+  -background SkyBlue -geometry -10+2  -tile x1  \`uniqueName\`_polaroid_overlap.jpg
   `.trim(),
   },
-  
+
   {
     name: 'drawing tests 2',
     description: `https://www.imagemagick.org/Usage/scripts/generate_test`,
@@ -324,40 +399,39 @@ convert test_bgnd.png  test_fgnd.png  -composite \\
 convert test.png \\
     \( -size 150x100 tile:pattern:hexagons \\
        +clone +swap -compose overlay -composite \) \\
-    -compose SrcIn -composite  tint_overlay_pattern.png
+    -compose SrcIn -composite  \`uniqueName\`_tint_overlay_pattern.png
          `.trim(),
   },
-
 
   {
     name: 'morph resize',
     description: `https://www.imagemagick.org/Usage/anim_mods/#morph_resize`,
-    tags: [ExampleTag.morph,ExampleTag.animation],
+    tags: [ExampleTag.morph, ExampleTag.animation],
     command: `
     convert rose: $$IMAGE_0 -morph 10 \\
     -layers TrimBounds -set dispose previous -coalesce \\
     -background black -alpha remove \\
     -set delay '%[fx:(t>0&&t<n-1)?10:60]' \\
-    -duplicate 1,-2-1  -loop 0  morph_resize.gif
-    
+    -duplicate 1,-2-1  -loop 0  \`uniqueName\`_morph_resize.gif
+
          `.trim(),
   },
   {
     name: 'morph color',
     description: `https://www.imagemagick.org/Usage/anim_mods/#morph_color`,
-    tags: [ExampleTag.morph,ExampleTag.animation],
+    tags: [ExampleTag.morph, ExampleTag.animation],
     command: `
     convert rose: $$IMAGE_0  -morph 5 \\
     -set delay '%[fx:(t>0&&t<n-1)?10:240]' \\
-    -duplicate 1,-2-1    rose_flip_anim.gif
-    
+    -duplicate 1,-2-1    \`uniqueName\`_rose_flip_anim.gif
+
          `.trim(),
   },
 
   {
     name: 'morph tile',
     description: `https://www.imagemagick.org/Usage/anim_mods/#morph_color`,
-    tags: [ExampleTag.morph,ExampleTag.animation],
+    tags: [ExampleTag.morph, ExampleTag.animation],
     command: `
  convert rose: $$IMAGE_0 \\
     \( -clone 0 -crop 3x0 \) \\
@@ -372,41 +446,40 @@ convert test.png \\
     mpr:stack'[1]' \( mpr:stack'[2]' -set delay 5 -crop 0x4 \) \\
     mpr:stack'[2]' \( mpr:stack'[3]' -set delay 5 -crop 4x0 -reverse \) \\
     mpr:stack'[3]' \( mpr:stack'[0]' -set delay 5 -crop 0x4 -reverse \) \\
-    -loop 0 wipe_all.gif
-    
+    -loop 0 \`uniqueName\`_wipe_all.gif
+
          `.trim(),
   },
   {
     name: 'glitter_tiles tile',
     description: `https://www.imagemagick.org/Usage/anim_mods/#glitter_tiles`,
-    tags: [ExampleTag.morph,ExampleTag.animation],
+    tags: [ExampleTag.morph, ExampleTag.animation],
     command: `
     convert -size 600x600 xc: +noise Random -separate \\
     null: \( xc: +noise Random -separate -threshold 30% -negate \) \\
         -compose CopyOpacity -layers composite \\
     -set dispose background -set delay 20 -loop 0   glitter_overlay.gif
-  
+
     convert glitter_overlay.gif \\
     -compose Screen -bordercolor blue -border 0x0  glitter_plasma.gif
-  
+
             convert glitter_plasma.gif -virtual-pixel tile \\
             -set option:distort:viewport 680x680 -distort SRT 0 \\
             glitter_plasma_tiled.gif
-  
+
             convert logo: -matte -fuzz 33% -transparent blue logo_holed.gif
-            
+
             convert logo_holed.gif null: glitter_plasma_tiled.gif \\
             -compose DstOver -layers composite \\
-            -loop 0 -layers Optimize logo_glittered.gif
-    
+            -loop 0 -layers Optimize \`uniqueName\`_logo_glittered.gif
+
          `.trim(),
   },
 
-
-    {
+  {
     name: 'animated distorts',
     description: `https://www.imagemagick.org/Usage/anim_mods/#distort`,
-    tags: [ExampleTag.morph,ExampleTag.animation],
+    tags: [ExampleTag.morph, ExampleTag.animation],
     command: `
 
     convert $$IMAGE_0  -duplicate 29  -virtual-pixel tile \\
@@ -415,12 +488,11 @@ convert test.png \\
 
   convert $$IMAGE_0  -duplicate 29  -virtual-pixel Gray \\
     -distort SRT '%[fx:360*t/n]' \\
-    -set delay '%[fx:t==0?240:10]' -loop 0     rose_rotate.gif
-  
-    
+    -set delay '%[fx:t==0?240:10]' -loop 0     \`uniqueName\`_rose_rotate.gif
+
+
          `.trim(),
   },
-
 
   {
     name: 'gradient_complex_hues',
@@ -447,7 +519,6 @@ convert test.png \\
          `.trim(),
   },
 
-  
   {
     name: 'gradient baricentric',
     description: `https://www.imagemagick.org/Usage/canvas/#barycentric`,
@@ -473,8 +544,6 @@ convert test.png \\
     -colorspace sRGB   sparse_bary_triangle_3.png
          `.trim(),
   },
-
-
 
   {
     name: 'gradient shepards_power',
@@ -524,7 +593,7 @@ convert -size 100x100 xc: -colorspace RGB -define shepards:power=8 \\
 
          `.trim(),
   },
-  
+
   {
     name: 'gradient sparse_fill',
     description: `https://www.imagemagick.org/Usage/canvas/#sparse_fill`,
@@ -549,7 +618,6 @@ convert -size 100x100 xc: -colorspace RGB -define shepards:power=8 \\
 
          `.trim(),
   },
-
 
   {
     name: 'Hourglass Distortion Map',
@@ -618,7 +686,7 @@ convert -size 100x100 xc: +noise Random -channel R -threshold .4% \\
     \( +clone \) -compose multiply -flatten \\
     -virtual-pixel tile -blur 0x.4 -motion-blur 0x20+45 -normalize \\
     star_fall.gif
- 
+
 convert -size 100x100 xc: +noise Random -channel R -threshold 5% \\
 -negate -channel RG -separate +channel \\
 -compose multiply -composite   speckles.gif
@@ -638,23 +706,23 @@ stars_colored.gif
     `.trim(),
   },
 
-//   // commented - not working :
-//   {
-//     name: 'star bursts',
-//     description: `Here we motion blur the stars in six directions (in pairs) then merge them together to create a field of 'star bursts', such as you get in a glass lens.`,
-//     command: `
-// convert -size 100x100 xc: +noise Random -channel R -threshold .2% \\
-//   -negate -channel RG -separate +channel \\
-//   \( +clone \) -compose multiply -flatten \\
-//   -virtual-pixel tile  -blur 0x.3 \\
-//   \( -clone 0  -motion-blur 0x10+15  -motion-blur 0x10+195 \) \\
-//   \( -clone 0  -motion-blur 0x10+75  -motion-blur 0x10+255 \) \\
-//   \( -clone 0  -motion-blur 0x10-45  -motion-blur 0x10+135 \) \\
-//   -compose screen -background black -flatten  -normalize \\
-//     -compose multiply -layers composite \\
-//     -set delay 30 -loop 0 -layers Optimize    \\
-//   star_field.gif`.trim(),
-//   },
+  //   // commented - not working :
+  //   {
+  //     name: 'star bursts',
+  //     description: `Here we motion blur the stars in six directions (in pairs) then merge them together to create a field of 'star bursts', such as you get in a glass lens.`,
+  //     command: `
+  // convert -size 100x100 xc: +noise Random -channel R -threshold .2% \\
+  //   -negate -channel RG -separate +channel \\
+  //   \( +clone \) -compose multiply -flatten \\
+  //   -virtual-pixel tile  -blur 0x.3 \\
+  //   \( -clone 0  -motion-blur 0x10+15  -motion-blur 0x10+195 \) \\
+  //   \( -clone 0  -motion-blur 0x10+75  -motion-blur 0x10+255 \) \\
+  //   \( -clone 0  -motion-blur 0x10-45  -motion-blur 0x10+135 \) \\
+  //   -compose screen -background black -flatten  -normalize \\
+  //     -compose multiply -layers composite \\
+  //     -set delay 30 -loop 0 -layers Optimize    \\
+  //   star_field.gif`.trim(),
+  //   },
 
   {
     name: 'stars animation',
@@ -678,43 +746,43 @@ convert -size 200x200 xc: +noise Random -separate \\
       ( -clone 0  -motion-blur 10x15-30  -motion-blur 10x15+150 ) \\
       -compose screen -background black -flatten  -normalize ) \\
     -compose multiply -layers composite \\
-  -set delay 30 -loop 0 -layers Optimize       $$UNIQUE_NAME.gif
+  -set delay 30 -loop 0 -layers Optimize       \`uniqueName\`.gif
 
 `.trim(),
   },
 
-//   {
-//     name: 'radial flare',
-//     description: `the width of the initial image before polar distorting, basically sets the number of rays that will be produced`,
-//     command: `
-//     convert -size 100x1 xc: +noise Random -channel G -separate +channel \\
-//     -scale 100x100!                                +write flare_1a.png \\
-//     \( -size 100x100 gradient:gray(100%) -sigmoidal-contrast 10x50% \) \\
-//     -colorspace sRGB -compose hardlight -composite  +write flare_1b.png \\
-//     -virtual-pixel HorizontalTileEdge -distort Polar -1 \\
-//     flare_1_final.png
-// `.trim(),
-//   },
+  //   {
+  //     name: 'radial flare',
+  //     description: `the width of the initial image before polar distorting, basically sets the number of rays that will be produced`,
+  //     command: `
+  //     convert -size 100x1 xc: +noise Random -channel G -separate +channel \\
+  //     -scale 100x100!                                +write flare_1a.png \\
+  //     \( -size 100x100 gradient:gray(100%) -sigmoidal-contrast 10x50% \) \\
+  //     -colorspace sRGB -compose hardlight -composite  +write flare_1b.png \\
+  //     -virtual-pixel HorizontalTileEdge -distort Polar -1 \\
+  //     flare_1_final.png
+  // `.trim(),
+  //   },
 
-//   {
-//     name: 'radial flare2',
-//     description: `another example using multiple overlays to achieve a different looking flare. Note the technique used to generating intermediate debugging and example images showing the steps involved.`,
-//     command: `
-// convert -size 100x1 xc: +noise Random -channel G -separate +channel \\
-//     -size 100x99 xc:black -append -motion-blur 0x35-90 \\
-//     \( -size 100x50 gradient:gray(0) \\
-//        -evaluate cos .5 -sigmoidal-contrast 3,100% \\
-//        -size 100x50 xc:gray(0) -append \) \\
-//     \( -size 1x50 xc:gray(0) \\
-//        -size 1x1 xc:gray(50%) \\
-//        -size 1x49 xc:gray(0) \\
-//        -append -blur 0x2 -scale 100x100! \) \\ 
-//     -scene 10 +write flare_2%x.png \\
-//     -background gray(0) -compose screen -flatten +write flare_2f.png \\
-//     -virtual-pixel HorizontalTileEdge -distort Polar -1 \\
-//     -colorspace sRGB flare_2_final.png
-// `.trim(),
-//   },
+  //   {
+  //     name: 'radial flare2',
+  //     description: `another example using multiple overlays to achieve a different looking flare. Note the technique used to generating intermediate debugging and example images showing the steps involved.`,
+  //     command: `
+  // convert -size 100x1 xc: +noise Random -channel G -separate +channel \\
+  //     -size 100x99 xc:black -append -motion-blur 0x35-90 \\
+  //     \( -size 100x50 gradient:gray(0) \\
+  //        -evaluate cos .5 -sigmoidal-contrast 3,100% \\
+  //        -size 100x50 xc:gray(0) -append \) \\
+  //     \( -size 1x50 xc:gray(0) \\
+  //        -size 1x1 xc:gray(50%) \\
+  //        -size 1x49 xc:gray(0) \\
+  //        -append -blur 0x2 -scale 100x100! \) \\
+  //     -scene 10 +write flare_2%x.png \\
+  //     -background gray(0) -compose screen -flatten +write flare_2f.png \\
+  //     -virtual-pixel HorizontalTileEdge -distort Polar -1 \\
+  //     -colorspace sRGB flare_2_final.png
+  // `.trim(),
+  //   },
 
 ]
 

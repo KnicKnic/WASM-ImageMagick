@@ -11,7 +11,24 @@ export function install() {
 }
 
 const context = newExecutionContext()
- 
+let app 
 export function render() {
-  ReactDOM.render(<App context={context}></App>, document.querySelector('#app'));
+  app = ReactDOM.render(<App context={context}/>, document.querySelector('#app'));
+}
+
+window.addEventListener('hashchange', e=>{
+  console.log(window.location.hash);
+  let urlState  =jsonParseOr(decodeURIComponent(window.location.hash.substring(1, window.location.hash.length)), undefined)
+  if(urlState && urlState.commandString){
+    app.changeCommandString(urlState.commandString)
+  }
+})
+
+export function jsonParseOr<K>(s: string, defaultValue: K): K {
+  let val : K = defaultValue
+  try {
+    val = JSON.parse(s)
+  } catch (error) {
+  }
+  return val
 }

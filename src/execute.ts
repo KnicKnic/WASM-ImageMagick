@@ -1,12 +1,10 @@
 import pMap from 'p-map'
 import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
 import { isVirtualCommand, VirtualCommandContext, VirtualCommandLogs, _dispatchVirtualCommand } from './executeVirtualCommand/VirtualCommand'
-import { CallResult } from './magickApi'
+import { CallResult, CallCommand } from './magickApi'
 import { asInputFile, isInputFile } from './util'
 import { values } from './util/misc'
 import { _preprocessCommand } from './executeCommandPreprocessor';
-
-export type Command = (string | number)[]
 
 export interface ExecuteConfig {
   inputFiles?: MagickInputFile[]
@@ -18,6 +16,13 @@ export interface ExecuteConfig {
   /** if true command string preprocessor (aka templates) won't be executed */
   skipCommandPreprocessors?: boolean
 }
+
+export type Command = (string | number)[]
+
+export function asCallCommand(c: ExecuteCommand): CallCommand {
+  return asCommand(c).map(s=>s+'')
+}
+
 
 /**
  *

@@ -1,14 +1,9 @@
 import pMap from 'p-map'
 import * as React from 'react'
 import { style } from 'typestyle'
-import {
-  arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo,
-  getBuiltInImages, getInputFilesFromHtmlInputElement, MagickFile, isImage, MagickInputFile, readFileAsText,
-  getFileNameExtension, knownSupportedWriteOnlyImageFormats, addCallListener,
-} from 'wasm-imagemagick'
+import { arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo, getBuiltInImages, getFileNameExtension, getInputFilesFromHtmlInputElement, isImage, knownSupportedWriteOnlyImageFormats, MagickFile, MagickInputFile, readFileAsText, asCallCommand } from 'wasm-imagemagick'
 import { commandExamples, Example } from './commandExamples'
-import { blobToString } from 'imagemagick-browser'
-import { renderCommand } from './executeTemplate';
+import { renderCommand } from './executeTemplate'
 
 export interface AppProps {
   context: ExecutionContext
@@ -30,9 +25,9 @@ export interface AppState {
   exitCode: number
   prettyJSON: boolean
   isImageArray: boolean[]
-  finalCommand: string[][]
   memory: number
   selectedExampleDescription: string
+  status: 'iddle' | 'loading' | 'executing',
 }
 
 export class App extends React.Component<AppProps, AppState> {
@@ -53,9 +48,9 @@ export class App extends React.Component<AppProps, AppState> {
     exitCode: 0,
     prettyJSON: false,
     isImageArray: [],
-    finalCommand: [[]],
     memory: getMemory(),
-    selectedExampleDescription: ''
+    selectedExampleDescription: '',
+    status: 'iddle',
   }
 
   protected styles = {
@@ -109,8 +104,8 @@ export class App extends React.Component<AppProps, AppState> {
                 </tr></thead>
               }
               <tbody>
-                {this.state.files.map((f, i) =>
-                  <tr>
+                {this.state.files.map((f, i) => {
+                  return <tr>
                     <td><a download={f.name} target='_blank' href={URL.createObjectURL(new Blob([f.content]))}>{f.name}</a></td>
                     <td>
                       <button data-image={f.name} onClick={this.removeImage.bind(this)}>remove</button>
@@ -128,7 +123,8 @@ export class App extends React.Component<AppProps, AppState> {
                         <span>text file</span> :
                         ''}
                     </td>
-                  </tr>,
+                  </tr>
+                },
                 )}
               </tbody>
             </table>
@@ -147,21 +143,18 @@ export class App extends React.Component<AppProps, AppState> {
             <label>Pretty JSON ? <input type='checkbox' onChange={this.prettyJSONChange.bind(this)}></input></label>
           </div>
           <div>
-            Final Command:
-            <textarea className={this.styles.textarea} disabled={true} value={JSON.stringify(this.state.finalCommand)}></textarea>
-          </div>
-          <div>
             Or select one example
             <select disabled={this.state.files.length === 0} onChange={this.selectExampleChange.bind(this)}>
               {commandExamples.map(t =>
                 <option>{t.name}</option>)}
             </select>
-            <span>{this.state.selectedExampleDescription ? 'Description: '+this.state.selectedExampleDescription : ''}</span>
+            <span>{this.state.selectedExampleDescription ? 'Description: ' + this.state.selectedExampleDescription : ''}</span>
           </div>
         </div>
 
         <div>
-          <button onClick={this.execute.bind(this)}>Execute</button>
+          <button onClick={this.execute.bind(this)} disabled={this.state.status !== 'iddle'}>Execute</button>
+          <span>Status: {this.state.status}</span>
         </div>
 
         <div>
@@ -172,7 +165,7 @@ export class App extends React.Component<AppProps, AppState> {
                 <img src={this.state.outputFileSrcs[i]}></img> :
                 <textarea className={this.styles.infoTextarea} value={this.state.outputFileSrcs[i]}></textarea>}
             </li>,
-          )} 
+          )}
           </ul>}
         </div>
         <h5 className={this.styles.h5}><span className={this.state.exitCode ? this.styles.executionBad : this.styles.executionGood}>Exit code: {this.state.exitCode + ''}</span></h5>
@@ -188,11 +181,12 @@ export class App extends React.Component<AppProps, AppState> {
     if (!this.state.files.find(f => f.name === this.defaultImage)) {
       await this.addInputFiles([await buildInputFile(this.defaultImage)])
     }
-    addCallListener({beforeCall: console.log})
   }
 
   componentWillUpdate() {
     this.state.memory = getMemory()
+    // const hash = encodeURIComponent(JSON.stringify({commandString: this.state.commandString}))
+    // history.replaceState(null, null, document.location.pathname + "#" + encodeURIComponent(JSON.stringify({commandString: this.state.commandString})))
   }
 
   protected async prettyJSONChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -217,10 +211,13 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   protected commandStringChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    const commandArray = this.state.prettyJSON ? JSON.stringify(cliToArray(e.target.value), null, 2) : JSON.stringify(cliToArray(e.target.value))
+    this.changeCommandString(e.target.value)
+  }
+  changeCommandString(value: string): any {
+    const commandArray = this.state.prettyJSON ? JSON.stringify(cliToArray(value), null, 2) : JSON.stringify(cliToArray(value))
     // TODO: validate
-    this.state  = {...this.state, commandString: e.target.value, commandArray}
-    this.setState({ ...this.state, finalCommand: this.buildFinalCommand() })
+    this.state = { ...this.state, commandString: value, commandArray }
+    // this.setState({ ...this.state, finalCommand: this.buildFinalCommand() })
   }
 
   protected async addBuiltInImages() {
@@ -230,22 +227,21 @@ export class App extends React.Component<AppProps, AppState> {
       this.setState({ ...this.state, builtInImagesAdded: true })
     }
   }
- 
-  buildFinalCommand() {
-    return renderCommand({commands: JSON.parse(this.state.commandArray) as string[][], files: this.state.files})
-  } 
 
   protected async execute() {
-    this.state.finalCommand = this.buildFinalCommand()
-    const cmd = this.state.finalCommand
+    if (this.state.status !== 'iddle') {
+      return
+    }
+    this.setState({ ...this.state, status: 'executing' })
+    const cmd = this.state.commandString.replace(/\$\$ALLIMAGES/g, this.state.files.map(f=>f.name).join(' ')).replace(/\$\$IMAGE_0/g, this.state.files.length && this.state.files[0].name||'rose:')
     console.log('Final Command: ' + JSON.stringify(cmd))
     const result = await this.props.context.execute(cmd)
-    console.log(result);
-    
+    console.log(result)
     this.state.outputFiles = result.outputFiles
     this.state.stderr = result.stderr.join('\n')
     this.state.stdout = result.stdout.join('\n')
     this.state.exitCode = result.exitCode
+    this.setState({ ...this.state, status: 'loading' })
     await this.updateImages()
   }
 
@@ -258,8 +254,8 @@ export class App extends React.Component<AppProps, AppState> {
     } catch (error) {
       jsonError = error + ''
     }
-    this.state = {...this.state, commandString, commandArray, jsonError}
-    this.setState({ ...this.state, finalCommand: this.buildFinalCommand() })
+    this.state = { ...this.state, commandString, commandArray, jsonError }
+    this.setState({ ...this.state })
   }
 
   protected async addImagesInputChanged(e: React.ChangeEvent<HTMLInputElement>) {
@@ -268,12 +264,13 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   protected async addInputFiles(files: MagickInputFile[]) {
+    // this.setState({...this.state, status: 'loading'})
     this.props.context.addFiles(files)
     await this.updateImages()
   }
 
   protected async updateImages() {
-    const files = (await this.props.context.getAllFiles())
+    const files = await this.props.context.getAllFiles()
     const isImageArray = await pMap(files, isImage)
     const imgSrcs = this.state.showImagesAndInfo ? await pMap(files, (f, i) => buildFileSrc(f, isImageArray[i])) : this.state.imgSrcs
     const filesInfo = this.state.showImagesAndInfo ? await pMap(files, (f, i) => {
@@ -281,8 +278,8 @@ export class App extends React.Component<AppProps, AppState> {
         return extractInfo(f)
       }
     }) : this.state.filesInfo
-    const outputFileSrcs = await pMap(this.state.outputFiles.filter(f=>!f.ignore), f => buildFileSrc(f))
-    this.setState({ ...this.state, files, imgSrcs, outputFileSrcs, filesInfo, isImageArray })
+    const outputFileSrcs = await pMap(this.state.outputFiles.filter(f => !f.ignore), f => buildFileSrc(f))
+    this.setState({ ...this.state, files, imgSrcs, outputFileSrcs, filesInfo, isImageArray, status: 'iddle' })
   }
 
   protected async showImagesAndInfoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -295,7 +292,7 @@ export class App extends React.Component<AppProps, AppState> {
     const command = await this.commandExampleAsCommand(example)
     this.state.commandString = typeof example.command === 'string' ? example.command : arrayToCli(command)
     this.state.commandArray = JSON.stringify(command)
-    this.setState({ ...this.state,  finalCommand: this.buildFinalCommand(), selectedExampleDescription: example.description })
+    this.setState({ ...this.state, selectedExampleDescription: example.description })
   }
 
   protected async commandExampleAsCommand(example: Example): Promise<Command[]> {

@@ -1,4 +1,5 @@
 import * as StackTrace from 'stacktrace-js'
+import { ExecuteCommand } from './execute';
 
 // Worker loading
 
@@ -13,7 +14,7 @@ function createCallPromise(): CallPromise {
   return promise
 }
 
-function changeUrl(url, fileName) {
+function changeUrlFileName(url, fileName) {
   const splitUrl = url.split('/')
   splitUrl[splitUrl.length - 1] = fileName
   return splitUrl.join('/')
@@ -29,39 +30,51 @@ function changeUrl(url, fileName) {
 // } catch (error) {
 //   // eat
 // }
-const stacktrace = StackTrace.getSync()
-const currentJavascriptURL = stacktrace && stacktrace[0] && stacktrace[0].fileName || './magickApi.js'
-const magickWorkerUrl = changeUrl(currentJavascriptURL, 'magick.js')
+let _currentJsUrl: string
+/** gets the url of the current .js file loaded by the browser */
+function getCurrentJsUrl(): string {
+  if (!_currentJsUrl) {
+    const stacktrace = StackTrace.getSync()
+    _currentJsUrl = stacktrace && stacktrace[0] && stacktrace[0].fileName || './magickApi.js'
+  }
+  return _currentJsUrl
+}
 
-let magickWorker
-if (currentJavascriptURL.startsWith('http')) {
-  magickWorker = new Worker(window.URL.createObjectURL(new Blob([`
+function createWorker() {
+  const currentJavascriptURL = getCurrentJsUrl()
+  const magickWorkerUrl = changeUrlFileName(currentJavascriptURL, 'magick.js')
+  let worker: Worker
+  if (currentJavascriptURL.startsWith('http')) {
+    worker =new Worker(window.URL.createObjectURL(new Blob([`
   magickJsCurrentPath = '${magickWorkerUrl}'
   importScripts(magickJsCurrentPath)`
-])))
-}
-else {
-  magickWorker = new Worker(magickWorkerUrl)
+    ])))
+  }
+  else {
+    worker =  new Worker(magickWorkerUrl)
+  }
+  // handle responses as they stream in after being outputFiles by image magick
+  worker.onmessage = e => {
+    const response = e.data
+    const promise = magickWorkerPromises[response.requestNumber]
+    delete magickWorkerPromises[response.requestNumber]
+    const result: CallResult = {
+      outputFiles: response.outputFiles,
+      stdout: response.stdout,
+      stderr: response.stderr,
+      exitCode: response.exitCode || 0,
+      command: (promise as any).command,
+      inputFiles: (promise as any).inputFiles,
+    }
+    promise.resolve(result)
+  }
+  return worker
 }
 
 const magickWorkerPromises: { [key: string]: CallPromise } = {}
 let magickWorkerPromisesKey = 1
 
-// handle responses as they stream in after being outputFiles by image magick
-magickWorker.onmessage = e => {
-  const response = e.data
-  const promise = magickWorkerPromises[response.requestNumber]
-  delete magickWorkerPromises[response.requestNumber]
-  const result: CallResult = {
-    outputFiles: response.outputFiles,
-    stdout: response.stdout,
-    stderr: response.stderr,
-    exitCode: response.exitCode || 0,
-    command: (promise as any).command,
-    inputFiles: (promise as any).inputFiles,
-  }
-  promise.resolve(result)
-}
+const magickWorker = createWorker()
 
 // ImageMagick core types
 
@@ -112,11 +125,13 @@ export interface CallResult {
   exitCode: number
 
   /** the command used for this result */
-  command: string[],
+  command: CallCommand,
 
   /** the input files used for this result */
   inputFiles: MagickInputFile[]
 }
+
+export type CallCommand = string[]
 
 // call() main operation
 /**

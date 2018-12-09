@@ -92,6 +92,7 @@ export function cliToArray(cliCommand: string): Command[] {
 }
 
 /**
+ * TODO: move to execute.ts
  * Makes sure that given {@link ExecuteCommand}, in whatever syntax, is transformed to the form `string[][]` that is compatible with {@link call}
  */
 export function asCommand(c: ExecuteCommand): Command[] {
