@@ -11,3 +11,4 @@ node_modules
 /magickApi.js
 /buildLocal.sh
 llvm-lto3
+/prefix
