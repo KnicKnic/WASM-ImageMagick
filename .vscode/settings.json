@@ -1,11 +1,11 @@
 {
   "search.exclude": {
     "**/dist/**": true,
-    "ImageMagick/**": true,
-    "libwebp/**": true,
-    "libjpeg/**": true,
-    "libpng/**": true,
-    "libtiff/**": true,
-    "zlib/**": true
+    // "ImageMagick/**": true,
+    // "libwebp/**": true,
+    // "libjpeg/**": true,
+    // "libpng/**": true,
+    // "libtiff/**": true,
+    // "zlib/**": true
   }
 }
