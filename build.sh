@@ -7,6 +7,10 @@ export CXXFLAGS="$CFLAGS"
 export PKG_CONFIG_PATH="/code/lib/pkgconfig"
 export PNG_LIBS="$LDFLAGS"
 
+# sh clean.sh
+rm -rf utilities/magick.{wasm,js} 
+rm -rf pref
+
 cd /code/zlib
 emconfigure ./configure --prefix=/code/prefix --static  
 echo "
@@ -91,9 +95,8 @@ echo "
  ImageMagick 'make install' exit code: $?
 "
 
-# # produce the correct output file
-# rm -rf utilities/magick.{wasm,js} 
-# ./libtool --silent --tag=CC --mode=link emcc -verbose $MAKE_FLAGS $CXXFLAGS -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -o utilities/magick.html utilities/magick.o MagickCore/libMagickCore-7.Q16HDRI.la MagickWand/libMagickWand-7.Q16HDRI.la
-# echo "
-#  ImageMagick link exit code: $?
-# "
+# produce the correct output file
+./libtool --silent --tag=CC --mode=link emcc -verbose $MAKE_FLAGS $CXXFLAGS -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -o utilities/magick.html utilities/magick.o MagickCore/libMagickCore-7.Q16HDRI.la MagickWand/libMagickWand-7.Q16HDRI.la
+echo "
+ ImageMagick link exit code: $?
+"
