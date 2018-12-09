@@ -22,61 +22,53 @@ testExitCode  ()
 }
 
 rm -rf /code/ImageMagick/utilities/magick.{wasm,js} 
-# rm -rf /code/prefix
+rm -rf /code/prefix
 
-# cd /code/zlib
-# emconfigure ./configure --prefix=/code/prefix --static 
-# testExitCode "zlib configure" $?
-# emcmake make CFLAGS="$CFLAGS"
-# testExitCode "zlib make" $?
-# emcmake make install
+cd /code/zlib
+emconfigure ./configure --prefix=/code/prefix --static 
+testExitCode "zlib configure" $?
+emcmake make CFLAGS="$CFLAGS"
+testExitCode "zlib make" $?
+emcmake make install
 
-# cd /code/libjpeg
-# autoreconf -fvi
-# emconfigure ./configure --prefix=/code/prefix --disable-shared
-# testExitCode "libjpeg configure" $?
-# emcmake make CFAGS="$CFLAGS $LDFLAGS"
-# testExitCode "libjpeg make" $?
-# emcmake make install
+cd /code/libjpeg
+autoreconf -fvi
+emconfigure ./configure --prefix=/code/prefix --disable-shared
+testExitCode "libjpeg configure" $?
+emcmake make CFAGS="$CFLAGS $LDFLAGS"
+testExitCode "libjpeg make" $?
+emcmake make install
 
-# cd /code/libpng
-# libtoolize
-# # aclocal
-# autoreconf
-# automake --add-missing
-# # ./autogen
-# emconfigure ./configure --prefix=/code/prefix --disable-shared
-# testExitCode "libpng configure" $?
-# emcmake make 
-# testExitCode "libpng make" $?
-# emcmake make install
+cd /code/libpng
+libtoolize
+autoreconf
+automake --add-missing
+emconfigure ./configure --prefix=/code/prefix --disable-shared
+testExitCode "libpng configure" $?
+emcmake make 
+testExitCode "libpng make" $?
+emcmake make install
 
 
-# cd /code/libtiff
-# libtoolize --force
-# ###
-# aclocal
-# ###
-# autoreconf --force
-# #### 
-# automake --add-missing
-# ./autogen
-# autoconf
-# autoreconf
-# ####
-# emconfigure ./configure --prefix=/code/prefix --disable-shared
-# testExitCode "libtiff configure" $?
-# emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS"
-# testExitCode "libtiff make" $?
-# emcmake make install
+cd /code/libtiff
+libtoolize --force
+aclocal
+autoreconf --force
+automake --add-missing
+./autogen
+autoconf
+autoreconf
+emconfigure ./configure --prefix=/code/prefix --disable-shared
+testExitCode "libtiff configure" $?
+emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS"
+testExitCode "libtiff make" $?
+emcmake make install
 
 
 cd /code/ImageMagick
-
+autoconf
 # make sure freetype port folder exists since we are reading .h files from there: 
 emcc -s USE_FREETYPE=1 --cflags
-
-
 
 emconfigure ./configure --prefix=/code/prefix --disable-shared --disable-docs --without-threads --without-magick-plus-plus --without-perl --without-x \
   --disable-largefile --disable-openmp --without-bzlib --without-dps --without-jbig --without-openjp2 --without-lcms --without-wmf \
