@@ -1,4 +1,4 @@
-import { buildInputFile, compare, execute, executeAndReturnOutputFile, executeOne, extractInfo, ExecuteCommand } from '../src'
+import { buildInputFile, compare, execute, executeAndReturnOutputFile, executeOne, extractInfo } from '../src'
 import { showImages } from './testUtil'
 
 export default describe('execute', () => {
@@ -211,7 +211,6 @@ export default describe('execute', () => {
 
   })
 
-
   describe('command preprocessors', () => {
     xit('should allow to register a new preprocessor', async done => {
       done()
@@ -225,6 +224,51 @@ export default describe('execute', () => {
       done()
     })
 
+    it('lodash templates complex example', async done => {
+      const command = `
+<%
+const img = 'fn.png'
+const delay = 20
+const frames = 2 // probably you want more than 2 but we want the test to run fast
+const t = new Date().getTime()
+const names = []
+const random = (min, max) => Math.random() * (max - min) + min
+const f1 = random(0.02,0.2)
+const f2 = random(-0.3,-0.1)
+const f3 = random(-0.2, 0.1)
+const f4 = random(0.2, 0.5)
+%>
+# build input file with virtual command build file
+buildFile fn.png
+<%
+  for(var i = 1; i<= frames; i++) {
+    const a1 = f1 * i
+    const a2 = f2 * Math.log(i + 1)
+    const a3 = f3 * Math.log(i + 1)
+    const a4 = f4 * Math.log(i + 1)
+    const name = \`out_\${t}_\${f1}_\${f2}_\${f3}_\${f4}___\${a1}_\${a2}_\${a3}_\${a4}.miff\`
+    names.push(name)
+    %>
+convert <%= img %> -virtual-pixel random -distort Barrel '<%= a1 %>,<%= a2 %>,<%= a3 %>,<%= a4 %>' <%= name %>
+    <%
+}
+%>
+convert -morph 6 -delay <%= delay %> <%= img %> \\
+  <%= names[0] %> <%= names.join(' ') %> \\
+  <%= names.reverse().join(' ') %> \\
+  \`uniqueName\`.gif
+`
+      const result = await execute(command)
+      expect(result.exitCode).toBe(0)
+      done()
+    })
+    it('preprocessing errors', async done => {
+      const command = `<%= alsda lksjdlaksjd  %>`
+      const result = await execute(command)
+      expect(result.exitCode).not.toBe(0)
+      expect(result.clientError).toBeDefined()
+      done()
+    })
   })
 
 })

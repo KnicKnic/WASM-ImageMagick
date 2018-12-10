@@ -36,4 +36,13 @@ convert -size 320x100 xc:lightblue -font helvetica.ttf -pointsize 72 \\
 
   * enhancement : virtual command for delete images from execute result.outputFiles- use case: we are building an animation and we don't want frames to be outputed by execute() - Other use case: when dumping info to a file to parse it - or when loading a font file - we don't want those files to be in the output. the command could remove images by name or by index. Notice that IM already has a -delete operation to remove output files but this only happens on a single command and not on a execute composed command.
 
- * IM scripts examples: https://www.imagemagick.org/Usage/scripts/
+  * virtual command like uniqueName but with a parameter so other call() can reference it: 
+```
+convert rose: -rotate 6 \`uniqueName rotated1\`.png
+convert \`uniqueName rotated1\`.png -resize 5% \`uniqueName img2\`.png
+```
+  basically uniqueName foo will return the same id when in the same execute(). Tip: use executionId+givenName
+
+  Why? because convert will fail silently if using an existing file or writing to an existing input file and in execute() we probably have lots of call() and we want to reference files by name and also want unique names. 
+
+ * check: IM scripts examples: https://www.imagemagick.org/Usage/scripts/

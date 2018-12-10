@@ -1,10 +1,19 @@
 // This file helps make the compiled js file be imported as a web worker by the src/magickApi.ts file
 
+// The following is a workaround that checks if this file is being loaded as a normal script and not as a Web Worker, in that case we do nothing. 
+// This is because gulp-jasmine-browser will load any .js assets automatically. 
+// TODO: fix this: issue reported: https://github.com/jasmine/gulp-jasmine-browser/issues/68
+const notInAWebWorker = typeof window!=='undefined' && typeof window.document!=='undefined'
+if(notInAWebWorker){
+  throw new Error('magick.js must be loaded as a web worker, i.e. new Worker(pathToMagickJs)')
+}
+
 const stdout = []
 const stderr = []
 let exitCode = 0
 
-function getMagickJsUrl(fileName) {
+function getMagickJsUrl(path, prefix) {
+  debugger
   let splitUrl = magickJsCurrentPath.split('/')
   splitUrl[splitUrl.length -1] = fileName
   return splitUrl.join('/')
@@ -15,7 +24,7 @@ if (typeof Module == 'undefined') {
     noInitialRun: true,
     moduleLoaded: false,
     messagesToProcess: [],
-    locateFile: typeof magickJsCurrentPath !== "undefined" ? getMagickJsUrl : undefined,
+    // locateFile: typeof magickJsCurrentPath !== "undefined" ? getMagickJsUrl : undefined,
     onRuntimeInitialized: () => {
       FS.mkdir('/pictures')
       FS.currentPath = '/pictures'

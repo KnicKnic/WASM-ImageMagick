@@ -9,10 +9,10 @@ interface CallPromise extends Promise<CallResult> {
 }
 
 enum WorkerMessageType {
-  'stderr',
-  'stdout',
-  'result',
-  'call',
+  'stderr' = 'stderr',
+  'stdout' = 'stdout',
+  'result' = 'result',
+  'call' = 'call',
 }
 interface WorkerMessage {
   type: WorkerMessageType
@@ -22,7 +22,7 @@ interface WorkerMessage {
 interface CommandCallClientRequest extends WorkerMessage {
   type: WorkerMessageType.call
   command: CallCommand
-  inputFiles: MagickInputFile[]
+  files: MagickInputFile[]
   requestNumber: number
 }
 
@@ -52,12 +52,6 @@ function createCallPromise(): CallPromise {
   return promise
 }
 
-function changeUrlFileName(url, fileName) {
-  const splitUrl = url.split('/')
-  splitUrl[splitUrl.length - 1] = fileName
-  return splitUrl.join('/')
-}
-
 // Heads up : instead of doing the sane code of being able to just use import.meta.url
 // (Edge doesn't work) (safari mobile, chrome, opera, firefox all do) . We use stacktrace-js library to get the current file name
 //
@@ -70,28 +64,32 @@ function changeUrlFileName(url, fileName) {
 // }
 let _currentJsUrl: string
 /** gets the url of the current .js file loaded by the browser */
-function getCurrentJsUrl(): string {
+function getCurrentJsUrl(defaultUrl = './magick.js'): string {
   if (!_currentJsUrl) {
     const stacktrace = StackTrace.getSync()
-    _currentJsUrl = stacktrace && stacktrace[0] && stacktrace[0].fileName || './magickApi.js'
+    _currentJsUrl = stacktrace && stacktrace[0] && stacktrace[0].fileName || defaultUrl
   }
   return _currentJsUrl
 }
 
-function createWorker() {
-  const currentJavascriptURL = getCurrentJsUrl()
-  const magickWorkerUrl = changeUrlFileName(currentJavascriptURL, 'magick.js')
-  let worker: Worker
-  if (currentJavascriptURL.startsWith('http')) {
-    worker = new Worker(window.URL.createObjectURL(new Blob([`
-// global variable read by webworker to see if there is a custom path
-magickJsCurrentPath = '${magickWorkerUrl}'
-importScripts(magickJsCurrentPath)
-`])))
+/** returns the final web worker magick.js url considering global variable wasmImageMagickWorkerCustomUrl that users can initialize
+ * before loading the library to declare an external host. If not, it will try to load magick.js and magick.wasm files from the same
+ * path of this library's .js (the current file) 
+ */
+function getMagickJsUrl() {
+  if (typeof (window as any).wasmImageMagickWorkerCustomUrl !== 'undefined') {
+    return (window as any).wasmImageMagickWorkerCustomUrl
   }
   else {
-    worker = new Worker(magickWorkerUrl)
+    const url = getCurrentJsUrl()
+    const splitUrl = url.split('/')
+    splitUrl[splitUrl.length - 1] = 'magick.js'
+    const newUrl = splitUrl.join('/')
+    return newUrl
   }
+}
+function createWorker() {
+  const worker: Worker = new Worker(getMagickJsUrl())
   // handle responses as they stream in after being outputFiles by image magick
   worker.onmessage = e => {
     const response = e.data as WorkerMessage
@@ -121,6 +119,13 @@ importScripts(magickJsCurrentPath)
     else {
       throw new Error(`Message type ${response.type} unknown from web worker`)
     }
+  }
+  worker.onerror = function(e) {
+    callListeners.forEach(l => {
+      if (l.onWorkerError) {
+        l.onWorkerError.bind(this)(e)
+      }
+    })
   }
   return worker
 }
@@ -180,7 +185,12 @@ export interface CallResult {
   exitCode: number
 
   /** the command used for this result */
-  command: CallCommand,
+  command: CallCommand
+
+  /** sometimes it an error could be thrown even before calling ImageMagick, for example on command preprocessing. In that case, 
+   * besides returning exitCode!==0 and stderr, an Error instance could also be returned here 
+   */
+  clientError?: Error
 
   /** the input files used for this result */
   inputFiles: MagickInputFile[]
@@ -195,7 +205,7 @@ export type CallCommand = string[]
  */
 export function call(inputFiles: MagickInputFile[], command: CallCommand): Promise<CallResult> {
   const request: CommandCallClientRequest = {
-    inputFiles,
+    files: inputFiles,
     type: WorkerMessageType.call,
     command,
     requestNumber: magickWorkerPromisesKey,
@@ -252,6 +262,7 @@ export interface CallListener {
   beforeCall?(event: CallEvent): void
   onStdout?(text: string): void
   onStderr?(text: string): void
+  onWorkerError?: ((this: AbstractWorker, ev: ErrorEvent) => any) | null
 }
 
 const callListeners: CallListener[] = []

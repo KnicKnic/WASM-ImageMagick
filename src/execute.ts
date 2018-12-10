@@ -3,8 +3,8 @@ import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
 import { isVirtualCommand, VirtualCommandContext, VirtualCommandLogs, _dispatchVirtualCommand } from './executeVirtualCommand/VirtualCommand'
 import { CallResult, CallCommand } from './magickApi'
 import { asInputFile, isInputFile } from './util'
-import { values } from './util/misc'
-import { _preprocessCommand } from './executeCommandPreprocessor';
+import { values, jsonStringifyOr } from './util/misc'
+import { _preprocessCommand } from './executeCommandPreprocessor'
 
 export interface ExecuteConfig {
   inputFiles?: MagickInputFile[]
@@ -20,9 +20,8 @@ export interface ExecuteConfig {
 export type Command = (string | number)[]
 
 export function asCallCommand(c: ExecuteCommand): CallCommand {
-  return asCommand(c).map(s=>s+'')
+  return asCommand(c).map(s => s + '')
 }
-
 
 /**
  *
@@ -175,7 +174,23 @@ export interface ExecuteResult extends CallResult {
  */
 
 export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCommand | MagickInputFile[], command?: ExecuteCommand): Promise<ExecuteResult> {
-  const config = asExecuteConfig(configOrCommandOrFiles, command)
+  let config: ExecuteConfig
+  try {
+    config = asExecuteConfig(configOrCommandOrFiles, command)
+  } catch (error) {
+    console.error(error)
+    return {
+      exitCode: 1,
+      stderr: ['Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'), jsonStringifyOr(error, '{}')],
+      command: [],
+      clientError: error,
+      stdout: [],
+      results: [],
+      inputFiles: [],
+      outputFiles: [],
+      commands: [],
+    }
+  }
   const executionId = config.executionId || ++executionIdCounter
   config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}

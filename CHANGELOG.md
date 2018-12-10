@@ -58,4 +58,5 @@
    * virtual command uniqueName: ``convert rose: -rotate 22 `uniqueName`.gif``
  * using jasmine-expect library for better matchers
  * fix stdout/stderr flush problems with `-s EXIT_RUNTIME=1`
- * supports fonts and text by using emscripten freetype port. supports ttf fonts. 
+ * supports fonts and text by using emscripten freetype port. ttf fonts tested. 
+ * execute string commands are reprocessed and supports lodash templates by default

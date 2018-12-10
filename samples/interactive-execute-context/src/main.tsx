@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { newExecutionContext } from 'wasm-imagemagick';
+import { newExecutionContext, jsonParseOr } from 'wasm-imagemagick';
 import { App } from './app';
  
 export function install() {
@@ -23,12 +23,3 @@ window.addEventListener('hashchange', e=>{
     app.changeCommandString(urlState.commandString)
   }
 })
-
-export function jsonParseOr<K>(s: string, defaultValue: K): K {
-  let val : K = defaultValue
-  try {
-    val = JSON.parse(s)
-  } catch (error) {
-  }
-  return val
-}

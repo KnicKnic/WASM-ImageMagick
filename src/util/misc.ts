@@ -31,3 +31,21 @@ export function combinations<T>(arr: T[], fn: (a: T, b: T) => Promise<any>): Pro
   })
   return Promise.all(promises)
 }
+
+
+export function jsonParseOr<K>(s: string, defaultValue: K): K {
+  let val : K = defaultValue
+  try {
+    val = JSON.parse(s)
+  } catch (error) {
+  }
+  return val
+}
+
+export function jsonStringifyOr(o: any, defaultValue: string, pretty: boolean=false): string {
+  try {
+    return pretty ? JSON.stringify(o, null, 2) : JSON.stringify(o)
+  } catch (error) {
+    return defaultValue
+  }
+}

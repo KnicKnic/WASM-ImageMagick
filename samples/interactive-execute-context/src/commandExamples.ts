@@ -185,40 +185,34 @@ info:
     tags: [ExampleTag.animation, ExampleTag.distort, ExampleTag.template],
     command: `
 <%
-const onlyShowExtremes=false
-const img='boba.jpg'
+const img = \`buildFile fn.png\`
 const delay = 20
-const frames = 10
+const frames = 2 // probably you want more than 2 but we want the test to run fast
 const t = new Date().getTime()
 const names = []
-function random(min, max){
-  return Math.random() * (max - min) + min;
-}
-const R=2, 
-  f1 = random(0.02,0.2)*R,
-  f2=random(-0.3,-0.1)*R,
-  f3=random(-0.2, 0.1)*R,
-  f4=random(0.2, 0.5)*R
+const random = (min, max) => Math.random() * (max - min) + min
+const f1 = random(0.02,0.2)
+const f2 = random(-0.3,-0.1)
+const f3 = random(-0.2, 0.1)
+const f4 = random(0.2, 0.5)
 %>
 <%
   for(var i = 1; i<= frames; i++) {
-  const 
-    a1 = f1*i, 
-    a2 = f2*Math.log(i+1), 
-    a3= f3*Math.log(i+1),
-    a4= f4*Math.log(i+1),
-    name=\`out_\${t}_\${f1}_\${f2}_\${f3}_\${f4}___\${a1}_\${a2}_\${a3}_\${a4}.miff\`
-  if(!onlyShowExtremes||i==1||i==frames){
+    const a1 = f1 * i
+    const a2 = f2 * Math.log(i + 1)
+    const a3 = f3 * Math.log(i + 1)
+    const a4 = f4 * Math.log(i + 1)
+    const name = \`out_\${t}_\${f1}_\${f2}_\${f3}_\${f4}___\${a1}_\${a2}_\${a3}_\${a4}.miff\`
     names.push(name)
-  console.log(name)
-%>
-  convert <%= img %> -virtual-pixel random -distort Barrel '<%= a1%>,<%=a2%>,<%=a3%>,<%=a4%>' <%=name%>
-<%
-  }
+    %>
+convert <%= img %> -virtual-pixel random -distort Barrel '<%= a1 %>,<%= a2 %>,<%= a3 %>,<%= a4 %>' <%= name %>
+    <%
 }
 %>
-convert -morph 6 -delay <%= delay%><%= img%> <%= names[0]%> morph_<%=t%>.miff
-convert morph_<%=t%>.miff <%=names.join(' ')%> <%=names.reverse().join(' ')%> \`uniqueName\`.gif
+convert -morph 6 -delay <%= delay %> <%= img %> \\
+  <%= names[0] %> <%= names.join(' ') %> \\
+  <%= names.reverse().join(' ') %> \\
+  \`uniqueName\`.gif
 
 `.trim(),
   },
