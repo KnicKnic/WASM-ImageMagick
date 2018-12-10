@@ -19,10 +19,10 @@ export enum ExampleTag {
   distort,
   text,
   virtualCommand,
-}
-
-function absolutize(s) {
-  return `${window.location.protocol}//${window.location.host}/${s}`
+  template,
+  '3d',
+  effect,
+  artistic
 }
 
 export const commandExamples: Example[] = [
@@ -94,22 +94,28 @@ convert  -font \`buildFile 'AGA-Rasheeq-Regular.ttf'\` -pointsize 72 label:'اخ
     tags: [ExampleTag.text, ExampleTag.color],
     description: `Comet font: one of the specialised blurs operators, "-motion-blur" allows you to create a comet like tail to objects in an image. 
     Smoking Font: combining this with wave and you can make the comet font look like smoke, a smell, or even flames are rising off the font!`,
-    command: `
-<% 
+    command: `<% 
 const angle=44 
+const intensity=44
+const fontSize=55
+const imageWidth=500
+const imageHeight=200
+const font='waltographUI.ttf'
 %>
-buildFile waltographUI.ttf
-convert -size 340x120 xc:lightblue  -font waltographUI.ttf  -pointsize 72 \\
-  -fill navy   -annotate +45+95 'Comet Font' -motion-blur 0x25+65 \\
-  -fill black  -annotate +45+95 'Comet Font' -motion-blur 0x1+65 \\
+
+# build the font passing url and giving it the name 'font1.ttf'
+buildFile <%= font %> font1.ttf
+
+convert -size <%=imageWidth %>x<%= imageHeight %> xc:lightblue  -font font1.ttf  -pointsize <%= fontSize %> \\
+  -fill navy   -annotate +<%= imageWidth/10 %>+<%= imageHeight/1.7 %> 'Comet Font' -motion-blur 0x<%= intensity %>+<%= angle %> \\
+  -fill black  -annotate +<%= imageWidth/10 %>+<%= imageHeight/1.7 %> 'Comet Font' -motion-blur 0x1+<%= angle %> \\
   \`uniqueName\`_comet_font.jpg
 
-  convert -size 340x150 xc:lightblue  -font waltographUI.ttf  -pointsize 65 \\
-    -fill black  -annotate +10+105 'smoked'  -motion-blur 0x25+145 \\
-    -background lightblue -wave 3x35 \\
-    -fill navy   -annotate +15+105 'smoked'  \\
-    \`uniqueName\`_smoked_font.jpg
-
+convert -size <%=imageWidth %>x<%= imageHeight %> xc:lightblue  -font font1.ttf  -pointsize <%= fontSize %> \\
+  -fill black  -annotate +<%= imageWidth/10 %>+<%= imageHeight/1.7 %> 'Smoked Font' -motion-blur 0x<%= intensity %>+<%= angle %> \\
+  -background lightblue -wave 3x35 \\
+  -fill navy   -annotate +<%= imageWidth/10 %>+<%= imageHeight/1.7 %> 'Smoked Font'  \\
+  \`uniqueName\`_smoked_font.jpg
   `.trim(),
   },
 
@@ -172,6 +178,52 @@ info:
     tags: [ExampleTag.info],
   },
 
+
+  {
+    name: 'animate barrel random with template',
+    description: `https://imagemagick.org/Usage/canvas/#granularity`,
+    tags: [ExampleTag.animation, ExampleTag.distort, ExampleTag.template],
+    command: `
+<%
+const onlyShowExtremes=false
+const img='boba.jpg'
+const delay = 20
+const frames = 10
+const t = new Date().getTime()
+const names = []
+function random(min, max){
+  return Math.random() * (max - min) + min;
+}
+const R=2, 
+  f1 = random(0.02,0.2)*R,
+  f2=random(-0.3,-0.1)*R,
+  f3=random(-0.2, 0.1)*R,
+  f4=random(0.2, 0.5)*R
+%>
+<%
+  for(var i = 1; i<= frames; i++) {
+  const 
+    a1 = f1*i, 
+    a2 = f2*Math.log(i+1), 
+    a3= f3*Math.log(i+1),
+    a4= f4*Math.log(i+1),
+    name=\`out_\${t}_\${f1}_\${f2}_\${f3}_\${f4}___\${a1}_\${a2}_\${a3}_\${a4}.miff\`
+  if(!onlyShowExtremes||i==1||i==frames){
+    names.push(name)
+  console.log(name)
+%>
+  convert <%= img %> -virtual-pixel random -distort Barrel '<%= a1%>,<%=a2%>,<%=a3%>,<%=a4%>' <%=name%>
+<%
+  }
+}
+%>
+convert -morph 6 -delay <%= delay%><%= img%> <%= names[0]%> morph_<%=t%>.miff
+convert morph_<%=t%>.miff <%=names.join(' ')%> <%=names.reverse().join(' ')%> \`uniqueName\`.gif
+
+`.trim(),
+  },
+
+
   {
     name: 'animate_granularity',
     description: `https://imagemagick.org/Usage/canvas/#granularity`,
@@ -219,6 +271,27 @@ convert -size 100x60 xc:skyblue \\
     command: `convert rose: \`uniqueName\`.json  `.trim(),
   },
 
+  {
+    name: 'blur variable',
+    tags: [ExampleTag.artistic, ExampleTag.distort],
+    description: `https://www.imagemagick.org/Usage/mapping/#blur_angle`,
+    command: `
+buildFile fn.png
+convert -size 106x106 radial-gradient: -negate \\
+  -gravity center -crop 75x75+0+0 +repage gradient_radial.jpg
+convert gradient_radial.jpg gradient_radial.jpg gradient_polar.jpg \\
+  -channel RGB -combine blur_map_polar.jpg
+convert fn.png blur_map_polar.jpg \\
+  -compose blur -define compose:args=10x0+0+360 -composite \\
+  blur_polar.jpg
+convert fn.png blur_map_polar.jpg \\
+  -compose blur -define compose:args=5x0+90+450 -composite \\
+  blur_radial.jpg
+convert fn.png blur_map_polar.jpg \\
+  -compose blur -define compose:args=10x0+0+180 -composite \\
+  blur_weird.jpg
+    `.trim(),
+  },
   {
     name: 'pulsing animation',
     description: `generates a radial-gradient image, which is then cloned and adjusted to create a red to brighter red-orange pulse. This is then duplicated to create a reversed Patrol Cycle before creating a 30 second, looped `,
@@ -751,6 +824,75 @@ convert -size 200x200 xc: +noise Random -separate \\
 `.trim(),
   },
 
+// didn't work as expected TODO:
+//   {
+//     name: '3d logo',
+//     description: `https://www.imagemagick.org/Usage/advanced/#3d-logos`,
+//     tags: [ExampleTag.drawing, ExampleTag['3d']],
+//     command: `
+//     buildFile helvetica.ttf font1
+//     convert -alpha none -size 170x100 xc:black \\
+//             -fill white -draw 'circle    50,50  13,50' \\
+//                         -draw 'circle   120,50 157,50' \\
+//                         -draw 'rectangle 50,13 120,87' \\
+//             -fill black -draw 'circle    50,50  25,50' \\
+//                         -draw 'circle   120,50 145,50' \\
+//                         -draw 'rectangle 50,25 120,75' \\
+//             -fill white -draw 'circle    60,50  40,50' \\
+//                         -draw 'circle   110,50 130,50' \\
+//                         -draw 'rectangle 60,30 110,70' \\
+//             -gaussian 1x1 +matte logo_mask.png
+    
+// #  Now we use our mask to cut out the solid color of our logo, and add some text to generate a plain, solid color logo.
+  
+//     convert logo_mask.png -background red -alpha shape \\
+//             -font font1  -pointsize 26  -fill white  -stroke black \\
+//             -gravity Center  -annotate 0 "Ant" \\
+//             logo.png
+ 
+// #  Now lets give it a 3D-look, by using Overlay Highlighting techniques.
+  
+//     convert logo.png  -alpha extract -blur 0x6  -shade 110x30  -normalize \\
+//             logo.png  -compose Overlay -composite \\
+//             logo.png  -alpha on  -compose Dst_In  -composite \\
+//             logo_3D.png
+ 
+//  # Adding shadows is also easier thanks to the new Shadow Generation operator provided by IM.
+  
+//     convert logo_3D.png \( +clone -background navy -shadow 80x4+6+6 \) +swap \\
+//             -background none  -layers merge +repage logo_3D_shadowed.png
+  
+//   #Just for fun lets finish by overlay our logo on a 'rough paper' like background. A huge number of other background canvases can also be created, see Background Examples for a collection of such examples.
+  
+//     convert logo_3D_shadowed.png \\
+//             \( +clone +repage -alpha off -fx 'rand()' -shade 120x30 \\
+//                -fill grey70 -colorize 60 \\
+//                -fill lavender -tint 100 \) \\
+//             +swap -composite logo_3D_bg.jpg
+  
+  
+// `.trim(),
+//   },
+
+  {
+        name: 'poligonize photo artistic',
+        description: `the width of the initial image before polar distorting, basically sets the number of rays that will be produced`,
+        tags: [ExampleTag.artistic, ExampleTag.effect],
+        command: `
+<% 
+const size=10, 
+speed=2,
+intensity= 10
+%>
+convert \`buildFile https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60 photo1\` \\
+  -resize <%= 100/speed%>% -blur 0x1 -colorspace YIQ -monitor \\
+  -mean-shift <%= \`\${size}x\${size}%>+10% +monitor -set colorspace YIQ -colorspace sRGB \\
+  -resize <%= 100*speed%>% \`uniqueName\`.png
+    `.trim()
+  },
+
+
+
   //   {
   //     name: 'radial flare',
   //     description: `the width of the initial image before polar distorting, basically sets the number of rays that will be produced`,
@@ -784,7 +926,7 @@ convert -size 200x200 xc: +noise Random -separate \\
   // `.trim(),
   //   },
 
-]
+].map(m=>m)
 
 let selectExampleCounter = 0
 

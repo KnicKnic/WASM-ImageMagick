@@ -4,16 +4,10 @@ const stdout = []
 const stderr = []
 let exitCode = 0
 
-// function changeUrl(url, fileName) {
-//     let splitUrl = url.split('/')
-//     splitUrl[splitUrl.length -1] = fileName
-//     return splitUrl.join('/')
-// }
 function getMagickJsUrl(fileName) {
   let splitUrl = magickJsCurrentPath.split('/')
   splitUrl[splitUrl.length -1] = fileName
   return splitUrl.join('/')
-    // return changeUrl(magickJsCurrentPath, fileName)
 }
 
 if (typeof Module == 'undefined') {
@@ -29,11 +23,12 @@ if (typeof Module == 'undefined') {
       processFiles()
     },
     print: text => {
-      // console.log('LOG', text);
+      postMessage({type: 'stdout', text})
       stdout.push(text)
     },
     printErr: text => {
       stderr.push(text)
+      postMessage({type: 'stderr', text})
       console.error(text);
     },
     quit: status => {
@@ -48,14 +43,21 @@ function processFiles() {
   }
 
   for (let message of Module.messagesToProcess) {
+    if(message.type!=='call'){
+      // TODO: handle other types of request in the future, for example, 
+      // users might request current stdout/err asynchronously for a given requestNumber/id. 
+      // Also maybe a query to see if the module is ready (moduleLoaded)
+      // Right now we only support command execution requests
+      continue; 
+    }
     for (let file of message.files) {
       FS.writeFile(file.name, file.content)
     }
 
     try {
       Module.noExitRuntime = true // if not stdout might not be correctly flushed
-      Module.callMain(message.args)
-      // flush stdio so stdout gets string that doesn't end with new line
+      Module.callMain(message.command)
+      // flush stdio so clients get stdout string that doesn't end with new lines. TODO: investigate why we need this even if we use 
       if(Module._fflush) {
         Module._fflush(0)
         Module._fflush(1)
@@ -68,27 +70,31 @@ function processFiles() {
 
     // cleanup input files except if command if mogrify since it's the only one that can override input files
     for (let file of message.files) {
-      if (message.args[0] != 'mogrify') {
+      if (message.command[0] != 'mogrify') {
         // TODO : there could be output files that are not overwriting input files in that case we should remove them 
         FS.unlink(file.name)
       }
     }
     let dir = FS.open('/pictures')
     let files = dir.node.contents
-    let responseFiles = []
+    let outputFiles = []
+    // read all files generated in /pictures folder and remove them from FS to free memory
     for (let destFilename in files) {
       let processed = {}
       processed.name = destFilename
       let read = FS.readFile(destFilename)
-      FS.unlink(destFilename) // cleanup output file
+      FS.unlink(destFilename)
       processed.blob = new Blob([read])
-      responseFiles.push(processed)
+      outputFiles.push(processed)
     }
-    message.outputFiles = responseFiles
-    message.stdout = stdout.map(s => s)
-    message.stderr = stderr.map(s => s)
-    message.exitCode = exitCode
-    postMessage(message)
+    postMessage({
+      ...message, 
+      type: 'result', 
+      outputFiles, 
+      stdout: stdout.map(s => s), 
+      stderr: stderr.map(s => s), 
+      exitCode
+    })
 
     // cleanup stdout, stderr and exitCode
     stdout.splice(0, stdout.length)

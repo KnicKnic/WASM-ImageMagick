@@ -1,15 +1,53 @@
 import * as StackTrace from 'stacktrace-js'
-import { ExecuteCommand } from './execute';
 
 // Worker loading
 
-type CallPromise = Promise<CallResult> & { resolve?: (CallResult) => void, reject?: any }
+interface CallPromise extends Promise<CallResult> {
+  resolve?: (CallResult) => void, reject?: any
+  command: CallCommand
+  files: MagickInputFile[]
+}
+
+enum WorkerMessageType {
+  'stderr',
+  'stdout',
+  'result',
+  'call',
+}
+interface WorkerMessage {
+  type: WorkerMessageType
+}
+
+/** message posted from the client to the worker requesting a command call */
+interface CommandCallClientRequest extends WorkerMessage {
+  type: WorkerMessageType.call
+  command: CallCommand
+  files: MagickInputFile[]
+  requestNumber: number
+}
+
+/** message posted form the worker to the client notifying a command call has ended.  */
+interface WorkerResultMessage extends WorkerMessage, CallResult {
+  type: WorkerMessageType.result
+  requestNumber: number
+}
+
+/** message posted from the worker globally each time stdout or stderr command have new content */
+interface WorkerStdioMessage extends WorkerMessage {
+  text: string
+}
+
+function isWorkerStdioMessage(m: any): m is WorkerStdioMessage {
+  return (m.type === WorkerMessageType.stdout || m.type === WorkerMessageType.stderr) && typeof m.text !== 'undefined'
+}
+
+function isWorkerResultMessage(m: any): m is WorkerResultMessage {
+  return m.type === WorkerMessageType.result
+}
 
 function createCallPromise(): CallPromise {
   let resolver
-  const promise = new Promise(resolve => {
-    resolver = resolve
-  }) as CallPromise
+  const promise = new Promise(resolve => resolver = resolve) as CallPromise
   promise.resolve = resolver
   return promise
 }
@@ -45,33 +83,50 @@ function createWorker() {
   const magickWorkerUrl = changeUrlFileName(currentJavascriptURL, 'magick.js')
   let worker: Worker
   if (currentJavascriptURL.startsWith('http')) {
-    worker =new Worker(window.URL.createObjectURL(new Blob([`
-  magickJsCurrentPath = '${magickWorkerUrl}'
-  importScripts(magickJsCurrentPath)`
-    ])))
+    worker = new Worker(window.URL.createObjectURL(new Blob([`
+// global variable read by webworker to see if there is a custom path
+magickJsCurrentPath = '${magickWorkerUrl}'
+importScripts(magickJsCurrentPath)
+`])))
   }
   else {
-    worker =  new Worker(magickWorkerUrl)
+    worker = new Worker(magickWorkerUrl)
   }
   // handle responses as they stream in after being outputFiles by image magick
   worker.onmessage = e => {
-    const response = e.data
-    const promise = magickWorkerPromises[response.requestNumber]
-    delete magickWorkerPromises[response.requestNumber]
-    const result: CallResult = {
-      outputFiles: response.outputFiles,
-      stdout: response.stdout,
-      stderr: response.stderr,
-      exitCode: response.exitCode || 0,
-      command: (promise as any).command,
-      inputFiles: (promise as any).inputFiles,
+    const response = e.data as WorkerMessage
+    if (isWorkerResultMessage(response)) {
+      const promise = magickWorkerPromises[response.requestNumber]
+      delete magickWorkerPromises[response.requestNumber]
+      const result: CallResult = {
+        outputFiles: response.outputFiles,
+        stdout: response.stdout,
+        stderr: response.stderr,
+        exitCode: response.exitCode || 0,
+        command: promise.command,
+        files: promise.files,
+      }
+      promise.resolve(result)
     }
-    promise.resolve(result)
+    else if (isWorkerStdioMessage(response)) {
+      callListeners.forEach(l => {
+        if (response.type === WorkerMessageType.stderr && l.onStderr) {
+          l.onStderr(response.text)
+        }
+        else if (response.type === WorkerMessageType.stdout && l.onStdout) {
+          l.onStdout(response.text)
+        }
+      })
+    }
+    else {
+      throw new Error(`Message type ${response.type} unknown from web worker`)
+    }
   }
   return worker
 }
 
-const magickWorkerPromises: { [key: string]: CallPromise } = {}
+const magickWorkerPromises: { [key: number]: CallPromise } = {}
+
 let magickWorkerPromisesKey = 1
 
 const magickWorker = createWorker()
@@ -128,7 +183,7 @@ export interface CallResult {
   command: CallCommand,
 
   /** the input files used for this result */
-  inputFiles: MagickInputFile[]
+  files: MagickInputFile[]
 }
 
 export type CallCommand = string[]
@@ -138,22 +193,23 @@ export type CallCommand = string[]
  * Low level, core, IM command execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute)
  * ends up calling this one. It accept only one command and only in the form of array of strings.
  */
-export function call(inputFiles: MagickInputFile[], command: string[]): Promise<CallResult> {
-  const request = {
-    files: inputFiles,
-    args: command,
+export function call(files: MagickInputFile[], command: CallCommand): Promise<CallResult> {
+  const request: CommandCallClientRequest = {
+    files,
+    type: WorkerMessageType.call,
+    command,
     requestNumber: magickWorkerPromisesKey,
   }
   const promise = createCallPromise();
   (promise as any).command = command;
-  (promise as any).inputFiles = inputFiles
+  (promise as any).files = files
   magickWorkerPromises[magickWorkerPromisesKey] = promise
 
   const t0 = performance.now()
   const id = magickWorkerPromisesKey
   callListeners.forEach(listener => {
     if (listener.beforeCall) {
-      listener.beforeCall({ inputFiles, command, id })
+      listener.beforeCall({ files, command, id })
     }
   })
 
@@ -161,7 +217,7 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
     const took = performance.now() - t0
     callListeners.forEach(listener => {
       if (listener.afterCall) {
-        listener.afterCall({ inputFiles, command, id, callResult, took })
+        listener.afterCall({ files, command, id, callResult, took })
       }
     })
     return callResult
@@ -185,7 +241,7 @@ export async function Call(inputFiles: MagickInputFile[], command: string[]): Pr
 
 export interface CallEvent {
   command: string[]
-  inputFiles: MagickInputFile[]
+  files: MagickInputFile[]
   callResult?: CallResult
   took?: number
   id: number
@@ -194,12 +250,14 @@ export interface CallEvent {
 export interface CallListener {
   afterCall?(event: CallEvent): void
   beforeCall?(event: CallEvent): void
+  onStdout?(text: string): void
+  onStderr?(text: string): void
 }
 
 const callListeners: CallListener[] = []
 
 /**
- * Adds a new call() listener notified before and after call() executes.
+ * Register a global `call()` listener that will be notified on any command call and when any stdout/stderr occurs
  */
 export function addCallListener(l: CallListener) {
   callListeners.push(l)
@@ -208,3 +266,5 @@ export function addCallListener(l: CallListener) {
 export function removeAllCallListeners() {
   callListeners.splice(0, callListeners.length)
 }
+
+// TODO: removeCallListener

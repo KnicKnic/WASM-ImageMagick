@@ -12,3 +12,5 @@ node_modules
 /buildLocal.sh
 llvm-lto3
 /prefix
+/libwebp
+/libxml

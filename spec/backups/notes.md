@@ -33,3 +33,7 @@ convert -size 320x100 xc:lightblue -font helvetica.ttf -pointsize 72 \\
   `,
   
   ```
+
+  * enhancement : virtual command for delete images from execute result.outputFiles- use case: we are building an animation and we don't want frames to be outputed by execute() - Other use case: when dumping info to a file to parse it - or when loading a font file - we don't want those files to be in the output. the command could remove images by name or by index. Notice that IM already has a -delete operation to remove output files but this only happens on a single command and not on a execute composed command.
+
+ * IM scripts examples: https://www.imagemagick.org/Usage/scripts/

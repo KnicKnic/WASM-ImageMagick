@@ -1,9 +1,8 @@
 import pMap from 'p-map'
 import * as React from 'react'
 import { style } from 'typestyle'
-import { arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo, getBuiltInImages, getFileNameExtension, getInputFilesFromHtmlInputElement, isImage, knownSupportedWriteOnlyImageFormats, MagickFile, MagickInputFile, readFileAsText, asCallCommand } from 'wasm-imagemagick'
+import { arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo, getBuiltInImages, getFileNameExtension, getInputFilesFromHtmlInputElement, isImage, knownSupportedWriteOnlyImageFormats, MagickFile, MagickInputFile, readFileAsText } from 'wasm-imagemagick'
 import { commandExamples, Example } from './commandExamples'
-import { renderCommand } from './executeTemplate'
 
 export interface AppProps {
   context: ExecutionContext
@@ -215,9 +214,7 @@ export class App extends React.Component<AppProps, AppState> {
   }
   changeCommandString(value: string): any {
     const commandArray = this.state.prettyJSON ? JSON.stringify(cliToArray(value), null, 2) : JSON.stringify(cliToArray(value))
-    // TODO: validate
-    this.state = { ...this.state, commandString: value, commandArray }
-    // this.setState({ ...this.state, finalCommand: this.buildFinalCommand() })
+    this.setState({ ...this.state, commandString: value, commandArray })
   }
 
   protected async addBuiltInImages() {
@@ -233,7 +230,7 @@ export class App extends React.Component<AppProps, AppState> {
       return
     }
     this.setState({ ...this.state, status: 'executing' })
-    const cmd = this.state.commandString.replace(/\$\$ALLIMAGES/g, this.state.files.map(f=>f.name).join(' ')).replace(/\$\$IMAGE_0/g, this.state.files.length && this.state.files[0].name||'rose:')
+    const cmd = this.state.commandString.replace(/\$\$ALLIMAGES/g, this.state.files.map(f => f.name).join(' ')).replace(/\$\$IMAGE_0/g, this.state.files.length && this.state.files[0].name || 'rose:')
     console.log('Final Command: ' + JSON.stringify(cmd))
     const result = await this.props.context.execute(cmd)
     console.log(result)
@@ -312,6 +309,5 @@ async function buildFileSrc(file: MagickFile, isImage_?: boolean): Promise<strin
 }
 
 function getMemory() {
-  // return ((performance as any).memory.usedJSHeapSize) /(performance as any).memory.totalJSHeapSize
   return Math.round(((performance as any).memory.usedJSHeapSize) * 100 / (performance as any).memory.totalJSHeapSize)
 }
