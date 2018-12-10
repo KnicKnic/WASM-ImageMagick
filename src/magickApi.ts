@@ -22,7 +22,7 @@ interface WorkerMessage {
 interface CommandCallClientRequest extends WorkerMessage {
   type: WorkerMessageType.call
   command: CallCommand
-  files: MagickInputFile[]
+  inputFiles: MagickInputFile[]
   requestNumber: number
 }
 
@@ -104,7 +104,7 @@ importScripts(magickJsCurrentPath)
         stderr: response.stderr,
         exitCode: response.exitCode || 0,
         command: promise.command,
-        files: promise.files,
+        inputFiles: promise.files,
       }
       promise.resolve(result)
     }
@@ -183,7 +183,7 @@ export interface CallResult {
   command: CallCommand,
 
   /** the input files used for this result */
-  files: MagickInputFile[]
+  inputFiles: MagickInputFile[]
 }
 
 export type CallCommand = string[]
@@ -193,23 +193,23 @@ export type CallCommand = string[]
  * Low level, core, IM command execution function. All the other functions like [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute)
  * ends up calling this one. It accept only one command and only in the form of array of strings.
  */
-export function call(files: MagickInputFile[], command: CallCommand): Promise<CallResult> {
+export function call(inputFiles: MagickInputFile[], command: CallCommand): Promise<CallResult> {
   const request: CommandCallClientRequest = {
-    files,
+    inputFiles,
     type: WorkerMessageType.call,
     command,
     requestNumber: magickWorkerPromisesKey,
   }
   const promise = createCallPromise();
   (promise as any).command = command;
-  (promise as any).files = files
+  (promise as any).files = inputFiles
   magickWorkerPromises[magickWorkerPromisesKey] = promise
 
   const t0 = performance.now()
   const id = magickWorkerPromisesKey
   callListeners.forEach(listener => {
     if (listener.beforeCall) {
-      listener.beforeCall({ files, command, id })
+      listener.beforeCall({ inputFiles, command, id })
     }
   })
 
@@ -217,7 +217,7 @@ export function call(files: MagickInputFile[], command: CallCommand): Promise<Ca
     const took = performance.now() - t0
     callListeners.forEach(listener => {
       if (listener.afterCall) {
-        listener.afterCall({ files, command, id, callResult, took })
+        listener.afterCall({ inputFiles, command, id, callResult, took })
       }
     })
     return callResult
@@ -241,7 +241,7 @@ export async function Call(inputFiles: MagickInputFile[], command: string[]): Pr
 
 export interface CallEvent {
   command: string[]
-  files: MagickInputFile[]
+  inputFiles: MagickInputFile[]
   callResult?: CallResult
   took?: number
   id: number

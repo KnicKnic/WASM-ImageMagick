@@ -23,8 +23,8 @@ if (typeof Module == 'undefined') {
       processFiles()
     },
     print: text => {
-      postMessage({type: 'stdout', text})
       stdout.push(text)
+      postMessage({type: 'stdout', text})
     },
     printErr: text => {
       stderr.push(text)
