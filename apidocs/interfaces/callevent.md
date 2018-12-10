@@ -26,7 +26,7 @@
 
 **● callResult**: *[CallResult](callresult.md)*
 
-*Defined in [magickApi.ts:136](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L136)*
+*Defined in [magickApi.ts:255](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L255)*
 
 ___
 <a id="command"></a>
@@ -35,7 +35,7 @@ ___
 
 **● command**: *`string`[]*
 
-*Defined in [magickApi.ts:134](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L134)*
+*Defined in [magickApi.ts:253](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L253)*
 
 ___
 <a id="id"></a>
@@ -44,7 +44,7 @@ ___
 
 **● id**: *`number`*
 
-*Defined in [magickApi.ts:138](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L138)*
+*Defined in [magickApi.ts:257](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L257)*
 
 ___
 <a id="inputfiles"></a>
@@ -53,7 +53,7 @@ ___
 
 **● inputFiles**: *[MagickInputFile](magickinputfile.md)[]*
 
-*Defined in [magickApi.ts:135](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L135)*
+*Defined in [magickApi.ts:254](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L254)*
 
 ___
 <a id="took"></a>
@@ -62,7 +62,7 @@ ___
 
 **● took**: *`number`*
 
-*Defined in [magickApi.ts:137](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L137)*
+*Defined in [magickApi.ts:256](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L256)*
 
 ___
 

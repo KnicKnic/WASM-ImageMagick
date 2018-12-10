@@ -15,6 +15,7 @@ Represents output files generated when an ImageMagick command executes.
 ### Properties
 
 * [blob](magickoutputfile.md#blob)
+* [ignore](magickoutputfile.md#ignore)
 * [name](magickoutputfile.md#name)
 
 ---
@@ -27,7 +28,20 @@ Represents output files generated when an ImageMagick command executes.
 
 **● blob**: *`Blob`*
 
-*Defined in [magickApi.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L12)*
+*Defined in [magickApi.ts:154](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L154)*
+
+___
+<a id="ignore"></a>
+
+### `<Optional>` ignore
+
+**● ignore**: *`boolean`*
+
+*Inherited from [MagickFile](magickfile.md).[ignore](magickfile.md#ignore)*
+
+*Defined in [magickApi.ts:147](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L147)*
+
+Internal flag so some commands (virtual) can flag an (output) to be ignored by manager / UI
 
 ___
 <a id="name"></a>
@@ -38,7 +52,7 @@ ___
 
 *Inherited from [MagickFile](magickfile.md).[name](magickfile.md#name)*
 
-*Defined in [magickApi.ts:5](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L5)*
+*Defined in [magickApi.ts:145](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L145)*
 
 ___
 

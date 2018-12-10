@@ -29,7 +29,7 @@ Allow multiple execute() calls remembering previous execute() generated output f
 
 ▸ **addBuiltInImages**(): `Promise`<`void`>
 
-*Defined in [executionContext.ts:27](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executionContext.ts#L27)*
+*Defined in [executionContext.ts:27](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/executionContext.ts#L27)*
 
 Add ImageMagick built-in images like `rose:`, `logo:`, etc to this execution context so they are present in `getAllFiles()`.
 
@@ -42,7 +42,7 @@ ___
 
 ▸ **addFiles**(files: *[MagickFile](magickfile.md)[]*): `void`
 
-*Defined in [executionContext.ts:17](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executionContext.ts#L17)*
+*Defined in [executionContext.ts:17](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/executionContext.ts#L17)*
 
 Programmatically add new files so they are available if following `execute()` calls.
 
@@ -61,7 +61,7 @@ ___
 
 ▸ **execute**(configOrCommands: * [ExecuteConfig](executeconfig.md) &#124; [ExecuteCommand](../#executecommand) &#124; `string`*): `Promise`<[ExecuteResult](executeresult.md)>
 
-*Defined in [executionContext.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executionContext.ts#L12)*
+*Defined in [executionContext.ts:12](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/executionContext.ts#L12)*
 
 This behaves almost the same as [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute).
 
@@ -80,7 +80,7 @@ ___
 
 ▸ **getAllFiles**(): `Promise`<[MagickInputFile](magickinputfile.md)[]>
 
-*Defined in [executionContext.ts:22](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executionContext.ts#L22)*
+*Defined in [executionContext.ts:22](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/executionContext.ts#L22)*
 
 Get all the files currently available in this context.
 
@@ -93,7 +93,7 @@ ___
 
 ▸ **getFile**(name: *`string`*): `Promise`< [MagickInputFile](magickinputfile.md) &#124; `undefined`>
 
-*Defined in [executionContext.ts:32](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executionContext.ts#L32)*
+*Defined in [executionContext.ts:32](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/executionContext.ts#L32)*
 
 Get a file by name or undefined if none.
 
@@ -112,7 +112,7 @@ ___
 
 ▸ **removeFiles**(names: *`string`[]*): [MagickInputFile](magickinputfile.md)[]
 
-*Defined in [executionContext.ts:38](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/executionContext.ts#L38)*
+*Defined in [executionContext.ts:38](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/executionContext.ts#L38)*
 
 Remove files by name.
 

@@ -8,12 +8,31 @@
 
 ## Index
 
+### Properties
+
+* [onWorkerError](calllistener.md#onworkererror)
+
 ### Methods
 
 * [afterCall](calllistener.md#aftercall)
 * [beforeCall](calllistener.md#beforecall)
+* [onStderr](calllistener.md#onstderr)
+* [onStdout](calllistener.md#onstdout)
 
 ---
+
+## Properties
+
+<a id="onworkererror"></a>
+
+### `<Optional>` onWorkerError
+
+**● onWorkerError**: * `function` &#124; `null`
+*
+
+*Defined in [magickApi.ts:265](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L265)*
+
+___
 
 ## Methods
 
@@ -23,7 +42,7 @@
 
 ▸ **afterCall**(event: *[CallEvent](callevent.md)*): `void`
 
-*Defined in [magickApi.ts:142](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L142)*
+*Defined in [magickApi.ts:261](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L261)*
 
 **Parameters:**
 
@@ -40,13 +59,47 @@ ___
 
 ▸ **beforeCall**(event: *[CallEvent](callevent.md)*): `void`
 
-*Defined in [magickApi.ts:143](https://github.com/KnicKnic/WASM-ImageMagick/blob/940c9be/src/magickApi.ts#L143)*
+*Defined in [magickApi.ts:262](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L262)*
 
 **Parameters:**
 
 | Name | Type |
 | ------ | ------ |
 | event | [CallEvent](callevent.md) |
+
+**Returns:** `void`
+
+___
+<a id="onstderr"></a>
+
+### `<Optional>` onStderr
+
+▸ **onStderr**(text: *`string`*): `void`
+
+*Defined in [magickApi.ts:264](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L264)*
+
+**Parameters:**
+
+| Name | Type |
+| ------ | ------ |
+| text | `string` |
+
+**Returns:** `void`
+
+___
+<a id="onstdout"></a>
+
+### `<Optional>` onStdout
+
+▸ **onStdout**(text: *`string`*): `void`
+
+*Defined in [magickApi.ts:263](https://github.com/KnicKnic/WASM-ImageMagick/blob/2a709c4/src/magickApi.ts#L263)*
+
+**Parameters:**
+
+| Name | Type |
+| ------ | ------ |
+| text | `string` |
 
 **Returns:** `void`
 
