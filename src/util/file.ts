@@ -55,7 +55,7 @@ export async function isImage(file: MagickFile): Promise<boolean> {
   if (getFileNameExtension(file) === 'svg') {
     return true
   }
-  const { exitCode } = await execute({ inputFiles: [await asInputFile(file)], commands: `identify ${file.name}` })
+  const { exitCode } = await execute({ inputFiles: [await asInputFile(file)], commands: `identify '${file.name}'` })
   return exitCode === 0
 }
 

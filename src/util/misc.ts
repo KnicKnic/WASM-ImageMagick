@@ -1,3 +1,5 @@
+import { ExecuteResult } from "../execute";
+
 // internal misc utilities
 
 export function values<T>(object: { [k: string]: T }): T[] {
@@ -31,7 +33,6 @@ export function combinations<T>(arr: T[], fn: (a: T, b: T) => Promise<any>): Pro
   })
   return Promise.all(promises)
 }
-
 
 export function jsonParseOr<K>(s: string, defaultValue: K): K {
   let val : K = defaultValue

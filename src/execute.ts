@@ -64,24 +64,21 @@ export type ExecuteCommand = Command[] | Command | string
  *
  * @see [execute](https://github.com/KnicKnic/WASM-ImageMagick/tree/master/apidocs#execute) for full documentation on accepted signatures
  */
-export async function executeOne(configOrCommand: ExecuteConfig | ExecuteCommand | MagickInputFile[], execCommand?: ExecuteCommand): Promise<CallResult> {
-  const config = asExecuteConfig(configOrCommand, execCommand)
+export async function executeOne(configOrCommandOrFiles: ExecuteConfig | ExecuteCommand | MagickInputFile[], execCommand?: ExecuteCommand): Promise<CallResult> {
+  let config: ExecuteConfig
+  try {
+    config = asExecuteConfig(configOrCommandOrFiles, execCommand)
+    config = config.skipCommandPreprocessors ? config : await _preprocessCommand(config)
+  } catch (error) {
+    console.error(error)
+    return buildExecuteResultWithError(['Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'), jsonStringifyOr(error, '{}')], error)
+  }
   config.inputFiles = config.inputFiles || []
   const command = asCommand(config.commands)[0]
-  let result: CallResult = {
-    stderr: [],
-    stdout: [],
-    outputFiles: [],
-    exitCode: 1,
-    command: command.map(c => c + ''),
-    inputFiles: config.inputFiles,
-  }
-
   try {
-    result = await call(config.inputFiles, command.map(c => c + ''))
-    return { ...result }
+    return await call(config.inputFiles, command.map(c => c + ''))
   } catch (error) {
-    return { ...result }
+    return buildExecuteResultWithError(error+ '', error)
   }
 }
 
@@ -112,7 +109,7 @@ export function asExecuteConfig(configOrCommandOrFiles: ExecuteConfig | ExecuteC
       commands: configOrCommandOrFiles as ExecuteCommand,
     }
   }
-  return result.skipCommandPreprocessors ? result : _preprocessCommand(result)
+  return result
 }
 
 /**
@@ -120,8 +117,8 @@ export function asExecuteConfig(configOrCommandOrFiles: ExecuteConfig | ExecuteC
  */
 export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig | ExecuteCommand | MagickInputFile[],
   command?: ExecuteCommand): Promise<MagickOutputFile | undefined> {
-  const config = asExecuteConfig(configOrCommand, command)
-  const result = await execute(config)
+  // const config = asExecuteConfig(configOrCommand, command)
+  const result = await execute(configOrCommand, command)
   return result.outputFiles.length && result.outputFiles[0] || undefined
 }
 
@@ -135,6 +132,20 @@ export interface ExecuteResult extends CallResult {
   commands: ExecuteCommand[],
   // breakOnError?: boolean
   virtualCommandLogs?: VirtualCommandLogs
+}
+
+export function buildExecuteResultWithError(s: string | string[] = [], clientError = undefined): ExecuteResult  {
+  return {
+    results: [],
+    commands: [],
+    command: [],
+    inputFiles: [],
+    outputFiles: [],
+    stdout: [],
+    exitCode: 1,
+    clientError,
+    stderr: Array.isArray(s) ? s : [s]
+  }
 }
 
 /**
@@ -177,19 +188,21 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   let config: ExecuteConfig
   try {
     config = asExecuteConfig(configOrCommandOrFiles, command)
+    config = config.skipCommandPreprocessors ? config : await _preprocessCommand(config)
   } catch (error) {
     console.error(error)
-    return {
-      exitCode: 1,
-      stderr: ['Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'), jsonStringifyOr(error, '{}')],
-      command: [],
-      clientError: error,
-      stdout: [],
-      results: [],
-      inputFiles: [],
-      outputFiles: [],
-      commands: [],
-    }
+    return buildExecuteResultWithError(['Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'), jsonStringifyOr(error, '{}')], error)
+    // return {
+    //   exitCode: 1,
+    //   stderr: ['Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'), jsonStringifyOr(error, '{}')],
+    //   command: [],
+    //   clientError: error,
+    //   stdout: [],
+    //   results: [],
+    //   inputFiles: [],
+    //   outputFiles: [],
+    //   commands: [],
+    // }
   }
   const executionId = config.executionId || ++executionIdCounter
   config.inputFiles = config.inputFiles || []
@@ -206,6 +219,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     const thisConfig = {
       inputFiles: values(allInputFiles),
       commands: [c],
+      lastStdout: allStdout.length ? [allStdout[allStdout.length-1]] : []
     }
     const virtualCommandContext: VirtualCommandContext = {
       command: c,

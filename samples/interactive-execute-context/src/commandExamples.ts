@@ -59,6 +59,7 @@ convert -size 400x120 xc:lightblue  -font helvetica.ttf  -pointsize 72 \\
   -fill black  -annotate +45+95 'Sebastián' -motion-blur 0x1+65 \\
   \`uniqueName\`.jpg
 
+  # Psychedelic Font: In a similar way by slowly reducing the stroke width size while swapping colors, a psychedelic outline effect can be easily generated.
 convert -size 320x100 xc:lightblue -font \`buildFile 'helvetica.ttf'\` -pointsize 72 -fill white \\
 -stroke black -strokewidth 25 -annotate +25+65 'Seba' \\
 -stroke white -strokewidth 20 -annotate +25+65 'Seba' \\
@@ -659,8 +660,23 @@ convert -size 100x100 xc: -colorspace RGB -define shepards:power=8 \\
     convert $$IMAGE_0 histogram:histogram.gi
 
          `.trim(),
+  },  
+  {
+    name: 'all IM -preview',
+    description: `execute all -preview supported by IM`,
+    tags: [ExampleTag.info, ExampleTag.template],
+    command: `
+buildFile helvetica.ttf helvetica
+<% 
+const {stdout} = await execute('convert -list preview')
+stdout.forEach(preview => {
+%>
+convert rose: -preview <%= preview %> 'Preview:\`uniqueName\`.png'
+<%
+})
+%>
+         `.trim(),
   },
-
   {
     name: 'gradient sparse_fill',
     description: `https://www.imagemagick.org/Usage/canvas/#sparse_fill`,

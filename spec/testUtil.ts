@@ -6,7 +6,6 @@ export async function showImages(images: MagickFile[]|MagickFile): Promise<HTMLI
   return await pMap(images, async image => {
     const el = document.createElement('img')
     el.title = el.alt = image.name
-
     document.body.appendChild(el)
     return loadImageElement(image, el)
   }, {concurrency: 1})
