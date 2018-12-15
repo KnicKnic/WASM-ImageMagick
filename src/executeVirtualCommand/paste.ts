@@ -7,7 +7,7 @@ import pMap from 'p-map';
 /**
  * paste command: simulates image paste region. Usage: 
  * 
- * ``paste bigImage.miff smallerImage.miff 50x60  resultNewImage.miff```
+ * ```paste bigImage.miff smallerImage.miff 50x60  resultNewImage.miff```
  * 
  * When finish it there will be a new file esultNewImage.miff containing bigImage composed with smallerImage in given coordinates
  * 

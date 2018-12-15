@@ -7,7 +7,7 @@ import pMap from 'p-map';
 /**
  * cut command: simulates image cut region. Usage: 
  * 
- * ``cut bigImage.miff 'rectangle 40,50 200,100' bigImageCutted.miff sectionCut.miff```
+ * ```cut bigImage.miff 'rectangle 40,50 200,100' bigImageCutted.miff sectionCut.miff```
  * 
  * When finish it there will be two new files in the execution chain: bigImageCutted.miff that has the 
  * modified image with the region cutted totally transparent and sectionCut.miff: an image containing the section cutted.
