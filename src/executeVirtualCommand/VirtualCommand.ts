@@ -1,4 +1,4 @@
-import { ExecuteResult, ExecuteConfig } from '../execute'
+import { ExecuteResult, ExecuteConfig, buildExecuteResultWithError } from '../execute'
 import { MagickInputFile } from '../magickApi'
 import { values } from '../util'
 import buildFile from './buildFile'
@@ -18,6 +18,7 @@ export interface VirtualCommand {
   execute(c: VirtualCommandContext): Promise<ExecuteResult>
   predicate(c: VirtualCommandContext): boolean
   postProcessResult?(r: ExecuteResult): Promise<ExecuteResult>
+  validateCommands?(c: VirtualCommandContext): false|string
 }
 
 export type VirtualCommandLogs = { [virtualCommandName: string]: any[] }
@@ -42,10 +43,16 @@ export function getVirtualCommandLogsFor(c: ExecuteConfig): VirtualCommandLogs {
   return virtualCommandLogs[c.executionId]
   // TODO: probably we can delete all logs from previous executionIds
 }
-export function _dispatchVirtualCommand(context: VirtualCommandContext): Promise<ExecuteResult> {
+export async function _dispatchVirtualCommand(context: VirtualCommandContext): Promise<ExecuteResult> {
   const cmd = virtualCommands.find(c => c.predicate(context))
   context.virtualCommandLogs[cmd.name] = context.virtualCommandLogs[cmd.name] || []
-  return cmd.execute(context)
+  if(cmd.validateCommands){
+    const error = cmd.validateCommands(context)
+    if(error){
+      return buildExecuteResultWithError(error)
+    }
+  }
+  return await cmd.execute(context)
 }
 
 export async function _dispatchVirtualCommandPostproccessResult(result: ExecuteResult): Promise<ExecuteResult> {

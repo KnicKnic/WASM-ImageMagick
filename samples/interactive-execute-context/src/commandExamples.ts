@@ -470,7 +470,7 @@ convert radial.png solid.png angular.png \\
     tags: [ExampleTag.drawing],
   },
 
-  { 
+  {  
     name: 'Fill color - configurable',
     description: `uses -floodbill or -opaque to replace a color - uses templates to be configurable with varibales`,
     command: `

@@ -123,7 +123,7 @@ export default describe('executeVirtualCommand', () => {
       ` )
 
       expect(result.exitCode).toBe(0)
-      await showImages(result.outputFiles)
+      // await showImages(result.outputFiles)
       expect(await compare(result.outputFiles[0], result.outputFiles.find(f => f.name === '1b.miff'))).not.toBe(true)
       done()
     })
@@ -139,7 +139,7 @@ export default describe('executeVirtualCommand', () => {
       const result = await execute(`
       convert rose: -rotate 22 -resize 200% 1.miff
       convert logo: -resize 20x20! 2.miff
-      paste 1.miff 2.miff 5x5 pasted.miff
+      paste 1.miff  5x5 2.miff pasted.miff
       ` )
 
       expect(result.exitCode).toBe(0)
@@ -147,7 +147,30 @@ export default describe('executeVirtualCommand', () => {
 
       done()
     })
+    
+    it('if no target output image is declared then the first image itself is modified', async done => {
 
+      const result = await execute(`
+convert rose: -rotate 77 -scale 55% 1.miff
+convert 1.miff 2.miff
+convert rose: -resize 33% -rotate -44 small.miff
+paste 1.miff  30x40 small.miff ''
+      ` )
+
+      await showImages(result.outputFiles)
+      expect(result.exitCode).toBe(0)
+      expect(await compare(result.outputFiles, '1.miff', '2.miff')).not.toBe(true)
+
+
+      done()
+    })
+    xit('errors in commands', async done => {
+      // this is failing : paste 1.miff  30x40 small.miff
+      done()
+    })
+    xit('if no small image to paste then try to paste last cut', async done => {
+      done()
+    })
     xit('pasted section could be transformed / resized according to given shape area', async done => {
       done()
     })

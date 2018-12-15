@@ -87,7 +87,7 @@ export default describe('execute', () => {
       const result2 = await execute('convert rose: -rotate 70 -scale 23% image2.png')
       const image3 = outputFiles.find(f => f.name === 'image3.jpg')
       const image2 = result2.outputFiles[0]
-      await showImages([image3, image2])
+      // await showImages([image3, image2])
       expect(await compare(image3, image2)).toBe(true)
       done()
     })

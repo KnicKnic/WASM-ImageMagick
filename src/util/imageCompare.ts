@@ -1,12 +1,22 @@
 import { asInputFile, Call, MagickFile, blobToString, MagickInputFile } from '..'
 
 /**
- * Compare the two images and return true if they are equal visually. Optionally, a margin of error can be provided using `fuzz`
+ * Compare the two images and return true if they are equal visually. Optionally, a margin of error can be provided using `fuzz`. 
+ * 
+ * Alternative way of calling: `compare(result.outputFiles, '1.miff', '2.miff')`
  */
-export async function compare(img1: MagickFile | MagickFile[] | string, img2?: MagickFile | string, fuzz: number = 0.015): Promise<boolean> {
+export async function compare(img1: MagickFile | MagickFile[] | string, img2?: MagickFile | string, fuzz: number|string = 0.015): Promise<boolean> {
   if (Array.isArray(img1)) {
-    img2 = img1[1]
-    img1 = img1[0]
+    if(typeof fuzz!=='string'){
+      img2 = img1[1]
+      img1 = img1[0]
+    }
+    else {
+      const aux = img2
+      img2 = img1.find(i=>i.name===fuzz)
+      img1 = img1.find(i=>i.name===aux)
+      
+    }
   }
   const identical = await compareNumber(img1, img2)
   return identical <= fuzz

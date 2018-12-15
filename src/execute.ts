@@ -1,7 +1,9 @@
 import pMap from 'p-map'
 import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
-import {getVirtualCommandLogsFor, isVirtualCommand, VirtualCommandContext, VirtualCommandLogs, 
-  _dispatchVirtualCommand, _dispatchVirtualCommandPostproccessResult } from './executeVirtualCommand/VirtualCommand'
+import {
+  getVirtualCommandLogsFor, isVirtualCommand, VirtualCommandContext, VirtualCommandLogs,
+  _dispatchVirtualCommand, _dispatchVirtualCommandPostproccessResult
+} from './executeVirtualCommand/VirtualCommand'
 import { CallResult, CallCommand } from './magickApi'
 import { asInputFile, isInputFile, asOutputFile, isOutputFile } from './util'
 import { values, jsonStringifyOr } from './util/misc'
@@ -80,7 +82,7 @@ export async function executeOne(configOrCommandOrFiles: ExecuteConfig | Execute
   try {
     return await call(config.inputFiles, command.map(c => c + ''))
   } catch (error) {
-    return buildExecuteResultWithError(error+ '', error)
+    return buildExecuteResultWithError(error + '', error)
   }
 }
 
@@ -129,30 +131,34 @@ export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig 
  */
 export interface ExecuteResult extends CallResult {
   /** results of internal `call()` calls */
-  results: (CallResult|ExecuteResult)[],
+  results: (CallResult | ExecuteResult)[],
   /** the original commands used in the execute() call */
   commands: ExecuteCommand[],
   // breakOnError?: boolean
   virtualCommandLogs?: VirtualCommandLogs
-  executionId?:number
+  executionId?: number
   /** a virtual command or other custom inner call to execute() can instruct it to replace existing files with new content. By default convert can't override files (only mogrify) and in general IM commands will always create new images, but for some more high level tools it makes sense to override existing files, for example paste, cut, fillColor. TODO: maybe forget vp could be implemented using this feature */
-  replaceFiles?: {existingFileName: string, newOutputFileName: string}[]
+  manipulateFiles?: ExecuteResultFileManipulation[]
 }
-
+export interface ExecuteResultFileManipulation {
+  type: 'replace' | 'remove',
+  existingFileName: string, 
+  newOutputFileName: string
+}
 
 export function isExecuteResult(r: any): r is ExecuteResult {
   return typeof r === 'object' && r.commands && r.executionId
 }
 export function cleanExecuteResultFiles(r: CallResult | ExecuteResult, filesToClean: string[]) {
-  r.inputFiles = r.inputFiles.filter(f => filesToClean.indexOf(f.name)===-1)
-  r.outputFiles = r.outputFiles.filter(f => filesToClean.indexOf(f.name)===-1);
+  r.inputFiles = r.inputFiles.filter(f => filesToClean.indexOf(f.name) === -1)
+  r.outputFiles = r.outputFiles.filter(f => filesToClean.indexOf(f.name) === -1);
   // TODO: should we dispose blobs / arrays somehow here?
   ((r as ExecuteResult).results || []).forEach(r2 => cleanExecuteResultFiles(r2, filesToClean))
 }
 
 
 
-export function buildExecuteResultWithError(s: string | string[] = [], clientError = undefined): ExecuteResult  {
+export function buildExecuteResultWithError(s: string | string[] = [], clientError = undefined): ExecuteResult {
   return {
     results: [],
     commands: [],
@@ -210,15 +216,15 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   } catch (error) {
     console.error(error)
     return buildExecuteResultWithError([
-      'Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'), 
+      'Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'),
       jsonStringifyOr(error, '{}')], error)
   }
   // if(!config.executionId){
   //   config.executionId = executionIdCounter++
   //   console.log('++executionIdCounter', config.executionId);
-    
+
   // }
-  config.executionId = config.executionId ||++executionIdCounter
+  config.executionId = config.executionId || ++executionIdCounter
   config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}
   const allInputFiles: { [name: string]: MagickInputFile } = {}
@@ -228,12 +234,12 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
   const results: CallResult[] = []
   let allStdout = []
   let allStderr = []
-  const virtualCommandLogs= getVirtualCommandLogsFor(config)
+  const virtualCommandLogs = getVirtualCommandLogsFor(config)
   async function mapper(c: string[]) {
     const thisConfig = {
       inputFiles: values(allInputFiles),
       commands: [c],
-      lastStdout: allStdout.length ? [allStdout[allStdout.length-1]] : []
+      lastStdout: allStdout.length ? [allStdout[allStdout.length - 1]] : []
     }
     const virtualCommandContext: VirtualCommandContext = {
       command: c,
@@ -241,7 +247,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       executionId: config.executionId,
       virtualCommandLogs,
     }
-    let result: CallResult|ExecuteResult
+    let result: CallResult | ExecuteResult
     if (!config.skipVirtualCommands && isVirtualCommand(virtualCommandContext)) {
       result = await _dispatchVirtualCommand(virtualCommandContext)
     }
@@ -251,8 +257,8 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     results.push(result)
     allStdout = allStdout.concat(result.stdout || [])
     allStderr = allStderr.concat(result.stderr || [])
-    
-    
+
+
     await pMap(result.outputFiles, async f => {
       allOutputFiles[f.name] = f
       const inputFile = await asInputFile(f)
@@ -277,29 +283,29 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     executionId: config.executionId
   }
 
-  finalResult= await _dispatchVirtualCommandPostproccessResult(finalResult)
+  finalResult = await _dispatchVirtualCommandPostproccessResult(finalResult)
   return finalResult
 }
 
 let executionIdCounter = 1
 
 
-async function verifyFiles(result: ExecuteResult|CallResult,
-  allInputFiles: { [name: string]: MagickInputFile }, allOutputFiles: { [name: string]: MagickOutputFile }, 
-  results: CallResult[] /* TODO results */ ): Promise<void>{
-  
+async function verifyFiles(result: ExecuteResult | CallResult,
+  allInputFiles: { [name: string]: MagickInputFile }, allOutputFiles: { [name: string]: MagickOutputFile },
+  results: CallResult[] /* TODO results */): Promise<void> {
+
   const allFiles = [].concat(result.inputFiles).concat(values(allOutputFiles)).concat(values(allInputFiles))
-  const replacements = isExecuteResult(result) && result.replaceFiles || []
-  allFiles.forEach(async f=>{
-    const replacement = replacements.find(re=>re.existingFileName===f.name)
-    if(replacement){
-      const newFile = result.outputFiles.find(ff=>ff.name === replacement.newOutputFileName)
-      if(newFile){
-        if(isInputFile(f)){
+  const replacements = isExecuteResult(result) && result.manipulateFiles || []
+  allFiles.forEach(async f => {
+    const replacement = replacements.find(re => re.existingFileName === f.name)
+    if (replacement) {
+      const newFile = result.outputFiles.find(ff => ff.name === replacement.newOutputFileName)
+      if (newFile) {
+        if (isInputFile(f)) {
           const newInputFile = await asInputFile(newFile)
           f.content = newInputFile.content
-        }if(isOutputFile(f)){
-          f.blob=newFile.blob
+        } if (isOutputFile(f)) {
+          f.blob = newFile.blob
         }
       }
     }
@@ -307,15 +313,15 @@ async function verifyFiles(result: ExecuteResult|CallResult,
 
   // and now we remove all replacement.newOutputFile s
 
-  replacements.forEach(replacement=>{
+  replacements.forEach(replacement => {
     delete allInputFiles[replacement.newOutputFileName]
     delete allOutputFiles[replacement.newOutputFileName]
-    let i = result.outputFiles.findIndex(f=>f.name===replacement.newOutputFileName)
-    if(i!==-1){
+    let i = result.outputFiles.findIndex(f => f.name === replacement.newOutputFileName)
+    if (i !== -1) {
       result.outputFiles.splice(i, 1)
     }
-    i = result.inputFiles.findIndex(f=>f.name===replacement.newOutputFileName)
-    if(i!==-1){
+    i = result.inputFiles.findIndex(f => f.name === replacement.newOutputFileName)
+    if (i !== -1) {
       result.inputFiles.splice(i, 1)
     }
   })
@@ -328,6 +334,6 @@ async function verifyFiles(result: ExecuteResult|CallResult,
   //   allInputFiles[realFile.name] = realInputFile
   //   result.inputFiles = result.inputFiles.filter(ff=>ff.name===realInputFile.name ? realInputFile : ff )
   //   result.outputFiles = result.outputFiles.filter(ff=>ff.name===realOutputFile.name ? realOutputFile : ff )
-    
+
   // }, { concurrency: 1 })
 }
