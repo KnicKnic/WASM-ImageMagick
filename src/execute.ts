@@ -264,7 +264,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       const inputFile = await asInputFile(f)
       allInputFiles[inputFile.name] = inputFile
     }, { concurrency: 1 })
-    await verifyFiles(result, allInputFiles, allOutputFiles, results)
+    await performFileManipulations(result, allInputFiles, allOutputFiles, results)
   }
   const commands = asCommand(config.commands)
   await pMap(commands, mapper, { concurrency: 1 })
@@ -289,13 +289,17 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
 
 let executionIdCounter = 1
 
-
-async function verifyFiles(result: ExecuteResult | CallResult,
+/**
+ * see ExecuteResult.manipulateFiles property. Third party like virtual commands can manipulate current execution files. 
+ * TODO: results arg not considered 
+ */
+async function performFileManipulations(result: ExecuteResult | CallResult,
   allInputFiles: { [name: string]: MagickInputFile }, allOutputFiles: { [name: string]: MagickOutputFile },
   results: CallResult[] /* TODO results */): Promise<void> {
 
+  const replaced = []
   const allFiles = [].concat(result.inputFiles).concat(values(allOutputFiles)).concat(values(allInputFiles))
-  const replacements = isExecuteResult(result) && result.manipulateFiles || []
+  const replacements = isExecuteResult(result) && result.manipulateFiles&& result.manipulateFiles.filter(m=>m.type==='replace') || []
   allFiles.forEach(async f => {
     const replacement = replacements.find(re => re.existingFileName === f.name)
     if (replacement) {
@@ -304,36 +308,41 @@ async function verifyFiles(result: ExecuteResult | CallResult,
         if (isInputFile(f)) {
           const newInputFile = await asInputFile(newFile)
           f.content = newInputFile.content
-        } if (isOutputFile(f)) {
+        } 
+        if (isOutputFile(f)) {
           f.blob = newFile.blob
         }
+        replaced.push(newFile.name)
       }
     }
   })
 
-  // and now we remove all replacement.newOutputFile s
+  // and now we remove all replacement.newOutputFile s and also support remove action
 
-  replacements.forEach(replacement => {
-    delete allInputFiles[replacement.newOutputFileName]
-    delete allOutputFiles[replacement.newOutputFileName]
-    let i = result.outputFiles.findIndex(f => f.name === replacement.newOutputFileName)
+  replaced.forEach(n => {
+    removeFileNamed(n)
+  })
+
+  function removeFileNamed(n :string){
+    delete allInputFiles[n]
+    delete allOutputFiles[n]
+    let i = result.outputFiles.findIndex(f => f.name === n)
     if (i !== -1) {
       result.outputFiles.splice(i, 1)
     }
-    i = result.inputFiles.findIndex(f => f.name === replacement.newOutputFileName)
+    i = result.inputFiles.findIndex(f => f.name === n)
     if (i !== -1) {
       result.inputFiles.splice(i, 1)
     }
+  }
+  // support 'remove' action
+  const removes = isExecuteResult(result) && result.manipulateFiles&& result.manipulateFiles.filter(m=>m.type==='remove') || []
+  removes.forEach(r=>{
+    if(r.existingFileName){
+      removeFileNamed(r.existingFileName)
+    }
+    if(r.newOutputFileName){
+      removeFileNamed(r.newOutputFileName)
+    }
   })
-  // await pMap(result.outputFiles, async f => {
-  //   const realFile = allFiles.find(ff=>ff.name===replacement.newOutputFileName)||f
-  //   const realOutputFile = await asOutputFile(realFile)
-
-  //   allOutputFiles[f.name] = realOutputFile
-  //   const realInputFile = await asInputFile(realFile)
-  //   allInputFiles[realFile.name] = realInputFile
-  //   result.inputFiles = result.inputFiles.filter(ff=>ff.name===realInputFile.name ? realInputFile : ff )
-  //   result.outputFiles = result.outputFiles.filter(ff=>ff.name===realOutputFile.name ? realOutputFile : ff )
-
-  // }, { concurrency: 1 })
 }

@@ -46,6 +46,7 @@ export function getVirtualCommandLogsFor(c: ExecuteConfig): VirtualCommandLogs {
 export async function _dispatchVirtualCommand(context: VirtualCommandContext): Promise<ExecuteResult> {
   const cmd = virtualCommands.find(c => c.predicate(context))
   context.virtualCommandLogs[cmd.name] = context.virtualCommandLogs[cmd.name] || []
+  debugger
   if(cmd.validateCommands){
     const error = cmd.validateCommands(context)
     if(error){
