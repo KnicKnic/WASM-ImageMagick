@@ -5,6 +5,7 @@ import { MagickInputFile } from '../magickApi';
 import { getUniqueIdentifier } from '../executeVirtualCommand/uniqueName';
 import { unquote } from './cli';
 import { extractInfo } from './imageExtractInfo';
+import { ShapeRepresentation, shapeTpDrawCommand } from './draw';
 
 export async function getPixelColor(img: MagickFile, x: number, y: number): Promise<string> {
   const file = await executeAndReturnOutputFile({ inputFiles: [await asInputFile(img)], commands: `convert ${img.name} -format '%[pixel:p{${x},${y}}]\\n' info:info.txt` })
@@ -17,7 +18,7 @@ export async function getPixelColor(img: MagickFile, x: number, y: number): Prom
  * 
  */
 export async function cutShape(image: MagickInputFile, r: ShapeRepresentation,
-  modifiedFileName: string = getUniqueIdentifier() + '.miff',
+  outputFileName: string = getUniqueIdentifier() + '.miff',
   cutSectionFileName: string = getUniqueIdentifier() + '.miff',
   maskFileName: string = getUniqueIdentifier() + '.miff',
   executionId?: number)
@@ -36,10 +37,10 @@ export async function cutShape(image: MagickInputFile, r: ShapeRepresentation,
 
   const result2 = await execute({
     inputFiles: [image, mask],
-    commands: `convert ${image.name} ${mask.name} -alpha off  -compose CopyOpacity -composite ${modifiedFileName}`,
+    commands: `convert ${image.name} ${mask.name} -alpha off  -compose CopyOpacity -composite ${outputFileName}`,
     executionId
   })
-  const modifiedFile = result2.outputFiles.find(f => f.name === modifiedFileName)
+  const modifiedFile = result2.outputFiles.find(f => f.name === outputFileName)
 
   //also we want to copy the removed portion in image 3
   const result3 = await execute({
@@ -72,47 +73,3 @@ export async function paste(targetImage: MagickInputFile, imageToPaste: MagickIn
   return { modified, result }
 }
 
-
-
-/* something that can be -draw by IM */
-export interface Shape {
-  type: ShapeType
-}
-export type ShapeRepresentation = Shape | string
-export enum ShapeType {
-  'Rectangle' = 'Rectangle',
-  'Path' = 'Path'
-}
-
-export interface Point {
-  x: number
-  y: number
-}
-export interface Rectangle extends Shape {
-  type: ShapeType.Rectangle
-  a: Point
-  b: Point
-}
-export function isRectangle(r: any): r is Rectangle {
-  return r.type === ShapeType.Rectangle
-}
-export interface Path extends Shape, Array<Point | string> {
-  type: ShapeType.Path
-}
-export function isPath(r: any): r is Path {
-  return r.type === ShapeType.Path
-}
-export function shapeTpDrawCommand(s: ShapeRepresentation): string {
-  if (typeof s === 'string') {
-    return unquote(s)
-  }
-  if (isRectangle(s)) {
-    return `Rectangle  ${s.a.x},${s.a.y} ${s.b.x},${s.b.y}`
-  }
-  if (isPath(s)) {
-    return `path ${s.map(i => typeof i === 'string' ? i : (i.x + ',' + i.y)).join(' ')}`
-  }
-  else {
-    throw new Error('dont know how to represent command for shape ' + s.type)
-  }
-}

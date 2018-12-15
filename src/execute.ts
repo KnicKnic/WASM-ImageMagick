@@ -135,7 +135,18 @@ export interface ExecuteResult extends CallResult {
   // breakOnError?: boolean
   virtualCommandLogs?: VirtualCommandLogs
   executionId?:number
+  /** a virtual command or other custom inner call to execute() can instruct it to replace existing files with new content. By default convert can't override files (only mogrify) and in general IM commands will always create new images, but for some more high level tools it makes sense to override existing files, for example paste, cut, fillColor. TODO: maybe forget vp could be implemented using this feature */
+  replaceFiles?: {existingFileName: string, newOutputFileName: string}[]
 }
+
+export function cleanExecuteResultFiles(r: CallResult | ExecuteResult, filesToClean: string[]) {
+  r.inputFiles = r.inputFiles.filter(f => !filesToClean.includes(f.name))
+  r.outputFiles = r.outputFiles.filter(f => !filesToClean.includes(f.name));
+  // TODO: should we dispose blobs / arrays somehow here?
+  ((r as ExecuteResult).results || []).forEach(r2 => cleanExecuteResultFiles(r2, filesToClean))
+}
+
+
 
 export function buildExecuteResultWithError(s: string | string[] = [], clientError = undefined): ExecuteResult  {
   return {

@@ -2,6 +2,7 @@ import { ExecuteResult } from '..';
 import { CallResult } from '../magickApi';
 import { flat } from '../util';
 import { VirtualCommand, VirtualCommandContext, _newExecuteResult } from './VirtualCommand';
+import { cleanExecuteResultFiles } from '../execute';
 const Minimatch = require('minimatch')
 
 /**
@@ -37,17 +38,10 @@ export default {
       // means this execution belongs from another call
       return
     }
-    cleanResult(r, toForgetDic[r.executionId])
+    cleanExecuteResultFiles(r, toForgetDic[r.executionId])
     return r
   }
 
 } as VirtualCommand
-
-function cleanResult(r: CallResult | ExecuteResult, toForget: string[]) {
-  r.inputFiles = r.inputFiles.filter(f => !toForget.includes(f.name))
-  r.outputFiles = r.outputFiles.filter(f => !toForget.includes(f.name));
-  // TODO: should we dispose blobs / arrays somehow here?
-  ((r as ExecuteResult).results || []).forEach(r2 => cleanResult(r2, toForget))
-}
 
 const toForgetDic: { [k: number]: string[] } = {}

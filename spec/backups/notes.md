@@ -48,3 +48,5 @@ convert \`uniqueName rotated1\`.png -resize 5% \`uniqueName img2\`.png
  * check: IM scripts examples: https://www.imagemagick.org/Usage/scripts/
 
  * documentation here is wrong: https://www.imagemagick.org/Usage/draw/#svg_drivers - you cannot read .svg files with msvg - the example fails. you can only write. But, what if we write to svg, resize and then if it's possible to render the svg in canvas or to extract the picmap from svg image - then we could also perform the read svg part and can resize without aliasing as in  https://www.imagemagick.org/Usage/draw/#svg_output
+
+ virtuall command for getting the color of x,y 
