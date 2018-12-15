@@ -38,11 +38,11 @@ fillMode: 'floodfill'|'opaque'
   /** The color to fill in */
   fill: Color
   /** Required in case fillMode=='opaque */
-  opaqueColor: Color
+  opaqueColor?: Color
   /** tolerance when matching similar colors - apply for both modes */
-  fuzz: number
+  fuzz?: number
   /** applies for floodfill mode - the point where to start filling from */
-  floodfillPoint: Point
+  floodfillPoint?: Point
 
 }
 const fillColor: SimpleConvertCommandBuilder<FillColorConfig> = async config => { 

@@ -25,7 +25,7 @@ export default {
     const outputFileName = c.command[4]
 
     const config : FillColorConfig={
-      fill, outputFileName, fillMode: 'floodfill',  floodfillPoint, 
+      fill, outputFileName, fillMode: 'floodfill',  floodfillPoint, targetImage, 
     } 
     const result = await execute({inputFiles: [targetImage], commands: await fillColorConvert.commandBuilder(config)} )
 
@@ -36,7 +36,6 @@ export default {
 
     return _newExecuteResult(c, {
       ...result,
-      outputFiles: await pMap([modified], f => asOutputFile(f)),
     })
     //TODO: ceck errors, stdout, stderr, etc
 

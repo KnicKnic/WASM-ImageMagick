@@ -3,7 +3,7 @@ import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
 import {getVirtualCommandLogsFor, isVirtualCommand, VirtualCommandContext, VirtualCommandLogs, 
   _dispatchVirtualCommand, _dispatchVirtualCommandPostproccessResult } from './executeVirtualCommand/VirtualCommand'
 import { CallResult, CallCommand } from './magickApi'
-import { asInputFile, isInputFile } from './util'
+import { asInputFile, isInputFile, asOutputFile, isOutputFile } from './util'
 import { values, jsonStringifyOr } from './util/misc'
 import { _preprocessCommand } from './executeCommandPreprocessor'
 
@@ -129,7 +129,7 @@ export async function executeAndReturnOutputFile(configOrCommand: ExecuteConfig 
  */
 export interface ExecuteResult extends CallResult {
   /** results of internal `call()` calls */
-  results: CallResult[],
+  results: (CallResult|ExecuteResult)[],
   /** the original commands used in the execute() call */
   commands: ExecuteCommand[],
   // breakOnError?: boolean
@@ -139,9 +139,13 @@ export interface ExecuteResult extends CallResult {
   replaceFiles?: {existingFileName: string, newOutputFileName: string}[]
 }
 
+
+export function isExecuteResult(r: any): r is ExecuteResult {
+  return typeof r === 'object' && r.commands && r.executionId
+}
 export function cleanExecuteResultFiles(r: CallResult | ExecuteResult, filesToClean: string[]) {
-  r.inputFiles = r.inputFiles.filter(f => !filesToClean.includes(f.name))
-  r.outputFiles = r.outputFiles.filter(f => !filesToClean.includes(f.name));
+  r.inputFiles = r.inputFiles.filter(f => filesToClean.indexOf(f.name)===-1)
+  r.outputFiles = r.outputFiles.filter(f => filesToClean.indexOf(f.name)===-1);
   // TODO: should we dispose blobs / arrays somehow here?
   ((r as ExecuteResult).results || []).forEach(r2 => cleanExecuteResultFiles(r2, filesToClean))
 }
@@ -237,7 +241,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       executionId: config.executionId,
       virtualCommandLogs,
     }
-    let result: CallResult
+    let result: CallResult|ExecuteResult
     if (!config.skipVirtualCommands && isVirtualCommand(virtualCommandContext)) {
       result = await _dispatchVirtualCommand(virtualCommandContext)
     }
@@ -247,11 +251,14 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     results.push(result)
     allStdout = allStdout.concat(result.stdout || [])
     allStderr = allStderr.concat(result.stderr || [])
+    
+    
     await pMap(result.outputFiles, async f => {
       allOutputFiles[f.name] = f
       const inputFile = await asInputFile(f)
       allInputFiles[inputFile.name] = inputFile
     }, { concurrency: 1 })
+    await verifyFiles(result, allInputFiles, allOutputFiles, results)
   }
   const commands = asCommand(config.commands)
   await pMap(commands, mapper, { concurrency: 1 })
@@ -275,3 +282,52 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
 }
 
 let executionIdCounter = 1
+
+
+async function verifyFiles(result: ExecuteResult|CallResult,
+  allInputFiles: { [name: string]: MagickInputFile }, allOutputFiles: { [name: string]: MagickOutputFile }, 
+  results: CallResult[] /* TODO results */ ): Promise<void>{
+  
+  const allFiles = [].concat(result.inputFiles).concat(values(allOutputFiles)).concat(values(allInputFiles))
+  const replacements = isExecuteResult(result) && result.replaceFiles || []
+  allFiles.forEach(async f=>{
+    const replacement = replacements.find(re=>re.existingFileName===f.name)
+    if(replacement){
+      const newFile = result.outputFiles.find(ff=>ff.name === replacement.newOutputFileName)
+      if(newFile){
+        if(isInputFile(f)){
+          const newInputFile = await asInputFile(newFile)
+          f.content = newInputFile.content
+        }if(isOutputFile(f)){
+          f.blob=newFile.blob
+        }
+      }
+    }
+  })
+
+  // and now we remove all replacement.newOutputFile s
+
+  replacements.forEach(replacement=>{
+    delete allInputFiles[replacement.newOutputFileName]
+    delete allOutputFiles[replacement.newOutputFileName]
+    let i = result.outputFiles.findIndex(f=>f.name===replacement.newOutputFileName)
+    if(i!==-1){
+      result.outputFiles.splice(i, 1)
+    }
+    i = result.inputFiles.findIndex(f=>f.name===replacement.newOutputFileName)
+    if(i!==-1){
+      result.inputFiles.splice(i, 1)
+    }
+  })
+  // await pMap(result.outputFiles, async f => {
+  //   const realFile = allFiles.find(ff=>ff.name===replacement.newOutputFileName)||f
+  //   const realOutputFile = await asOutputFile(realFile)
+
+  //   allOutputFiles[f.name] = realOutputFile
+  //   const realInputFile = await asInputFile(realFile)
+  //   allInputFiles[realFile.name] = realInputFile
+  //   result.inputFiles = result.inputFiles.filter(ff=>ff.name===realInputFile.name ? realInputFile : ff )
+  //   result.outputFiles = result.outputFiles.filter(ff=>ff.name===realOutputFile.name ? realOutputFile : ff )
+    
+  // }, { concurrency: 1 })
+}

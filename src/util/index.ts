@@ -8,3 +8,7 @@ export * from './imageExtractInfo'
 export * from './imageExtractInfoTypes'
 export * from './support'
 export * from './misc'
+
+export * from './color'
+
+export * from './draw'
