@@ -205,6 +205,53 @@ require(['wasm-imagemagick'], function (WasmImagemagick) {
 [Working example source code](./tests/bundles/umd-test-nolibrary.html)
 
 
+## `execute()` syntax and tools
+
+`execute()` supports not only a high level syntax similar to shell scripts but also some interesting features to easy write powerful command in the form of just strings. 
+
+### shell script features
+
+ * lines starting with `#` are considered comments and are not parsed/executed
+ * long commands can be splitted in several lines using `\` like in bash
+ * command substitution like in shell using `` ` ``
+ * `ls` and `cat` commands with glob support
+ * Let me explain with an example: 
+
+```
+const commands = `
+convert -size \`identify -format %wx%h\n metallic_a.png\` \\
+  gradient:rgb(100%,100%,100%)-black ( metallic_a.png -negate ) \\
+  -compose CopyOpacity -composite \\
+  
+  # This is a commant line because it starts with hash
+  
+  ( metallic_a.png ( +clone -negate -level 0%x10% ) \\
+    -compose CopyOpacity -composite -shade 315x45 -auto-gamma -auto-level \\
+  ) \\
+
+  # This is another comment, in the middle of this unique long IM command
+
+  -compose Overlay -composite metallic_clut.png -clut \\
+  ( +clone -background rgb(0,0,75%) -shadow 80x2+3+3 -write metallic_shad.png ) \\
+  +swap -compose Over -composite -trim +repage \\
+  out.png
+`
+```
+
+That's a long command but fortunately we were able to: 
+
+ * split same command in several lines ending lines with `\\`
+ * we called `` `identify -format %wx%h\n metallic_a.png` `` using command substitution. It will print the required size, something like `-size 45x67`. **Tip**: In unix, calling a command inside back-quotes like that, will replace the expression with its stdout
+ * Notice that there are two comment lines in the middle of the command.
+
+## Virtual commands
+
+TODO
+    
+## Template preprocessor
+
+TODO
+
 
 ## Build instructions
 

@@ -1,4 +1,4 @@
-import { ExecuteResult } from '../execute'
+import { ExecuteResult, ExecuteConfig } from '../execute'
 import { MagickInputFile } from '../magickApi'
 import { values } from '../util'
 import buildFile from './buildFile'
@@ -10,11 +10,14 @@ import variableDeclaration from './variableDeclaration'
 import variableSubstitution from './variableSubstitution';
 import cut from './cut';
 import paste from './paste'
+import pMap from 'p-map';
+import forget from './forget';
 
 export interface VirtualCommand {
   name: string
   execute(c: VirtualCommandContext): Promise<ExecuteResult>
   predicate(c: VirtualCommandContext): boolean
+  postProcessResult?(r: ExecuteResult): Promise<ExecuteResult>
 }
 
 export type VirtualCommandLogs = { [virtualCommandName: string]: any[] }
@@ -30,11 +33,27 @@ const virtualCommands: VirtualCommand[] = []
 export function isVirtualCommand(context: VirtualCommandContext): boolean {
   return !!virtualCommands.find(c => c.predicate(context))
 }
-
+const virtualCommandLogs = {}
+export function getVirtualCommandLogsFor(c: ExecuteConfig): VirtualCommandLogs {
+  if (!c.executionId) { throw new Error('execution config without executionId') }
+  if (!virtualCommandLogs[c.executionId]) {
+    virtualCommandLogs[c.executionId] = {}
+  }
+  return virtualCommandLogs[c.executionId]
+  // TODO: probably we can delete all logs from previous executionIds
+}
 export function _dispatchVirtualCommand(context: VirtualCommandContext): Promise<ExecuteResult> {
   const cmd = virtualCommands.find(c => c.predicate(context))
   context.virtualCommandLogs[cmd.name] = context.virtualCommandLogs[cmd.name] || []
   return cmd.execute(context)
+}
+
+export async function _dispatchVirtualCommandPostproccessResult(result: ExecuteResult): Promise<ExecuteResult> {
+  await pMap(virtualCommands.filter(v => v.postProcessResult), c => {
+    result.virtualCommandLogs[c.name] = result.virtualCommandLogs[c.name] || []
+    c.postProcessResult(result)
+  }, { concurrency: 1 })
+  return result
 }
 
 export function registerExecuteVirtualCommand(c: VirtualCommand) {
@@ -54,6 +73,7 @@ registerExecuteVirtualCommand(buildFile)
 registerExecuteVirtualCommand(uniqueName)
 registerExecuteVirtualCommand(cut)
 registerExecuteVirtualCommand(paste)
+registerExecuteVirtualCommand(forget)
 
 export function _newExecuteResult(c: VirtualCommandContext, result: Partial<ExecuteResult> = {}): ExecuteResult {
   const r: ExecuteResult = {

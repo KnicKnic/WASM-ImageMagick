@@ -219,6 +219,8 @@ convert -morph 6 -delay <%= delay %> <%= img %> \\
   },
 
 
+
+
   {
     name: 'animate_granularity',
     description: `https://imagemagick.org/Usage/canvas/#granularity`,
@@ -287,6 +289,8 @@ convert fn.png blur_map_polar.jpg \\
   blur_weird.jpg
     `.trim(),
   },
+
+
   {
     name: 'pulsing animation',
     description: `generates a radial-gradient image, which is then cloned and adjusted to create a red to brighter red-orange pulse. This is then duplicated to create a reversed Patrol Cycle before creating a 30 second, looped `,
@@ -301,6 +305,76 @@ convert fn.png blur_map_polar.jpg \\
     `.trim(),
     tags: [ExampleTag.animation],
   },
+
+
+
+  {
+    name: 'Morph using cut/paste and random paths',
+    description: ``,
+    command: `
+<%
+  // Morph Configuration. Important, 
+  const delay = 13 // time between frames
+  const morph = 3  // frames interpolated artificially (smoothly)
+  const modePasteCuts = true // if false is just cut randomly, if true we also paste the other image segment
+  const frameCount = 19
+  const W=200 // both images will be resized to W,H. watch out with the memory
+  const H=100
+  const pathMinPoints = 4 // random paths are created with points in this range
+  const pathMaxPoints = 12
+
+  # Some utilities
+  const seq = n => new Array(n).fill(0).map((m, i)=>i)
+  const random = (min, max) => Math.trunc(Math.random() * (max - min) + min)
+  const randomPath = (w=W, h=H) =>  \`path "M \${seq(random(pathMinPoints, pathMaxPoints)).map(i=>\`\${random(0, w)},\${random(0, h)}\`).join(' ')} Z"\`
+
+  const frames = seq(frameCount)
+%>
+
+convert rose: -resize <%=W%>x<%=H%>! 1.miff
+convert \`buildFile 'fn.png'\` -resize <%=W%>x<%=H%>! 2.miff
+
+<%  frames.forEach(i=>{ %>
+
+  # cut a random shape from each of them
+  cut 1.miff '<%=randomPath()%>' 1<%=i%>.miff 1<%=i%>section.miff
+  cut 2.miff '<%=randomPath()%>' 2<%=i%>.miff 2<%=i%>section.miff 
+
+  <% if(modePasteCuts) {%>
+    # In this mode we paste the cut fragment from one image to the other:
+
+    paste <%=i===0?'2.miff' : \`2\${i-1}pasted.miff\` %>  1<%=i%>section.miff 0x0 2<%=i%>pasted.miff
+    paste <%=i===0?'1.miff' : \`1\${i-1}pasted.miff\` %>  2<%=i%>section.miff 0x0 1<%=i%>pasted.miff
+
+  <%  } %>
+
+<%  }) %>
+
+
+<% 
+// we have all the frames needed let's generate the gifs
+
+if(!modePasteCuts) {%>
+
+  convert -delay <%= delay%>  -morph <%=morph%>  1.miff <%= frames.map(i=>\`1\${i}section.miff\`).join(' ')%> \\
+    <%= frames.map(i=>\`2\${i}section.miff\`).reverse().join(' ')%>  2.miff 2.miff 2.miff   \\
+    <%= frames.map(i=>\`2\${i}section.miff\`).join(' ')%> \\
+    <%= frames.map(i=>\`1\${i}section.miff\`).reverse().join(' ')%>  1.miff 1.miff \\
+    \`uniqueName\`_normalMode.gif 
+
+<% }else  {%>
+  
+  convert -delay <%= delay%>  -morph <%=morph%>  1.miff \\
+    <%= frames.map(i=>\`1\${i}pasted.miff\`).join(' ')%>  2.miff 2.miff  \\
+    <%= frames.map(i=>\`2\${i}pasted.miff\`).join(' ')%>   1.miff  1.miff 1.miff  \\
+    \`uniqueName\`_modePasteCuts.gif 
+
+<%  } %>
+    `.trim(),
+    tags: [ExampleTag.virtualCommand, ExampleTag.morph, ExampleTag.template],
+  },
+
+
 
   {
     name: 'color wheels',
@@ -352,6 +426,28 @@ convert radial.png solid.png angular.png \\
 
     `.trim(),
   },
+
+  {
+    name: 'warping local region',
+    description: `https://imagemagick.org/Usage/masking/#region_warping`,
+    command: `
+    convert -size 600x70 xc:darkred \\
+    -fill white -draw 'roundrectangle 5,5  595,65 5,5' \\
+    -fill black -draw 'rectangle 5,25 595,31' \\
+    -fill red -draw 'rectangle 5,39 595,45' \\
+    lines.gif
+  convert lines.gif \\
+    -region 90x70+10+0    -swirl  400  \\
+    -region 90x70+100+0   -swirl  400 \\
+    -region 90x70+190+0   -swirl -400 \\
+    -region 120x70+280+0  -implode 1.5 \\
+    -region 100x70+380+0  -implode -7  \\
+    -region 101x70+480+0  -wave 10x50 -crop 0x70+0+10! \\
+    +region \`uniqueName\`_warping_regions.gif
+    `.trim(),
+    tags: [ExampleTag.drawing],
+  },
+
 
   {
     name: 'warping local region',

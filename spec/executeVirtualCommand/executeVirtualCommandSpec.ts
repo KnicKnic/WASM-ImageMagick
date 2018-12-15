@@ -1,4 +1,4 @@
-import { compare, execute } from '../../src'
+import { compare, execute, ExecuteResult, CallResult, MagickFile } from '../../src'
 import { absolutize, showImages } from '../testUtil'
 
 export default describe('executeVirtualCommand', () => {
@@ -121,8 +121,10 @@ export default describe('executeVirtualCommand', () => {
       convert rose: -rotate 22 -resize 200% 1.miff
       cut 1.miff 'rectangle 40,50 78,60' 1b.miff section.miff
       ` )
+
+      expect(result.exitCode).toBe(0)
       await showImages(result.outputFiles)
-      expect(await compare(result.outputFiles[0], result.outputFiles.find(f=>f.name==='1b.miff'))).not.toBe(true)
+      expect(await compare(result.outputFiles[0], result.outputFiles.find(f => f.name === '1b.miff'))).not.toBe(true)
       done()
     })
 
@@ -139,6 +141,8 @@ export default describe('executeVirtualCommand', () => {
       convert logo: -resize 20x20! 2.miff
       paste 1.miff 2.miff 5x5 pasted.miff
       ` )
+
+      expect(result.exitCode).toBe(0)
       await showImages(result.outputFiles)
 
       done()
@@ -147,6 +151,42 @@ export default describe('executeVirtualCommand', () => {
     xit('pasted section could be transformed / resized according to given shape area', async done => {
       done()
     })
+  })
+
+
+  describe('forget', () => {
+
+    function collectAllFiles(r: ExecuteResult | CallResult, files: MagickFile[]) {
+      [].concat(r.inputFiles).concat(r.outputFiles).forEach(f => files.push(f));
+      ((r as ExecuteResult).results || []).forEach(r2 => collectAllFiles(r2, files))
+    }
+
+    it('allows to remove input and output files returned by execute() to save memory', async done => {
+      const result = await execute(`
+      # 1.miff doesnt exsts yet so forget shount' remove it
+      forget 1.miff
+      convert rose: -rotate 22 -resize 10% 1.miff
+      convert logo: -resize 20x20! 2tmp_jo.miff
+      convert 2tmp_jo.miff nomatch.jpg
+      convert rose: tmp_Also.miff
+      buildFile 'fn.png' buildedWithVirtualCommands_tmp_.miff
+      convert \`buildFile 'fn.png' buildedWithVirtualCommands2_tmp_.miff\` another_t_mp_as.miff
+      forget '*tmp_*.miff'
+      ` )
+
+      expect(result.exitCode).toBe(0)
+      const allFiles = []
+      collectAllFiles(result, allFiles)
+
+      expect(allFiles.map(f => f.name)).not.toContain('2tmp_jo.miff')
+      expect(allFiles.map(f => f.name)).not.toContain('tmp_Also.miff')
+      expect(allFiles.map(f => f.name)).not.toContain('buildedWithVirtualCommands_tmp_.miff')
+      expect(allFiles.map(f => f.name)).toContain('nomatch.jpg')
+      expect(allFiles.map(f => f.name)).toContain('1.miff')
+      expect(allFiles.map(f => f.name)).toContain('another_t_mp_as.miff')
+      done()
+    })
+
   })
 
 })
