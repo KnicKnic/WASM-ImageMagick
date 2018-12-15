@@ -1,4 +1,6 @@
 import { execute } from '../'
+import { isMagickFile, getFileNameExtension } from './file';
+import { MagickFile } from '../magickApi';
 
 export async function getConfigureFolders(): Promise<string[]> {
   const result = await execute(`convert -debug configure rose: info:`)
@@ -60,3 +62,9 @@ export const knownSupportedReadOnlyImageFormats = [
 export const _knownSupportedImageFormatsInFolderForTest = [
   'mat',
 ]
+
+export function isReadable(f: MagickFile | string): boolean {
+  const s = isMagickFile(f) ? f.name : f
+  return knownSupportedWriteOnlyImageFormats.indexOf(getFileNameExtension(s)) === -1
+}
+

@@ -1,7 +1,7 @@
 import pMap from 'p-map'
 import * as React from 'react'
 import { style } from 'typestyle'
-import { arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo, getBuiltInImages, getFileNameExtension, getInputFilesFromHtmlInputElement, isImage, knownSupportedWriteOnlyImageFormats, MagickFile, MagickInputFile, readFileAsText } from 'wasm-imagemagick'
+import { arrayToCli, asCommand, buildImageSrc, buildInputFile, cliToArray, Command, ExecutionContext, extractInfo, getBuiltInImages, getFileNameExtension, getInputFilesFromHtmlInputElement, isImage, knownSupportedWriteOnlyImageFormats, MagickFile, MagickInputFile, readFileAsText, isReadable } from 'wasm-imagemagick'
 import { commandExamples, Example } from './commandExamples'
 
 export interface AppProps {
@@ -261,7 +261,6 @@ export class App extends React.Component<AppProps, AppState> {
   }
 
   protected async addInputFiles(files: MagickInputFile[]) {
-    // this.setState({...this.state, status: 'loading'})
     this.props.context.addFiles(files)
     await this.updateImages()
   }
@@ -271,7 +270,7 @@ export class App extends React.Component<AppProps, AppState> {
     const isImageArray = await pMap(files, isImage)
     const imgSrcs = this.state.showImagesAndInfo ? await pMap(files, (f, i) => buildFileSrc(f, isImageArray[i])) : this.state.imgSrcs
     const filesInfo = this.state.showImagesAndInfo ? await pMap(files, (f, i) => {
-      if (isImageArray[i] && knownSupportedWriteOnlyImageFormats.indexOf(getFileNameExtension(f.name)) === -1) {
+      if (isImageArray[i] && isReadable(f)) {
         return extractInfo(f)
       }
     }) : this.state.filesInfo
@@ -300,6 +299,9 @@ export class App extends React.Component<AppProps, AppState> {
 
 }
 async function buildFileSrc(file: MagickFile, isImage_?: boolean): Promise<string> {
+  if(!isReadable(file)){
+    return
+  }
   if (typeof isImage_ === 'undefined' ? await isImage(file) : isImage_) {
     return await buildImageSrc(file, true)
   }

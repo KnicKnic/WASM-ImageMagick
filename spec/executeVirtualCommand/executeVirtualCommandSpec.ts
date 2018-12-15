@@ -112,4 +112,34 @@ export default describe('executeVirtualCommand', () => {
     })
   })
 
+
+  describe('cut', () => {
+
+    it('allow me to cut a rectangle shape', async done => {
+
+      const result = await execute(`
+      convert rose: -rotate 22 -resize 200% 1.miff
+      cut 1.miff 'rectangle 40,50 78,60' 1b.miff section.miff
+      ` )
+      await showImages(result.outputFiles)
+      expect(await compare(result.outputFiles[0], result.outputFiles.find(f=>f.name==='1b.miff'))).not.toBe(true)
+      done()
+    })
+
+    xit('allows me to use path, ellipses, etc', async done => {
+      done()
+    })
+  })
+
+  xdescribe('paste', () => {
+
+    xit('allows me to paste an image in another at a certain pos', async done => {
+      done()
+    })
+
+    xit('pasted section could be transformed / resized according to given shape area', async done => {
+      done()
+    })
+  })
+
 })

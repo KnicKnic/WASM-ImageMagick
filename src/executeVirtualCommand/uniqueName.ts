@@ -7,8 +7,11 @@ export default {
     return c.command[0] === 'uniqueName'
   },
   async execute(c: VirtualCommandContext): Promise<ExecuteResult> {
-    return _newExecuteResult(c, { stdout: ['unique_' + (uniqueNameCounter++)] })
+    return _newExecuteResult(c, { stdout: [getUniqueIdentifier()] })
   },
 } as VirtualCommand
 
+export function getUniqueIdentifier(){
+  return 'unique_' + (uniqueNameCounter++)
+}
 let uniqueNameCounter = 0

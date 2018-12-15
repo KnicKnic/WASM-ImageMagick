@@ -8,6 +8,7 @@ import uniqueName from './uniqueName'
 import substitution from './substitution'
 import variableDeclaration from './variableDeclaration'
 import variableSubstitution from './variableSubstitution';
+import cut from './cut';
 
 export interface VirtualCommand {
   name: string
@@ -50,6 +51,7 @@ registerExecuteVirtualCommand(cat)
 registerExecuteVirtualCommand(buildFile)
 
 registerExecuteVirtualCommand(uniqueName)
+registerExecuteVirtualCommand(cut)
 
 export function _newExecuteResult(c: VirtualCommandContext, result: Partial<ExecuteResult> = {}): ExecuteResult {
   const r: ExecuteResult = {
@@ -63,5 +65,7 @@ export function _newExecuteResult(c: VirtualCommandContext, result: Partial<Exec
       results: []
     }, ...result,
   }
-  return { ...r, results: [r] }
+  const toReturn= { ...r, results: [r] }
+debugger
+  return toReturn
 }
