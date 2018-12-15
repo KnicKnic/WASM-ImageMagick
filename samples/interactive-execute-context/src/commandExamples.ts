@@ -375,6 +375,54 @@ convert radial.png solid.png angular.png \\
   },
 
   {
+    name: 'Fill color - configurable',
+    description: `uses -floodbill or -opaque to replace a color - uses templates to be configurable with varibales`,
+    command: `
+<%
+const fuzz=20
+const fillMode='opaque'//'floodfill' // opaque
+const floodfillPointX = 5
+const floodfillPointY = 5
+const opaqueColor = 'white'
+const fillColor = 'rgba(34,121,0,0.1)'
+const floodfillFragment = \` -floodfill +\${floodfillPointX}+\${floodfillPointY} \\\`convert logo: -format '%[pixel:p{\${floodfillPointX},\${floodfillPointY}}]\\n' info:\\\`\`
+const opaqueFragment = \`-opaque \${opaqueColor}\`
+%>
+convert logo: -alpha set -fuzz <%= fuzz%>% -fill <%= fillColor%> \\
+  <%= fillMode==='floodfill' ? floodfillFragment : opaqueFragment %> \`uniqueName\`.png
+    
+    `.trim(),
+  },
+
+
+  {
+    name: 'Rendering text files',
+    description: `tests IM capabilities to render a big text file into an image`,
+    command: `
+convert rose: info:foo.txt
+convert -font \`buildFile helvetica.ttf\` text:foo.txt \`uniqueName\`.pdf
+    `.trim(),
+  },
+
+  {
+    name: 'Removing a rectangle using a mask',
+    description: `http://www.imagemagick.org/Usage/masking/#two_backgrounde`,
+    command: `
+
+<%const img = 'fn.png';  t= new Date().getTime()%>
+
+# we will be removing a rectangle from image 1 using a mask in image2
+convert <%=img%> -alpha set 1<%=t%>.miff
+convert -alpha set -size \`convert -format '%wx%h\n' 1<%=t%>.miff info:\` xc:white -fill black -draw 'roundRectangle  23,5 98,25 5,5' 2<%=t%>.miff
+convert  1<%=t%>.miff 2<%=t%>.miff -alpha off  -compose CopyOpacity -composite 3<%=t%>.miff
+  
+#also we want to copy the removed portion in image 3
+convert  1<%=t%>.miff ( 2<%=t%>.miff -negate )  -alpha off  -compose CopyOpacity -composite 4<%=t%>.miff
+
+    `.trim(),
+  },
+ 
+  {
     name: 'remove background color',
     description: `https://imagemagick.org/Usage/masking/#difference`,
     command: `
@@ -677,6 +725,107 @@ convert rose: -preview <%= preview %> 'Preview:\`uniqueName\`.png'
 %>
          `.trim(),
   },
+
+  {
+    name: 'text with aqua font',
+    description: ``,
+    tags: [ExampleTag.text, ExampleTag["3d"]],
+    command: `
+buildFile Candice.ttf
+convert -background none -fill DodgerBlue \\
+  -font Candice.ttf -pointsize 172  label:A  -trim +repage \\
+  -bordercolor None -border 1x1  \\
+  aqua_shape.png
+
+convert aqua_shape.png  \\
+  -alpha Extract -blur 0x4 -shade 170x30 -alpha On \\
+  -background gray50 -alpha background  -function polynomial  '3.5,-5.05,2.05,0.3' -auto-level -normalize \\
+  aqua_shade.png
+
+convert aqua_shade.png aqua_shape.png \\
+  -alpha Off -compose CopyOpacity -composite    aqua_shade-mask.png
+  
+convert aqua_shape.png aqua_shade-mask.png \\
+  -compose Hardlight -composite   aqua_result.png
+         `.trim(),
+  },
+
+  {
+    name: 'gradients and histograms',
+    description: ``,
+    tags: [ExampleTag.gradient, ExampleTag.color],
+    command: `
+<% const t = new Date().getTime() %>
+convert -size 5x300 gradient: -rotate 90 linear<%=t%>.png
+convert linear<%=t%>.png histogram:linear_hist<%=t%>.png
+
+convert linear<%=t%>.png -evaluate sine 12 sine<%=t%>.png
+convert sine<%=t%>.png histogram:sine_hist<%=t%>.png
+
+convert sine<%=t%>.png  linear<%=t%>.png  -compose Multiply -composite  sine2<%=t%>.png
+convert sine2<%=t%>.png histogram:sine2_hist<%=t%>.png
+
+convert linear<%=t%>.png -negate -evaluate divide 2 bias<%=t%>.png
+convert bias<%=t%>.png histogram:bias_hist<%=t%>.png
+
+convert sine2<%=t%>.png bias<%=t%>.png -compose Plus -composite  attenuated<%=t%>.png
+convert attenuated<%=t%>.png histogram:attenuated_hist<%=t%>.png
+
+convert -size 5x300 gradient: -rotate 90 -function Polynomial -4,4,0 -evaluate Pow 0.5 circle_<%=t%>.png
+convert circle_<%=t%>.png histogram:circle_hist<%=t%>.png
+
+convert rose: rose<%=t%>.png
+convert rose: histogram:rose_hist<%=t%>.png 
+
+convert rose: -verbose -segment 100x3 rose_segments<%=t%>.png
+convert rose_segments<%=t%>.png histogram:rose_segments_hist<%=t%>.png
+
+convert fn.png fn<%=t%>.png
+convert fn.png histogram:fn_hist<%=t%>.png
+   
+         `.trim(),
+  },
+
+
+  {
+    name: 'playing with -fx and animations',
+    description: ``,
+    tags: [ExampleTag.animation, ExampleTag.morph],
+    command: `
+<%
+const frameCount = 5
+const frames = new Array(frameCount).fill(0).map((v,i)=>i+1)
+const R=1.2
+
+%>
+convert fn.png -resize 120x80! img1.miff
+convert img1.miff -edge 2 img1e.miff
+convert img1e.miff img1.miff  -fx 'vv=u.p{i,j}>0.5?v.p{i, j}*2:v.p{i, j}/2; debug(u.p{i,j});  vv' img1W.miff 
+convert rose: -resize 120x80! img2.miff
+convert img2.miff -edge 2 img2e.miff
+convert img2e.miff img2.miff  -fx 'vv=u.p{i,j}>0.5?v.p{i, j}*2:v.p{i, j}/2; debug(u.p{i,j});  vv' img2W.miff 
+<%
+frames.forEach(i=>{
+%>
+convert img1W.miff img2W.miff -fx 'vv=(u.p{i,j}/<%=i*R%> + v.p{i, j}*<%=i*R%>)/2; vv' out1_<%=i%>.miff
+convert img2W.miff img1W.miff -fx 'vv=(u.p{i,j}/<%=i*R%> + v.p{i, j}*<%=i*R%>)/2;vv' out2_<%=i%>.miff
+<%
+})
+%>
+convert -loop 0 -delay 10 -morph 10 img1.miff  \\
+  <%= frames.map(i=>\`out2_\${i}.miff\`).reverse().join(' ') %> <%= frames.map(i=>\`out1_\${i}.miff\`).join(' ') %> \\
+  img2.miff <%= frames.map(i=>\`out1_\${i}.miff\`).reverse().join(' ') %> \\
+  <%= frames.map(i=>\`out2_\${i}.miff\`).join(' ') %> img1.miff out3.gif
+
+
+   
+         `.trim(),
+  },
+
+
+
+
+
   {
     name: 'gradient sparse_fill',
     description: `https://www.imagemagick.org/Usage/canvas/#sparse_fill`,

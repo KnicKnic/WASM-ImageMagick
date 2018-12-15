@@ -32,7 +32,7 @@ registerCommandPreprocessor({
   async execute(context) {
     if (typeof (context.commands) === 'string') {
       // const commandTemplate = compile(context.commands, {async: true})
-      const commands = await render(context.commands, {...context, execute, compare, extractInfo}, {async: true})
+      const commands = await render(context.commands, {...context, execute, compare, extractInfo}, {async: true, escape: s=>s})
       return { ...context, commands }
     }
     else {

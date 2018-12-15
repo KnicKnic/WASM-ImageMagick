@@ -1,13 +1,15 @@
 import pMap from 'p-map'
-import { loadImageElement, MagickFile, asOutputFile } from '../src'
+import { loadImageElement, MagickFile, asOutputFile, execute, asInputFile } from '../src'
 
 export async function showImages(images: MagickFile[]|MagickFile): Promise<HTMLImageElement[]> {
   images = Array.isArray(images) ? images : [images]
   return await pMap(images, async image => {
+    const r = await execute({inputFiles: [await asInputFile(image)], commands: `convert ${image.name} out.png`})
+    const compatible = r.outputFiles.find(f=>f.name==='out.png')
     const el = document.createElement('img')
     el.title = el.alt = image.name
     document.body.appendChild(el)
-    return loadImageElement(image, el)
+    return loadImageElement(compatible, el)
   }, {concurrency: 1})
 }
 
