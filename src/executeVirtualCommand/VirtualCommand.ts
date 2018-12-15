@@ -9,6 +9,7 @@ import substitution from './substitution'
 import variableDeclaration from './variableDeclaration'
 import variableSubstitution from './variableSubstitution';
 import cut from './cut';
+import paste from './paste'
 
 export interface VirtualCommand {
   name: string
@@ -16,12 +17,12 @@ export interface VirtualCommand {
   predicate(c: VirtualCommandContext): boolean
 }
 
-export type VirtualCommandLogs = {[virtualCommandName: string]: any[]}
+export type VirtualCommandLogs = { [virtualCommandName: string]: any[] }
 export interface VirtualCommandContext {
   command: string[]
   files: { [name: string]: MagickInputFile }
   executionId: number
-  virtualCommandLogs:  VirtualCommandLogs
+  virtualCommandLogs: VirtualCommandLogs
 }
 
 const virtualCommands: VirtualCommand[] = []
@@ -32,7 +33,7 @@ export function isVirtualCommand(context: VirtualCommandContext): boolean {
 
 export function _dispatchVirtualCommand(context: VirtualCommandContext): Promise<ExecuteResult> {
   const cmd = virtualCommands.find(c => c.predicate(context))
-  context.virtualCommandLogs[cmd.name] = context.virtualCommandLogs[cmd.name] ||[]
+  context.virtualCommandLogs[cmd.name] = context.virtualCommandLogs[cmd.name] || []
   return cmd.execute(context)
 }
 
@@ -52,6 +53,7 @@ registerExecuteVirtualCommand(buildFile)
 
 registerExecuteVirtualCommand(uniqueName)
 registerExecuteVirtualCommand(cut)
+registerExecuteVirtualCommand(paste)
 
 export function _newExecuteResult(c: VirtualCommandContext, result: Partial<ExecuteResult> = {}): ExecuteResult {
   const r: ExecuteResult = {
@@ -61,11 +63,10 @@ export function _newExecuteResult(c: VirtualCommandContext, result: Partial<Exec
       command: c.command,
       exitCode: 0,
       stderr: [], stdout: [],
-      inputFiles: values(c.files), 
+      inputFiles: values(c.files),
       results: []
     }, ...result,
   }
-  const toReturn= { ...r, results: [r] }
-debugger
+  const toReturn = { ...r, results: [r] }
   return toReturn
 }

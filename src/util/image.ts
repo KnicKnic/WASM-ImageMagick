@@ -59,13 +59,17 @@ export async function cutShape(image: MagickInputFile, r: ShapeRepresentation,
  */
 export async function paste(targetImage: MagickInputFile, imageToPaste: MagickInputFile, x: number, y: number,
   modifiedFileName: string = getUniqueIdentifier() + '.miff',
-  w: number = 0, h: number = 0): Promise<{ modified: MagickFile }> {
+  w: number = 0, h: number = 0, executionId?:number)
+  : Promise<{ modified: MagickFile, result: ExecuteResult }> {
+
+  const commands =  `convert '${targetImage.name}' -gravity None -draw 'image over ${x},${y} ${w},${h} "${imageToPaste.name}"' '${modifiedFileName}'`
   const result = await execute({
     inputFiles: [imageToPaste, targetImage],
-    commands: `convert '${targetImage.name}' -gravity None -draw 'image over ${x},${y} ${w},${h} ${imageToPaste.name}' ${modifiedFileName}`
+    commands, 
+    executionId
   })
   const modified = result.outputFiles.find(f => f.name === modifiedFileName)
-  return { modified }
+  return { modified, result }
 }
 
 

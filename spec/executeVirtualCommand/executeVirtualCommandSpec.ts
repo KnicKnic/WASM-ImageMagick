@@ -131,9 +131,16 @@ export default describe('executeVirtualCommand', () => {
     })
   })
 
-  xdescribe('paste', () => {
+  describe('paste', () => {
 
-    xit('allows me to paste an image in another at a certain pos', async done => {
+    it('allows me to paste an image in another at a certain pos', async done => {
+      const result = await execute(`
+      convert rose: -rotate 22 -resize 200% 1.miff
+      convert logo: -resize 20x20! 2.miff
+      paste 1.miff 2.miff 5x5 pasted.miff
+      ` )
+      await showImages(result.outputFiles)
+
       done()
     })
 
