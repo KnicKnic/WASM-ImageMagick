@@ -34,7 +34,7 @@ export function shapeTpDrawCommand(s: Shape): string {
   }
 }
 
-export async function cutRectangle(image: MagickInputFile, r: Rectangle): Promise<{ modifiedSourceImage: MagickFile, cuttedSection: MagickFile }> {
+export async function cutShape(image: MagickInputFile, r: Shape): Promise<{ modifiedSourceImage: MagickFile, cuttedSection: MagickFile }> {
 
   const result = await execute({
     inputFiles: [image],
@@ -56,4 +56,9 @@ export async function cutRectangle(image: MagickInputFile, r: Rectangle): Promis
   }
 }
 
-// export async function paste
+export async function paste( targetImage: MagickInputFile,imageToPaste: MagickInputFile, x: number, y: number, w:number=0, h:number=0): Promise<{ modified: MagickFile}> {
+  const result = await execute({inputFiles: [imageToPaste, targetImage], 
+    commands: `convert '${targetImage.name}' -gravity None -draw 'image over ${x},${y} ${w},${h} ${imageToPaste.name}' out.miff`})
+  const modified = result.outputFiles.find(f=>f.name==='out.miff')
+  return {modified}
+}

@@ -413,7 +413,7 @@ convert -font \`buildFile helvetica.ttf\` text:foo.txt \`uniqueName\`.pdf
 
 # we will be removing a rectangle from image 1 using a mask in image2
 convert <%=img%> -alpha set 1<%=t%>.miff
-convert -alpha set -size \`convert -format '%wx%h\n' 1<%=t%>.miff info:\` xc:white -fill black -draw 'roundRectangle  23,5 98,25 5,5' 2<%=t%>.miff
+convert -alpha set -size \`convert -format '%wx%h\\n' 1<%=t%>.miff info:\` xc:white -fill black -draw 'roundRectangle  23,5 98,25 5,5' 2<%=t%>.miff
 convert  1<%=t%>.miff 2<%=t%>.miff -alpha off  -compose CopyOpacity -composite 3<%=t%>.miff
   
 #also we want to copy the removed portion in image 3
