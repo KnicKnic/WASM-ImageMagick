@@ -1,6 +1,7 @@
 import pMap from 'p-map'
 import { asCommand, call, MagickInputFile, MagickOutputFile } from '.'
-import {getVirtualCommandLogsFor, isVirtualCommand, VirtualCommandContext, VirtualCommandLogs, _dispatchVirtualCommand, _dispatchVirtualCommandPostproccessResult } from './executeVirtualCommand/VirtualCommand'
+import {getVirtualCommandLogsFor, isVirtualCommand, VirtualCommandContext, VirtualCommandLogs, 
+  _dispatchVirtualCommand, _dispatchVirtualCommandPostproccessResult } from './executeVirtualCommand/VirtualCommand'
 import { CallResult, CallCommand } from './magickApi'
 import { asInputFile, isInputFile } from './util'
 import { values, jsonStringifyOr } from './util/misc'
@@ -71,7 +72,8 @@ export async function executeOne(configOrCommandOrFiles: ExecuteConfig | Execute
     config = config.skipCommandPreprocessors ? config : await _preprocessCommand(config)
   } catch (error) {
     console.error(error)
-    return buildExecuteResultWithError(['Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'), jsonStringifyOr(error, '{}')], error)
+    return buildExecuteResultWithError([
+      'Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'), jsonStringifyOr(error, '{}')], error)
   }
   config.inputFiles = config.inputFiles || []
   const command = asCommand(config.commands)[0]
@@ -132,6 +134,7 @@ export interface ExecuteResult extends CallResult {
   commands: ExecuteCommand[],
   // breakOnError?: boolean
   virtualCommandLogs?: VirtualCommandLogs
+  executionId?:number
 }
 
 export function buildExecuteResultWithError(s: string | string[] = [], clientError = undefined): ExecuteResult  {
@@ -195,6 +198,11 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
       'Error in execute command preprocessor: ' + (error ? error + '' : error.stack && error.stack.join ? error.stack.join(' ') : 'unknown'), 
       jsonStringifyOr(error, '{}')], error)
   }
+  // if(!config.executionId){
+  //   config.executionId = executionIdCounter++
+  //   console.log('++executionIdCounter', config.executionId);
+    
+  // }
   config.executionId = config.executionId ||++executionIdCounter
   config.inputFiles = config.inputFiles || []
   const allOutputFiles: { [name: string]: MagickOutputFile } = {}
@@ -248,6 +256,7 @@ export async function execute(configOrCommandOrFiles: ExecuteConfig | ExecuteCom
     commands,
     inputFiles: config.inputFiles,
     virtualCommandLogs,
+    executionId: config.executionId
   }
 
   finalResult= await _dispatchVirtualCommandPostproccessResult(finalResult)

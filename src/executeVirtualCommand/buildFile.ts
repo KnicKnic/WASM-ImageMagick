@@ -26,6 +26,6 @@ export default {
       inputFiles: values(c.files),
       results: [],
     }
-    return { ...result, results: [result] }
+    return { ...result, results: [] }
   },
 } as VirtualCommand

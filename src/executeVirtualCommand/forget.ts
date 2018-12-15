@@ -21,20 +21,23 @@ export default {
     return c.command[0] === 'forget'
   },
   async execute(c: VirtualCommandContext): Promise<ExecuteResult> {
-    let matches = []
+    let matches: string[] = []
     const globs = c.command.slice(1, c.command.length)
     const files = Object.keys(c.files)
     globs.forEach(g => {
       matches = matches.concat(files.filter(f => Minimatch(f, g)))
     })
-    c.virtualCommandLogs[this.name].push({ toForget: matches })
+    toForgetDic[c.executionId] = toForgetDic[c.executionId] || []
+    toForgetDic[c.executionId] = toForgetDic[c.executionId].concat(matches)
     return _newExecuteResult(c)
   },
 
   async postProcessResult(r: ExecuteResult): Promise<ExecuteResult> {
-    const toForget: string[] = r.virtualCommandLogs[this.name].length ? flat(r.virtualCommandLogs[this.name].map(l => l.toForget||[])) : []
-    // clean up any input / output file recursively from result / results
-    cleanResult(r, toForget)
+    if (!toForgetDic[r.executionId]) {
+      // means this execution belongs from another call
+      return
+    }
+    cleanResult(r, toForgetDic[r.executionId])
     return r
   }
 
@@ -46,3 +49,5 @@ function cleanResult(r: CallResult | ExecuteResult, toForget: string[]) {
   // TODO: should we dispose blobs / arrays somehow here?
   ((r as ExecuteResult).results || []).forEach(r2 => cleanResult(r2, toForget))
 }
+
+const toForgetDic: { [k: number]: string[] } = {}

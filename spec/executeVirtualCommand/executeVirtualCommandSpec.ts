@@ -153,7 +153,6 @@ export default describe('executeVirtualCommand', () => {
     })
   })
 
-
   describe('forget', () => {
 
     function collectAllFiles(r: ExecuteResult | CallResult, files: MagickFile[]) {

@@ -25,7 +25,8 @@ export default {
     const result2 = await execute({ 
       inputFiles: files.concat(await pMap(result.outputFiles, f => asInputFile(f))), 
       commands: [fixedCommand], 
-      executionId: config.executionId })
+      executionId: config.executionId 
+    })
       config.virtualCommandLogs[this.name].push({substitutionCommand: substitution.command, substitutionCommandStdout: result.stdout, fixedCommand})
     return {
       ...result2, 
