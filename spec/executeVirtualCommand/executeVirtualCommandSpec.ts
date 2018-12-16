@@ -128,7 +128,7 @@ export default describe('executeVirtualCommand', () => {
       done()
     })
 
-    it('nto explicit the destiny will change the main img', async done => {
+    xit('nto explicit the destiny will change the main img', async done => {
 
       const result = await execute(`
       convert rose: -rotate 22 -resize 200% 1.miff
