@@ -12,6 +12,7 @@ import cut from './cut';
 import paste from './paste'
 import pMap from 'p-map';
 import forget from './forget';
+import fillColor from './fillColor';
 
 export interface VirtualCommand {
   name: string
@@ -46,7 +47,6 @@ export function getVirtualCommandLogsFor(c: ExecuteConfig): VirtualCommandLogs {
 export async function _dispatchVirtualCommand(context: VirtualCommandContext): Promise<ExecuteResult> {
   const cmd = virtualCommands.find(c => c.predicate(context))
   context.virtualCommandLogs[cmd.name] = context.virtualCommandLogs[cmd.name] || []
-  debugger
   if(cmd.validateCommands){
     const error = cmd.validateCommands(context)
     if(error){
@@ -82,6 +82,7 @@ registerExecuteVirtualCommand(uniqueName)
 registerExecuteVirtualCommand(cut)
 registerExecuteVirtualCommand(paste)
 registerExecuteVirtualCommand(forget)
+registerExecuteVirtualCommand(fillColor)
 
 export function _newExecuteResult(c: VirtualCommandContext, result: Partial<ExecuteResult> = {}): ExecuteResult {
   const r: ExecuteResult = {

@@ -124,10 +124,27 @@ export default describe('executeVirtualCommand', () => {
 
       expect(result.exitCode).toBe(0)
       // await showImages(result.outputFiles)
-      expect(await compare(result.outputFiles[0], result.outputFiles.find(f => f.name === '1b.miff'))).not.toBe(true)
+      expect(await compare(result.outputFiles, '1.miff', '1b.miff')).not.toBe(true)
       done()
     })
 
+    it('nto explicit the destiny will change the main img', async done => {
+
+      const result = await execute(`
+      convert rose: -rotate 22 -resize 200% 1.miff
+      convert 1.miff 2.miff
+      cut 1.miff 'rectangle 40,50 78,60' '' section.miff
+      ` )
+
+      expect(result.exitCode).toBe(0)
+      // await showImages(result.outputFiles)
+      expect(await compare(result.outputFiles, '1.miff', '2.miff')).not.toBe(true)
+      done()
+    })
+
+    xit('errors - and section.miff is not mandatory', async done => {
+      done()
+    })
     xit('allows me to use path, ellipses, etc', async done => {
       done()
     })
