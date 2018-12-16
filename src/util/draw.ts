@@ -9,7 +9,8 @@ export interface Shape {
 export type ShapeRepresentation = Shape | string
 export enum ShapeType {
   'Rectangle' = 'Rectangle',
-  'Path' = 'Path'
+  'Path' = 'Path',
+  'Circle' = 'Circle'
 }
 
 export interface Point {
@@ -35,12 +36,23 @@ export function shapeTpDrawCommand(s: ShapeRepresentation): string {
     return unquote(s)
   }
   if (isRectangle(s)) {
-    return `Rectangle  ${s.a.x},${s.a.y} ${s.b.x},${s.b.y}`
+    return `rectangle  ${s.a.x},${s.a.y} ${s.b.x},${s.b.y}`
   }
   if (isPath(s)) {
     return `path ${s.map(i => typeof i === 'string' ? i : (i.x + ',' + i.y)).join(' ')}`
   }
+  if (isCircle(s)) {
+    return `translate ${s.center.x},${s.center.y} circle 0,0,${s.radious},0`
+  }
   else {
     throw new Error('dont know how to represent command for shape ' + s.type)
   }
+}
+export interface Circle extends Shape{
+  type: ShapeType.Circle
+  center: Point
+  radious: number
+}
+export function isCircle(r: any): r is Circle {
+  return r.type === ShapeType.Circle
 }

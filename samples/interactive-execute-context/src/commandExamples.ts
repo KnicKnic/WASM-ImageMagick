@@ -22,7 +22,9 @@ export enum ExampleTag {
   template,
   '3d',
   effect,
-  artistic
+  artistic,
+  shade,
+  mask
 }
 
 export const commandExamples: Example[] = [
@@ -705,6 +707,44 @@ convert test.png \\
 
          `.trim(),
   },
+
+  
+  {
+    name: 'shaded text',
+    description: `https://www.imagemagick.org/Usage/anim_mods/#distort`,
+    tags: [ExampleTag.text, ExampleTag.template, ExampleTag.shade, ExampleTag.mask],
+    command: `
+<% 
+const i = new Date().getTime()
+const text = 'Hello'
+const size = '500x300'
+const color = 'red'
+const shade = '190x31'
+%>
+
+buildFile Candice.ttf
+
+# The blurred / shaded text:
+convert -alpha set -size <%=size %> -gravity center -background None \\
+          -font Candice.ttf 'label:<%=text %>'  \\
+          -alpha Extract  -blur 0x6 -shade <%= shade%> -alpha On  \\
+          -normalize +level 15%  -fill <%= color%> -tint 100%  aux_effect_<%=i%>.miff
+
+# and the mask
+convert -alpha set -size <%=size %> -gravity center -background None \\
+          -font Candice.ttf 'label:<%= text %>'  -alpha extract aux_mask<%=i%>.miff 
+
+# composite both to obtain the final thing:
+convert aux_effect_<%=i%>.miff aux_mask<%=i%>.miff  -alpha off  -compose CopyOpacity -composite oo<%=i%>.png
+
+# remove auxiliary images from the output
+forget aux*.miff
+
+
+         `.trim(),
+  },
+
+
 
   {
     name: 'gradient_complex_hues',

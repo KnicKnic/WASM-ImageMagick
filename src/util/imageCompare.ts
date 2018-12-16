@@ -15,9 +15,10 @@ export async function compare(img1: MagickFile | MagickFile[] | string, img2?: M
       const aux = img2
       img2 = img1.find(i => i.name === fuzz)
       img1 = img1.find(i => i.name === aux)
-
+      fuzz=0.015
     }
   }
+  // debugger
   const identical = await compareNumber(img1, img2)
   return identical <= fuzz
 }

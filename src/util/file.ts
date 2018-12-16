@@ -1,5 +1,6 @@
 import { MagickFile, MagickInputFile, MagickOutputFile } from '..'
 import { execute } from '../execute'
+import { StringIterator } from 'lodash';
 
 function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
   return new Promise(resolve => {
@@ -38,6 +39,9 @@ export function isMagickFile(file: any): file is MagickFile {
 function uint8ArrayToString(arr: Uint8Array, charset: string = 'utf-8'): string {
   return new TextDecoder(charset).decode(arr)
 }
+function stringToUint8Array(s: string): Uint8Array {
+  return new TextEncoder().encode(s)
+}
 
 /**
  * Read files as string. Useful when files contains plain text like in the output file info.txt of `convert logo: -format '%[pixel:p{0,0}]' info:info.txt`
@@ -57,6 +61,12 @@ export async function isImage(file: MagickFile): Promise<boolean> {
   }
   const { exitCode } = await execute({ inputFiles: [await asInputFile(file)], commands: `identify '${file.name}'` })
   return exitCode === 0
+}
+
+/** Useful when  you need you need IM to read text files, for example, a MGV file  */
+export function buildTextInputFile(text: string, name: string ): MagickInputFile {
+  const content = stringToUint8Array(text)
+  return {name, content}
 }
 
 /**

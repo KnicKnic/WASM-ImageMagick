@@ -1,6 +1,6 @@
 import {
   blobToString, buildInputFile, Call, compare, extractInfo, getFileNameExtension, getFileName, asInputFile,
-  asOutputFile, executeAndReturnOutputFile, isImage, readFileAsText, getPixelColor, getBuiltInImages, getBuiltInImage,
+  asOutputFile, executeAndReturnOutputFile, isImage, readFileAsText, getPixelColor, getBuiltInImages, getBuiltInImage, buildTextInputFile, execute,
 } from '../../src'
 import { showImages, absolutize } from '../testUtil'
 
@@ -81,6 +81,28 @@ export default describe('util/file', () => {
       done()
     })
   })
+
+  describe('buildTextInputFile', () => { // TODO: separate
+    it('should be possible to make IM read .mvg text files created by me', async done => {
+      const file = buildTextInputFile(`
+viewbox  0 0 100 60 
+fill green circle 41,39 44,57
+fill red circle 59,39 56,57
+`, 'test.mvg')
+
+const result = await execute({inputFiles: [file],  commands: `
+convert -size 100x60 xc:white 0.png
+convert -size 100x60 xc:white -draw @${file.name} 1.png
+convert mvg:test.mvg 2.png
+`})
+      expect(await compare(result.outputFiles, '0.png', '1.png')).not.toBeTrue()
+      expect(await compare(result.outputFiles, '0.png', '2.png')).not.toBeTrue()
+      expect(await compare(result.outputFiles, '2.png', '1.png')).toBeTrue()
+      await showImages(result.outputFiles)
+      done()
+    })
+  })
+
 
   describe('getFileNameExtension', () => {
 

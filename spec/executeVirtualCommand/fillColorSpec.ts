@@ -1,9 +1,9 @@
 import { compare, execute } from '../../src';
 import { showImages } from '../testUtil';
 
-export default fdescribe('fillColorSpec', () => {
+export default describe('fillColorSpec', () => {
 
-  fit('allows fill colors with 2 different methods and put the output in another file', async done => {
+  it('allows fill colors with 2 different methods and put the output in another file', async done => {
     const result = await execute(`
     convert logo: -resize 40% 1.miff
     fill flood 1.miff 12x12 #8811aa 20% 2.miff
