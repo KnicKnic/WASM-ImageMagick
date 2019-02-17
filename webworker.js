@@ -13,7 +13,7 @@ const stderr = []
 let exitCode = 0
 
 function getMagickJsUrl(path, prefix) {
-  debugger
+  // debugger
   let splitUrl = magickJsCurrentPath.split('/')
   splitUrl[splitUrl.length -1] = fileName
   return splitUrl.join('/')
