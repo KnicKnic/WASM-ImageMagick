@@ -68,7 +68,7 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
   return promise as Promise<CallResult>
 }
 
-function CreatePromiseEvent() {
+export function CreatePromiseEvent() {
   let resolver
   let rejecter
   const emptyPromise = new Promise((resolve, reject) => {
