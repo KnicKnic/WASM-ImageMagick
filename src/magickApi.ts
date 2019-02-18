@@ -1,3 +1,4 @@
+import StackTrace from "stacktrace-js"
 /**
  * Base class for ImageMagick input and output files.
  */
@@ -80,7 +81,56 @@ export function CreatePromiseEvent() {
   return emptyPromise
 }
 
-const magickWorker = new Worker('magick.js')
+
+function ChangeUrl(url, fileName)
+{
+    let splitUrl = url.split('/')
+    splitUrl[splitUrl.length -1] = fileName
+    return splitUrl.join('/')
+}
+function GetCurrentUrlDifferentFilename(fileName)
+{
+    return ChangeUrl(currentJavascriptURL, fileName)
+}
+let currentJavascriptURL = './magickApi.js';
+
+// // instead of doing the sane code of being able to just use import.meta.url 
+// // (Edge doesn't work) (safari mobile, chrome, opera, firefox all do)
+// // 
+// // I will use stacktrace-js library to get the current file name
+// //
+// try {
+//   // @ts-ignore
+//   let packageUrl = import.meta.url;
+//   currentJavascriptURL = packageUrl;
+// } catch (error) {
+//   // eat
+// }
+//
+//
+{
+  let stacktrace = StackTrace.getSync();
+  currentJavascriptURL = stacktrace[0].fileName;
+}
+
+const magickWorkerUrl = GetCurrentUrlDifferentFilename('magick.js')
+
+function GenerateMagickWorkerText(magickUrl){
+  // generates code for the following
+  // var magickJsCurrentPath = 'magickUrl';
+  // importScripts(magickJsCurrentPath);
+
+  return "var magickJsCurrentPath = '" + magickUrl +"';\n" +
+         'importScripts(magickJsCurrentPath);'
+}
+let magickWorker;
+if(currentJavascriptURL.startsWith('http'))
+{
+    magickWorker = new Worker(window.URL.createObjectURL(new Blob([GenerateMagickWorkerText(magickWorkerUrl)])));
+}
+else{
+    magickWorker = new Worker(magickWorkerUrl);
+}
 
 const magickWorkerPromises = {}
 let magickWorkerPromisesKey = 1

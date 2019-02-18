@@ -40,3 +40,8 @@
 ## 1.2.1
 
  * First automated release
+
+## 1.2.2
+
+ * Support auto discovery of magick.js & magick.wasm files
+   * Allows simple usage in CDNs
