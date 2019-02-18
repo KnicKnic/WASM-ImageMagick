@@ -5,7 +5,7 @@ See https://knicknic.github.io/imagemagick/rotate for demonstration website
 
 ## code
 In index.html see relevant portions called out below `"..."` means I deleted code
-```js
+```html
   <script type='module'>
     //import the library to talk to imagemagick
     import * as Magick from './magickApi.js';

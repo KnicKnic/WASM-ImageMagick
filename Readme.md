@@ -26,6 +26,8 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
 
 ## Demos and examples
 
+ * Simplest example. See [samples/rotate#code](samples/rotate#code). A simple webpage (plain javascript) that has image in array and loads magickApi.js to rotate file. Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
+
  * Basic playground (React & TypeScript project): [![Basic playground (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/lp7lxz6l59).
 
  * Image Diff Example (React & TypeScript project): [![Basic playground for image diff (React & TypeScript project)](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/yvn6rkr16z).
@@ -35,8 +37,6 @@ This project is not affiliated with [ImageMagick](https://www.imagemagick.org) ,
  * [Playground with several transformation examples and image formats](https://cancerberosgx.github.io/autumn-leaves/#/convertDemo). It also shows the output of transformations made with ImageMagick in the browser to verify wasm-imagemagick output the right thing.  
 
  * [Picture Frame editor](https://cancerberosgx.github.io/autumn-leaves/#/imageFrame).
-
- * Simple example. See [samples/rotate#code](samples/rotate#code). A simple webpage that has image in array and loads magickApi.js to rotate file. Demonstration site [https://knicknic.github.io/imagemagick/rotate/](https://knicknic.github.io/imagemagick/rotate/)
 
  * [https://knicknic.github.io/imagemagick/](https://knicknic.github.io/imagemagick/) a commandline sample of using ImageMagick
     * For code see [samples/cmdline](samples/cmdline)
@@ -169,7 +169,38 @@ const execute = require('wasm-imagemagick').execute
 If you are not working in a npm development environment you can still load the library bundle .js file. It supports being imported as JavaScript standard module or as a UMD module. Again, don't forget to copy `magick.js`, `magick.wasm` in the same folder as your html file.:
 
 
-#### Importing it as JavaScript standard module: 
+#### Importing magickApi.js as a JavaScript standard module: 
+
+Basic version, copy `magickApi.js` as well.
+
+See [samples/rotate#code](samples/rotate#code).
+
+Relevant portions called out below `"..."` means code is missing from example
+```html
+  <script type='module'>
+    //import the library to talk to imagemagick
+    import * as Magick from './magickApi.js';
+
+    // ...
+
+    // Fetch the image to rotate, and call image magick
+    let DoMagickCall = async function () {
+      // ....
+
+      // calling image magick with one source image, and command to rotate & resize image
+      let processedFiles = await Magick.Call([{ 'name': 'srcFile.png', 'content': sourceBytes }], ["convert", "srcFile.png", "-rotate", "90", "-resize", "200%", "out.png"]);
+
+      // ...
+    };
+    DoMagickCall();
+  </script>
+``` 
+
+[Working example source code](samples/rotate/index.html).
+
+
+#### Importing a bundle as a JavaScript standard module: 
+
 
 ```html
 <script type="module">
@@ -215,18 +246,29 @@ git clone --recurse-submodules https://github.com/KnicKnic/WASM-ImageMagick.git
 
 cd WASM-ImageMagick
 
-docker build -t wasm-imagemagick-build-tools .
+#ubuntu instructions
+#   install node
+sudo snap install --edge node --classic
+#   install typescript
+sudo npm install typescript -g
+#   install docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+#   be sure to add your user to the to the docker group and relogin
 
-docker run --rm -it --workdir /code -v "$PWD":/code wasm-imagemagick-build-tools bash ./build.sh
+# install and run build
+npm install
 
-#windows cmd
-#docker run --rm -it --workdir /code -v %CD%:/code wasm-imagemagick-build-tools bash ./build.sh
+
+#windows instructions
+# currently broken
+# If you really want a build, create a PR, 
+# a build will get kicked off, click show all checks -> Details -> top right of the details page (in artifcats) 
+
+# docker run --rm -it --workdir /code -v %CD%:/code wasm-imagemagick-build-tools bash ./build.sh
 ```
 
-Produces `magick.js` & `magick.wasm` in the current folder.
-
-Note: `npm run build` will perform all the previous commands plus compiling the TypeScript project.
-
+Produces `magick.js`, `magickApi.js`, & `magick.wasm` in the current folder.
 
 ## Run tests
 
