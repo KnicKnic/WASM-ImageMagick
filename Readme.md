@@ -166,12 +166,11 @@ const execute = require('wasm-imagemagick').execute
 
 ### Loading directly from html file
 
-If you are not working in a npm development environment you can still load the library bundle .js file. It supports being imported as JavaScript standard module or as a UMD module. Again, don't forget to copy `magick.js`, `magick.wasm` in the same folder as your html file.:
-
+If you are not working in a npm development environment you can still load the library bundle .js file. It supports being imported as JavaScript standard module or as a UMD module.
 
 #### Importing magickApi.js as a JavaScript standard module: 
 
-Basic version, copy `magickApi.js` as well.
+Basic version, just reference online https://knicknic.github.io/wasm-imagemagick/magickApi.js no files needed at all.
 
 See [samples/rotate#code](samples/rotate#code).
 
@@ -198,6 +197,10 @@ Relevant portions called out below `"..."` means code is missing from example
 
 [Working example source code](samples/rotate/index.html).
 
+
+#### Below examples need additional files coppied: 
+
+Copy `magick.js`, `magick.wasm` in the same folder as your html file.:
 
 #### Importing a bundle as a JavaScript standard module: 
 
