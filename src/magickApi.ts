@@ -196,6 +196,18 @@ export interface CallResult {
   inputFiles: MagickInputFile[]
 }
 
+export function CreatePromiseEvent() {
+  let resolver
+  let rejecter
+  const emptyPromise = new Promise((resolve, reject) => {
+    resolver = resolve
+    rejecter = reject
+  }) as Promise<{}> & { resolve?: any, reject?: any }
+  emptyPromise.resolve = resolver
+  emptyPromise.reject = rejecter
+  return emptyPromise
+}
+
 export type CallCommand = string[]
 
 // call() main operation
