@@ -179,7 +179,7 @@ Relevant portions called out below `"..."` means code is missing from example
 ```html
   <script type='module'>
     //import the library to talk to imagemagick
-    import * as Magick from './magickApi.js';
+    import * as Magick from 'https://knicknic.github.io/wasm-imagemagick/magickApi.js';
 
     // ...
 

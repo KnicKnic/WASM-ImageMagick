@@ -19,8 +19,9 @@
 
   <script type='module'>
     //import the library to talk to imagemagick
-    import * as Magick from './magickApi.js';
+    import * as Magick from 'https://knicknic.github.io/wasm-imagemagick/magickApi.js';
 
+    // various html elements
     let rotatedImage = document.getElementById('rotatedImage');
 
     // Fetch the image to rotate, and call image magick
@@ -32,7 +33,7 @@
       // calling image magick with one source image, and command to rotate & resize image
       const files = [{ 'name': 'srcFile.png', 'content': sourceBytes }];
       const command = ["convert", "srcFile.png", "-rotate", "90", "-resize", "200%", "out.png"];
-      let processedFiles = await Magick.Call(inputFiles, command);
+      let processedFiles = await Magick.Call(files, command);
 
       // response can be multiple files (example split)
       // here we know we just have one

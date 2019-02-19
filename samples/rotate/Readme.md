@@ -8,9 +8,9 @@ In index.html see relevant portions called out below `"..."` means I deleted cod
 ```html
   <script type='module'>
     //import the library to talk to imagemagick
-    import * as Magick from './magickApi.js';
+    import * as Magick from 'https://knicknic.github.io/wasm-imagemagick/magickApi.js';
 
-    // ...
+   // ...
 
     // Fetch the image to rotate, and call image magick
     let DoMagickCall = async function () {
@@ -26,6 +26,4 @@ In index.html see relevant portions called out below `"..."` means I deleted cod
 ``` 
 
 ## Deploy
-copy a release (magickApi.js, magick.js, magick.wasm) along with this index.html & rotate.png into a webserver.
-
-For an example webserver layout see the repository for the example page - https://github.com/KnicKnic/KnicKnic.github.io/tree/master/imagemagick/rotate
+copy a release [(magickApi.js, magick.js, magick.wasm) or use an exiting release such as https://knicknic.github.io/wasm-imagemagick/magickApi.js] along with this index.html & rotate.png into a webserver.
