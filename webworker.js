@@ -93,7 +93,7 @@ processFiles = function () {
     message.stdout = stdout.map(s => s)
     message.stderr = stderr.map(s => s)
     message.exitCode = exitCode
-    postMessage(message)
+    postMessage(message,[message])
   }
   Module.messagesToProcess = []
 }
