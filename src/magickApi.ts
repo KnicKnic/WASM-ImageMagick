@@ -64,7 +64,7 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
   }
   const promise = CreatePromiseEvent()
   magickWorkerPromises[magickWorkerPromisesKey] = promise
-  magickWorker.postMessage(request)
+  magickWorker.postMessage(request,[request])
   magickWorkerPromisesKey++
   return promise as Promise<CallResult>
 }
