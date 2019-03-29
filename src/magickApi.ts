@@ -11,6 +11,7 @@ export interface MagickFile {
  */
 export interface MagickOutputFile extends MagickFile {
   blob: Blob
+  buffer: ArrayBuffer
 }
 
 /**
@@ -26,7 +27,11 @@ export interface MagickInputFile extends MagickFile {
  * {@link call} shortcut that only returns the output files.
  */
 export async function Call(inputFiles: MagickInputFile[], command: string[]): Promise<MagickOutputFile[]> {
-  const result = await call(inputFiles, command)
+  const result = await call(inputFiles, command)  
+  for(let outputFile of result.outputFiles)
+  {
+    outputFile.blob = new Blob([outputFile.buffer])
+  }
   return result.outputFiles
 }
 
@@ -61,10 +66,22 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
     files: inputFiles,
     args: command,
     requestNumber: magickWorkerPromisesKey,
+    transferable: true,
   }
+  let transfer = [];
+  for (let file of request.files) {
+    if(file.content instanceof ArrayBuffer)
+    {
+      transfer.push(file.content)
+    }
+    else{
+      transfer.push(file.content.buffer)
+    }
+  }
+
   const promise = CreatePromiseEvent()
   magickWorkerPromises[magickWorkerPromisesKey] = promise
-  magickWorker.postMessage(request,[request])
+  magickWorker.postMessage(request,transfer)
   magickWorkerPromisesKey++
   return promise as Promise<CallResult>
 }

@@ -62,7 +62,13 @@ processFiles = function () {
   for (let message of Module.messagesToProcess) {
 
     for (let file of message.files) {
-      FS.writeFile(file.name, file.content)
+      let fileData = file.content
+      if(fileData instanceof ArrayBuffer)
+      {
+        // fileData = new DataView(fileData)
+        fileData = new Uint8Array(fileData);
+      }
+      FS.writeFile(file.name, fileData)
     }
 
     try {
@@ -80,20 +86,39 @@ processFiles = function () {
     let dir = FS.open('/pictures')
     let files = dir.node.contents
     let responseFiles = []
+    let transfer = []
     for (let destFilename in files) {
       let processed = {}
       processed.name = destFilename
       let read = FS.readFile(destFilename)
       // cleanup read file
       FS.unlink(destFilename)
-      processed.blob = new Blob([read])
+      
+      if('transferable' in message)
+      {
+        processed.buffer = read
+        transfer.push(read.buffer)
+      }
+      else{
+        processed.blob = new Blob([read])
+      }
       responseFiles.push(processed)
     }
     message.outputFiles = responseFiles
     message.stdout = stdout.map(s => s)
     message.stderr = stderr.map(s => s)
     message.exitCode = exitCode
-    postMessage(message,[message])
+
+    for (let file of message.files) {
+      if(file.content instanceof ArrayBuffer)
+      {
+        transfer.push(file.content)
+      }
+      else{
+        transfer.push(file.content.buffer)
+      }
+    }
+    postMessage(message, transfer)
   }
   Module.messagesToProcess = []
 }
