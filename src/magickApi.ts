@@ -11,7 +11,7 @@ export interface MagickFile {
  */
 export interface MagickOutputFile extends MagickFile {
   blob: Blob
-  buffer: ArrayBuffer
+  buffer?: ArrayBuffer
 }
 
 /**
