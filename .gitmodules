@@ -1,15 +1,4 @@
-[submodule "ImageMagick"]
-	path = ImageMagick
-	url = https://github.com/KnicKnic/ImageMagick
-[submodule "libjpeg"]
-	path = libjpeg
-	url = https://github.com/KnicKnic/libjpeg
-[submodule "libpng"]
-	path = libpng
-	url = https://github.com/KnicKnic/libpng
-[submodule "libtiff"]
-	path = libtiff
-	url = https://gitlab.com/libtiff/libtiff
-[submodule "zlib"]
-	path = zlib
-	url = https://github.com/madler/zlib
+[submodule "Magick.Native"]
+	path = Magick.Native
+	url = https://github.com/KnicKnic/Magick.Native.git
+	branch = compile_fix

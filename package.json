@@ -6,10 +6,11 @@
   "typings": "dist/src/index.d.ts",
   "module": "dist/bundles/wasm-imagemagick.esm-es5.js",
   "scripts": {
-    "build-wasm": "docker build -t wasm-imagemagick-build-tools . && docker run --rm --workdir /code -v \"$PWD\":/code wasm-imagemagick-build-tools bash ./build.sh",
+    "build-wasm": "docker build Magick.Native -f Magick.Native/build/wasm/linux/Dockerfile -t magick-wasm-linux && mkdir -p ImageMagick/utilities && docker run --rm -v \"$PWD\"/ImageMagick/utilities:/dest magick-wasm-linux cp /ImageMagick/libraries/ImageMagick/utilities/magick.js /ImageMagick/libraries/ImageMagick/utilities/magick.wasm /dest/",
+    "build-wasm-rename": "echo 0",
     "build-ts": "rm -rf dist && tsc && npm run bundle",
     "bundle": "npx tsc --project tsconfig-esm5.json && npx tsc --project tsconfig-esm6.json && npx tsc --project tsconfig-esm2018.json && mkdir -p dist/bundles && npx rollup -c rollup.config.js && npx rollup -c rollup.config.js --environment NODE_ENV:production",
-    "build": "npm run build-wasm && npm run build-ts",
+    "build": "npm run build-wasm && npm run build-wasm-rename && npm run build-ts",
     "prepare": "npm run build && npm run magickApiJs && npm run copy",
     "copy": "npm run copy-magickJs && npm run copy-magickWasm && mkdir -p dist && cp magick.js magickApi.js magick.wasm dist && mkdir -p dist/bundles && cp magick.js magickApi.js magick.wasm dist/bundles && cp magick.js magick.wasm spec/assets && cp -r spec/assets dist",
     "copy-magickJs": "rm -rf magick.js && cp webworker.js magick.js && cat ImageMagick/utilities/magick.js >> magick.js",
