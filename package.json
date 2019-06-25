@@ -6,8 +6,8 @@
   "typings": "dist/src/index.d.ts",
   "module": "dist/bundles/wasm-imagemagick.esm-es5.js",
   "scripts": {
-    "build-wasm": "docker build Magick.Native -f Magick.Native/build/wasm/linux/Dockerfile -t magick-wasm-linux && mkdir -p ImageMagick/utilities && docker run --rm -v \"$PWD\"/ImageMagick/utilities:/dest magick-wasm-linux cp /Native/Q8/magick-Q8.wasm /Native/Q8/magick-Q8.js /dest/",
-    "build-wasm-rename": "mv ImageMagick/utilities/magick-Q8.wasm ImageMagick/utilities/magick.wasm && mv ImageMagick/utilities/magick-Q8.js ImageMagick/utilities/magick.js",
+    "build-wasm": "docker build Magick.Native -f Magick.Native/build/wasm/linux/Dockerfile -t magick-wasm-linux && mkdir -p ImageMagick/utilities && docker run --rm -v \"$PWD\"/ImageMagick/utilities:/dest magick-wasm-linux cp /Native/Q8/magick* /dest/",
+    "build-wasm-rename": "echo 0",
     "build-ts": "rm -rf dist && tsc && npm run bundle",
     "bundle": "npx tsc --project tsconfig-esm5.json && npx tsc --project tsconfig-esm6.json && npx tsc --project tsconfig-esm2018.json && mkdir -p dist/bundles && npx rollup -c rollup.config.js && npx rollup -c rollup.config.js --environment NODE_ENV:production",
     "build": "npm run build-wasm && npm run build-wasm-rename && npm run build-ts",
