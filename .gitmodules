@@ -1,4 +1,4 @@
 [submodule "Magick.Native"]
 	path = Magick.Native
 	url = https://github.com/KnicKnic/Magick.Native.git
-    branch = compile_quick_fix
+	branch = compile_quick_fix
