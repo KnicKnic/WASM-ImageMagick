@@ -1,6 +1,6 @@
 
-export CPPFLAGS="-I/code/libpng -I/code/zlib -I/code/libjpeg -I/code/libtiff/libtiff"
-export LDFLAGS="-L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -L/code/libtiff/libtiff"
+export CPPFLAGS="-I/code/libpng -I/code/zlib -I/code/libjpeg -I/code/lcms -I/code/libtiff/libtiff"
+export LDFLAGS="-L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/lcms -L/code/libjpeg -L/code/libtiff/libtiff"
 export CFLAGS="-O3"
 export CXXFLAGS="$CFLAGS"
 MAKE_FLAGS="-s BINARYEN_TRAP_MODE=clamp -s ALLOW_MEMORY_GROWTH=1"
@@ -24,7 +24,7 @@ emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS"
 cd /code/lcms
 autoreconf -fiv
 mconfigure ./configure --disable-shared --prefix=/usr/local CFLAGS="$FLAGS"
-emcmake make install $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
+emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
 
 cd /code/libpng
 libtoolize
