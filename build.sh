@@ -1,5 +1,5 @@
 
-export CPPFLAGS="-I/code/libpng -I/code/zlib -I/code/libjpeg -I/code/lcms -I/code/libtiff/libtiff"
+export CPPFLAGS="-I/code/libpng -I/code/zlib -I/code/libjpeg -I/code/lcms -I/code/lcms/include -I/code/libtiff/libtiff"
 export LDFLAGS="-L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/lcms -L/code/libjpeg -L/code/libtiff/libtiff"
 export CFLAGS="-O3"
 export CXXFLAGS="$CFLAGS"
