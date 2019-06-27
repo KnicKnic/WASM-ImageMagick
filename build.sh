@@ -23,7 +23,7 @@ emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS"
 
 cd /code/lcms
 autoreconf -fiv
-mconfigure ./configure --disable-shared --prefix=/usr/local CFLAGS="$FLAGS"
+emconfigure ./configure --disable-shared --prefix=/usr/local CFLAGS="$FLAGS"
 emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
 
 cd /code/libpng
