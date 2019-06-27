@@ -21,6 +21,11 @@ autoreconf -fvi
 emconfigure ./configure --disable-shared
 emcmake make $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
 
+cd /code/lcms
+autoreconf -fiv
+mconfigure ./configure --disable-shared --prefix=/usr/local CFLAGS="$FLAGS"
+emcmake make install $MAKE_FLAGS CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" 
+
 cd /code/libpng
 libtoolize
 # aclocal
