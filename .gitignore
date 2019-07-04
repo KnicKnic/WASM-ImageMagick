@@ -10,3 +10,4 @@ node_modules
 *.tgz
 /magickApi.js
 /.build
+.DS_Store
