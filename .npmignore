@@ -13,3 +13,4 @@
 /dist/esm6/**/
 /dist/esm2018/**/
 /dist/bundle.js
+/prefix
