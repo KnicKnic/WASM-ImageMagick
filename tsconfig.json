@@ -6,6 +6,7 @@
     "lib": [
       "dom", "es2018"
     ],
+    "esModuleInterop": true,
     "target": "es2018",
     "module": "commonjs", 
     "skipLibCheck": true
