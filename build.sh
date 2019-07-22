@@ -77,7 +77,7 @@ emconfigure ./configure \
   --without-xml --without-fftw --without-flif --without-fpx --without-djvu \
   --without-fontconfig --without-raqm --without-gslib \
   --without-gvc --without-heic --without-lqr --without-openexr --without-pango \
-  --without-raw --without-rsvg --without-webp --enable-zero-configuration \
+  --without-raw --without-rsvg --without-webp \
   PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
 testExitCode "ImageMagick configure" $?
 
