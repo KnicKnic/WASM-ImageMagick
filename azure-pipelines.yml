@@ -7,6 +7,9 @@ steps:
   inputs:
     versionSpec: '11.x'
 
+- script: git submodule update --remote --merge ImageMagick
+  displayName: git submodule update
+
 - script: npm install
   displayName: install and build
 

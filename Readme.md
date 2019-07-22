@@ -249,24 +249,26 @@ git clone --recurse-submodules https://github.com/KnicKnic/WASM-ImageMagick.git
 
 cd WASM-ImageMagick
 
-#ubuntu instructions
-#   install node
+git submodule update --remote --merge ImageMagick
+
+# ubuntu instructions
+#   install Node.js
 sudo snap install --edge node --classic
-#   install typescript
+#   install TypeScript
 sudo npm install typescript -g
 #   install docker
 curl -fsSL https://get.docker.com -o get-docker.sh
 sh get-docker.sh
-#   be sure to add your user to the to the docker group and relogin
+#   be sure to add your user to the to the docker group and re-login
 
 # install and run build
 npm install
 
 
-#windows instructions
+# Windows instructions
 # currently broken
 # If you really want a build, create a PR, 
-# a build will get kicked off, click show all checks -> Details -> top right of the details page (in artifcats) 
+# a build will get kicked off, click show all checks -> Details -> top right of the details page (in artifacts) 
 
 # docker run --rm -it --workdir /code -v %CD%:/code wasm-imagemagick-build-tools bash ./build.sh
 ```
