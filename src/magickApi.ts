@@ -28,10 +28,6 @@ export interface MagickInputFile extends MagickFile {
  */
 export async function Call(inputFiles: MagickInputFile[], command: string[]): Promise<MagickOutputFile[]> {
   const result = await call(inputFiles, command)  
-  for(let outputFile of result.outputFiles)
-  {
-    outputFile.blob = new Blob([outputFile.buffer])
-  }
   return result.outputFiles
 }
 
@@ -162,6 +158,9 @@ magickWorker.onmessage = e => {
     stdout: response.stdout,
     stderr: response.stderr,
     exitCode: response.exitCode || 0,
+  }
+  for(let outputFile of result.outputFiles) {
+    outputFile.blob = new Blob([outputFile.buffer])
   }
   promise.resolve(result)
 }
