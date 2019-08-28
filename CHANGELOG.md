@@ -49,3 +49,7 @@
 ## 1.2.4
 
 Publish fix'd npm package
+
+## 1.2.5
+
+Undo publish of above
