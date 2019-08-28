@@ -1,6 +1,6 @@
 {
   "name": "wasm-imagemagick",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Webassembly compilation of ImageMagick",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

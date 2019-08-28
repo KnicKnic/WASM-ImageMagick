@@ -45,3 +45,7 @@
 
  * Support auto discovery of magick.js & magick.wasm files
    * Allows simple usage in CDNs
+
+## 1.2.4
+
+Publish fix'd npm package
