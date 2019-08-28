@@ -49,7 +49,7 @@ if (typeof Module == 'undefined') {
   }
 }
 
-processFiles = function () {
+let processFiles = function () {
   if (!Module.moduleLoaded) {
     return
   }
@@ -123,7 +123,7 @@ processFiles = function () {
   Module.messagesToProcess = []
 }
 
-onmessage = function (magickRequest) {
+let onmessage = function (magickRequest) {
   Module.messagesToProcess.push(magickRequest.data)
   processFiles()
 }
