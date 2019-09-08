@@ -53,3 +53,14 @@ Publish fix'd npm package
 ## 1.2.5
 
 Undo publish of above
+
+## 1.2.6
+
+fix using let breaking web worker https://github.com/KnicKnic/WASM-ImageMagick/issues/56
+
+## 1.2.7
+
+use published container for build, rather than build container image every time (updated utilities were failing build)
+
+Allow default style import in the commonjs version build
+
