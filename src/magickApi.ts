@@ -111,26 +111,7 @@ function GetCurrentUrlDifferentFilename(fileName)
 }
 let currentJavascriptURL = './magickApi.js';
 
-// // instead of doing the sane code of being able to just use import.meta.url 
-// // (Edge doesn't work) (safari mobile, chrome, opera, firefox all do)
-// // 
-// // I will use stacktrace-js library to get the current file name
-// //
-// try {
-//   // @ts-ignore
-//   let packageUrl = import.meta.url;
-//   currentJavascriptURL = packageUrl;
-// } catch (error) {
-//   // eat
-// }
-//
-//
-{
-  let stacktrace = StackTrace.getSync();
-  currentJavascriptURL = stacktrace[0].fileName;
-}
-
-const magickWorkerUrl = GetCurrentUrlDifferentFilename('magick.js')
+const magickWorkerUrl = './magick.js';
 
 function GenerateMagickWorkerText(magickUrl){
   // generates code for the following
