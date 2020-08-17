@@ -3,7 +3,7 @@ export CPPFLAGS="-I/code/libpng -I/code/zlib -I/code/libjpeg -I/code/libtiff/lib
 export LDFLAGS="-L/code/zlib -L/code/libpng -L/code/libpng/.libs -L/code/libjpeg -L/code/libtiff/libtiff"
 export CFLAGS="-O3"
 export CXXFLAGS="$CFLAGS"
-MAKE_FLAGS="-s ALLOW_MEMORY_GROWTH=1 -s MAXIMUM_MEMORY=4GB"
+MAKE_FLAGS="-s ALLOW_MEMORY_GROWTH=1 -s MAXIMUM_MEMORY=4GB -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']"
 
 # export CFLAGS="-O0 -g2"
 # export CXXFLAGS="$CFLAGS"
