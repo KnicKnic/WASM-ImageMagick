@@ -9,22 +9,24 @@ Module = {
 function getExtension(fileName){
   return fileName.substring(fileName.lastIndexOf(".")+1)
 }
-
+var sourceFileNameEmscripten = ''
+var sourceFile = ''
 function ValidateFormat(fileName, formatToMatch)
 {
-    fileNameEmscripten = '/' + fileName;
-    file = fs.readFileSync(fileName);
+    var fileNameEmscripten = '/' + fileName;
+    var file = fs.readFileSync(fileName);
     FS.writeFile(sourceFileNameEmscripten, sourceFile);
     
-    command =  ["identify", fileNameEmscripten];
+    var command =  ["identify", fileNameEmscripten];
     // couldnt get just grabbing type to work
     // command =  ["identify", "-format", '"%[page]"', fileNameEmscripten]; 
     console.log(`running command ${command}`)
-    matched = false
+    var matched = false
     try{
         module_output = ''
-        a = Module['callMain'](command);
-        form = module_output.split(' ')[1]
+        var a = Module['callMain'](command);
+        console.log(`got format ${module_output}`)
+        var form = module_output.split(' ')[1]
         console.log(`got format ${form}` )
         if (formatToMatch == form)
         {matched = true}
@@ -45,10 +47,10 @@ function ValidateFormat(fileName, formatToMatch)
 function ConvertImage(sourceFileName, destinationFileName, convertArgs = [])
 {
     sourceFileNameEmscripten = '/' + sourceFileName;
-    destinationFileNameEmscripten = '/' + destinationFileName;
+    var destinationFileNameEmscripten = '/' + destinationFileName;
     sourceFile = fs.readFileSync(sourceFileName);
     FS.writeFile(sourceFileNameEmscripten, sourceFile);
-    command =  ["convert", sourceFileNameEmscripten].concat(convertArgs, [destinationFileNameEmscripten]);
+    var command =  ["convert", sourceFileNameEmscripten].concat(convertArgs, [destinationFileNameEmscripten]);
     if(destinationFileName.endsWith('.png'))
     {
         command =  ["convert", sourceFileNameEmscripten].concat(convertArgs,  ["-define", "png:include-chunk=none", destinationFileNameEmscripten]);
@@ -57,7 +59,7 @@ function ConvertImage(sourceFileName, destinationFileName, convertArgs = [])
     console.log(`running command ${command}`)
 
     try{
-        a = Module['callMain'](command);
+        var a = Module['callMain'](command);
     }
     catch(e)
     {
@@ -68,20 +70,21 @@ function ConvertImage(sourceFileName, destinationFileName, convertArgs = [])
     console.log(`ran command ${command}`)
     
     console.log(`converted ${sourceFileName} to ${destinationFileName}` )
-    destinationFileEmscripten = FS.readFile(destinationFileNameEmscripten);
+    var destinationFileEmscripten = FS.readFile(destinationFileNameEmscripten);
     fs.writeFileSync(destinationFileName,destinationFileEmscripten);
     return true;
 }
 
 function RotateFile(sourceFileName, destinationFileName)
 {
-    return ConvertImage(sourceFileName, destinationFileName, convertArgs = ["-rotate", "90"])
+  var convertArgs = ["-rotate", "90"]
+    return ConvertImage(sourceFileName, destinationFileName, convertArgs)
 }
 
 function ValidateFilesSame(leftFileName, rightFileName)
 {
-    leftFile = fs.readFileSync(leftFileName);
-    rightFile = fs.readFileSync(rightFileName);
+    var leftFile = fs.readFileSync(leftFileName);
+    var rightFile = fs.readFileSync(rightFileName);
     if(leftFile.toString() == rightFile.toString()) // this will not catch 0 padding at ends
     {
         console.log(`Files ${leftFileName} and ${rightFileName} are the same` );
@@ -127,7 +130,14 @@ Module.onRuntimeInitialized = function (){
         process.exit(1);
     }
 }
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { createRequire } from 'module';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const require = createRequire(import.meta.url);
 var fs = require('fs');
 
 console.log('loading')

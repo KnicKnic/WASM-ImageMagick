@@ -5,7 +5,7 @@ steps:
 
 - task: NodeTool@0
   inputs:
-    versionSpec: '11.x'
+    versionSpec: '14.x'
 
 - script: npm install
   displayName: install and build
