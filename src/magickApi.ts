@@ -105,9 +105,8 @@ function ChangeUrl(url, fileName)
     splitUrl[splitUrl.length -1] = fileName
     return splitUrl.join('/')
 }
-function GetCurrentUrlDifferentFilename(fileName)
-{
-    return ChangeUrl(currentJavascriptURL, fileName)
+function GetCurrentUrlDifferentFilename(currentUrl, fileName) {
+  return ChangeUrl(currentUrl, fileName);
 }
 let currentJavascriptURL = './magickApi.js';
 
@@ -123,17 +122,58 @@ let currentJavascriptURL = './magickApi.js';
 // } catch (error) {
 //   // eat
 // }
-//
-//
-{
-  let stacktrace = StackTrace.getSync();
-  // Pulling the filename from the 3rd callsite of the stacktrace to get the full path
-  // to the module. The first index is inconsitent across browsers and does not return 
-  // the full path in Safari and resuls in the worker failing to reslolve. 
-  currentJavascriptURL = stacktrace[2].fileName;
+
+function GenerateStackAndGetPathAtDepth(depth){
+  try {
+    let stacktrace$$1 = StackTrace.getSync();
+    let filePath = stacktrace$$1[depth].fileName;
+    
+    // if the stack trace code doesn't return a path separator
+    if(filePath !== undefined && filePath.indexOf('/') === -1 && filePath.indexOf('\\') === -1){
+      return undefined
+    }
+    return filePath
+
+  } catch (error) {
+    return undefined
+  }
 }
 
-const magickWorkerUrl = GetCurrentUrlDifferentFilename('magick.js')
+function GetCurrentFileURLHelper3() {
+  // 3rd call site didn't work, so I made this complicated maze of helpers.. 
+
+  // Pulling the filename from the 3rd call site of the stacktrace to get the full path
+  // to the module. The first index is inconsistent across browsers and does not return 
+  // the full path in Safari and results in the worker failing to resolve. 
+
+  // I am preferring to do depth 0 first, as that will ensure people that do minification still works
+
+  let filePath = GenerateStackAndGetPathAtDepth(0)
+  if(filePath === undefined){
+    filePath = GenerateStackAndGetPathAtDepth(2)
+  }
+
+  // if the stack trace code messes up 
+  if(filePath === undefined){
+    filePath = './magickApi.js';
+  }
+
+  return filePath
+}
+
+function GetCurrentFileURLHelper2() {
+  return GetCurrentFileURLHelper3();
+}
+function GetCurrentFileURLHelper1() {
+  return GetCurrentFileURLHelper2();
+}
+function GetCurrentFileURL() {
+  return GetCurrentFileURLHelper1();
+}
+
+currentJavascriptURL = GetCurrentFileURL();
+
+const magickWorkerUrl = GetCurrentUrlDifferentFilename(currentJavascriptURL, 'magick.js');
 
 function GenerateMagickWorkerText(magickUrl){
   // generates code for the following
