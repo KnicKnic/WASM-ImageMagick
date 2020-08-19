@@ -132,7 +132,7 @@ function GetCurrentFileURLHelper3(){
   // to the module. The first index is inconsistent across browsers and does not return 
   // the full path in Safari and results in the worker failing to resolve. 
   let stacktrace = StackTrace.getSync();
-  return stacktrace[2].filename
+  return stacktrace[2].fileName
 }
 function GetCurrentFileURLHelper2(){
   return GetCurrentFileURLHelper3()
