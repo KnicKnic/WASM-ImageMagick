@@ -1,3 +1,4 @@
+import StackTrace from "stacktrace-js"
 /**
  * Base class for ImageMagick input and output files.
  */
@@ -110,29 +111,41 @@ function GetCurrentUrlDifferentFilename(fileName)
 }
 let currentJavascriptURL = './magickApi.js';
 
-// instead of doing the sane code of being able to just use import.meta.url 
-// (Edge doesn't work) (safari mobile, chrome, opera, firefox all do)
-// 
-// I will use stacktrace-js library to get the current file name
-//
-try {
-  // @ts-ignore
-  let packageUrl = import.meta.url;
-  currentJavascriptURL = packageUrl;
-} catch (error) {
-  // eat
-}
-
-
-// {
-//   let stacktrace = StackTrace.getSync();
-//   // 3rd callsite doesnt work, below comment is wrong.. don't konw what the right number is
-
-//   // Pulling the filename from the 3rd callsite of the stacktrace to get the full path
-//   // to the module. The first index is inconsitent across browsers and does not return 
-//   // the full path in Safari and resuls in the worker failing to reslolve. 
-//   currentJavascriptURL = stacktrace[2].fileName;
+// // instead of doing the sane code of being able to just use import.meta.url 
+// // (Edge doesn't work) (safari mobile, chrome, opera, firefox all do)
+// // 
+// // I will use stacktrace-js library to get the current file name
+// //
+// try {
+//   // @ts-ignore
+//   let packageUrl = import.meta.url;
+//   currentJavascriptURL = packageUrl;
+// } catch (error) {
+//   // eat
 // }
+
+
+function GetCurrentFileURLHelper3(){
+  // 3rd callsite didn't work, so I made this complicated maze of helpers.. 
+
+  // Pulling the filename from the 3rd callsite of the stacktrace to get the full path
+  // to the module. The first index is inconsistent across browsers and does not return 
+  // the full path in Safari and results in the worker failing to resolve. 
+  let stacktrace = StackTrace.getSync();
+  return stacktrace[2].filename
+}
+function GetCurrentFileURLHelper2(){
+  return GetCurrentFileURLHelper3()
+}
+function GetCurrentFileURLHelper1(){
+  return GetCurrentFileURLHelper2()
+}
+function GetCurrentFileURL(){
+  return GetCurrentFileURLHelper1()
+}
+{
+  currentJavascriptURL = GetCurrentFileURL();
+}
 
 const magickWorkerUrl = GetCurrentUrlDifferentFilename('magick.js')
 
