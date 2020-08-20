@@ -66,22 +66,22 @@ export function call(inputFiles: MagickInputFile[], command: string[]): Promise<
     files: inputFiles,
     args: command,
     requestNumber: magickWorkerPromisesKey,
-    transferable: true,
+    // transferable: true,
   }
-  let transfer = [];
-  for (let file of request.files) {
-    if(file.content instanceof ArrayBuffer)
-    {
-      transfer.push(file.content)
-    }
-    else{
-      transfer.push(file.content.buffer)
-    }
-  }
+  // let transfer = [];
+  // for (let file of request.files) {
+  //   if(file.content instanceof ArrayBuffer)
+  //   {
+  //     transfer.push(file.content)
+  //   }
+  //   else{
+  //     transfer.push(file.content.buffer)
+  //   }
+  // }
 
   const promise = CreatePromiseEvent()
   magickWorkerPromises[magickWorkerPromisesKey] = promise
-  magickWorker.postMessage(request,transfer)
+  magickWorker.postMessage(request)//,transfer)
   magickWorkerPromisesKey++
   return promise as Promise<CallResult>
 }
@@ -186,6 +186,7 @@ function GenerateMagickWorkerText(magickUrl){
 let magickWorker;
 if(currentJavascriptURL.startsWith('http'))
 {
+  // if worker is in a different domain fetch it, and run it
     magickWorker = new Worker(window.URL.createObjectURL(new Blob([GenerateMagickWorkerText(magickWorkerUrl)])));
 }
 else{
