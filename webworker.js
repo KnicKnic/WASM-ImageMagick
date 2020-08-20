@@ -4,7 +4,6 @@ const stdout = []
 const stderr = []
 let exitCode = 0
 
-
 function ChangeUrl(url, fileName)
 {
     let splitUrl = url.split('/')
@@ -58,7 +57,6 @@ processFiles = function () {
   stdout.splice(0, stdout.length)
   stderr.splice(0, stderr.length)
   exitCode = undefined
-
   for (let message of Module.messagesToProcess) {
 
     for (let file of message.files) {
@@ -93,7 +91,7 @@ processFiles = function () {
       let read = FS.readFile(destFilename)
       // cleanup read file
       FS.unlink(destFilename)
-      
+            
       if('transferable' in message)
       {
         processed.buffer = read
@@ -101,6 +99,7 @@ processFiles = function () {
       }
       else{
         processed.blob = new Blob([read])
+        processed.buffer = read
       }
       responseFiles.push(processed)
     }
@@ -118,7 +117,7 @@ processFiles = function () {
         transfer.push(file.content.buffer)
       }
     }
-    postMessage(message, transfer)
+    postMessage(message) //, transfer)
   }
   Module.messagesToProcess = []
 }
