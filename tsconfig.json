@@ -6,8 +6,10 @@
     "lib": [
       "dom", "es2018"
     ],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "target": "es2018",
-    "module": "commonjs", 
+    "module": "commonjs",
     "skipLibCheck": true
   },
   "include": [

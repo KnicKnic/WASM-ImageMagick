@@ -61,3 +61,10 @@ fix using let breaking web worker https://github.com/KnicKnic/WASM-ImageMagick/i
 ## 1.2.7
 
 use published container for build, rather than build container image every time (updated utilities were failing build)
+
+## 1.2.8
+
+* fix [Execute fails with 'TypeError: Cannot read property 'buffer' of undefined [...]'](https://github.com/KnicKnic/WASM-ImageMagick/issues/51)
+* fix [Uncaught TypeError: Cannot read property 'getSync' of undefined](https://github.com/KnicKnic/WASM-ImageMagick/issues/53)
+* fixed webworker location lookup code to fail to same directory on webserver (instead of failing)
+* fix docs - updated basic playground url
