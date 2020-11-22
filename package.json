@@ -83,7 +83,6 @@
     "webpack-config-utils": "^2.3.1"
   },
   "dependencies": {
-    "p-map": "^2.0.0",
-    "stacktrace-js": "^2.0.0"
+    "p-map": "^2.0.0"
   }
 }
