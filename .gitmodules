@@ -1,6 +1,6 @@
 [submodule "ImageMagick"]
 	path = ImageMagick
-	url = https://github.com/KnicKnic/ImageMagick
+	url = https://github.com/gradualcolors/ImageMagick
 [submodule "libjpeg"]
 	path = libjpeg
 	url = https://github.com/KnicKnic/libjpeg
