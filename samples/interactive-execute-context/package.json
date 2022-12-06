@@ -27,7 +27,7 @@
     "wasm-imagemagick": "file:../.."
   },
   "devDependencies": {
-    "http-server": "^0.11.1",
+    "http-server": "^0.11.2",
     "onchange": "^5.1.0",
     "@types/react": "^16.4.6",
     "@types/react-dom": "^16.0.6",
