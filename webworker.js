@@ -22,13 +22,13 @@ if (typeof Module == 'undefined') {
     moduleLoaded: false,
     messagesToProcess: [],
 
-    print: text => { 
-      stdout.push(text) 
-      console.log(text)      
+    print: text => {
+      stdout.push(text)
+      console.log(text)
     },
-    printErr: text => { 
+    printErr: text => {
       stderr.push(text)
-      console.error(text);      
+      console.error(text);
     },
     quit: status=> {
       exitCode = status
@@ -91,7 +91,7 @@ processFiles = function () {
       let read = FS.readFile(destFilename)
       // cleanup read file
       FS.unlink(destFilename)
-            
+
       if('transferable' in message)
       {
         processed.buffer = read
@@ -117,6 +117,7 @@ processFiles = function () {
         transfer.push(file.content.buffer)
       }
     }
+    FS.close(dir);
     postMessage(message) //, transfer)
   }
   Module.messagesToProcess = []
