@@ -4,7 +4,7 @@
   "description": "Webassembly compilation of ImageMagick",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
-  "module": "dist/bundles/wasm-imagemagick.esm-es5.js",
+  "module": "dist/bundles/magickApi.js",
   "scripts": {
     "build-wasm": "docker run --rm --workdir /code -v \"$PWD\":/code knicknic/wasm-imagemagick-build-tools:sdk-tag-1.38.12-64bit bash ./build.sh",
     "build-ts": "rm -rf dist && tsc && npm run bundle",
